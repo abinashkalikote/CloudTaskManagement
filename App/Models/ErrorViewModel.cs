@@ -1,4 +1,4 @@
-namespace CTM.Models
+namespace App.Models
 {
     public class ErrorViewModel
     {

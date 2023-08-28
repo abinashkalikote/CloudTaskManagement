@@ -16,8 +16,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\CTM.Base\App.Base.csproj" />
-	  <ProjectReference Include="..\CTM.Data\App.Data.csproj" />
+	  <ProjectReference Include="..\App.Base\App.Base.csproj" />
+	  <ProjectReference Include="..\App.Data\App.Data.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CTM.Model\App.Model.csproj" />
+    <ProjectReference Include="..\App.Model\App.Model.csproj" />
   </ItemGroup>
 
 </Project>

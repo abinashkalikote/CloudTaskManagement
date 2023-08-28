@@ -1,8 +1,8 @@
-﻿using CTM.Models;
+﻿using App.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace CTM.Controllers
+namespace App.Controllers
 {
     public class HomeController : Controller
     {

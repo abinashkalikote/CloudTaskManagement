@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace App.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230829115821_Inital")]
-    partial class Inital
+    [Migration("20230830111737_ChangeUserRecBy")]
+    partial class ChangeUserRecBy
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,7 +37,7 @@ namespace App.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RecBy")
+                    b.Property<int>("RecById")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("RecDate")
@@ -52,7 +52,7 @@ namespace App.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RecBy");
+                    b.HasIndex("RecById");
 
                     b.HasIndex("TaskId");
 
@@ -74,10 +74,7 @@ namespace App.Data.Migrations
                     b.Property<string>("CloudUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("CompletedBy")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CreatedBy")
+                    b.Property<int?>("CompletedById")
                         .HasColumnType("int");
 
                     b.Property<string>("IssueOnPreviousSoftware")
@@ -87,14 +84,14 @@ namespace App.Data.Migrations
                     b.Property<int?>("Priority")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProccedBy")
+                    b.Property<int?>("ProccedById")
                         .HasColumnType("int");
 
                     b.Property<string>("RecAuditLog")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RecBy")
+                    b.Property<int>("RecById")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("RecDate")
@@ -129,13 +126,11 @@ namespace App.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompletedBy");
+                    b.HasIndex("CompletedById");
 
-                    b.HasIndex("CreatedBy");
+                    b.HasIndex("ProccedById");
 
-                    b.HasIndex("ProccedBy");
-
-                    b.HasIndex("RecBy");
+                    b.HasIndex("RecById");
 
                     b.HasIndex("TaskTypeId");
 
@@ -150,7 +145,7 @@ namespace App.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("RecBy")
+                    b.Property<int>("RecById")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("RecDate")
@@ -165,7 +160,7 @@ namespace App.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RecBy");
+                    b.HasIndex("RecById");
 
                     b.ToTable("TaskTypes");
                 });
@@ -193,9 +188,8 @@ namespace App.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RecBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("RecBy")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("RecDate")
                         .HasColumnType("datetime2");
@@ -214,69 +208,65 @@ namespace App.Data.Migrations
 
             modelBuilder.Entity("App.Model.AuditTask", b =>
                 {
-                    b.HasOne("App.Model.User", "User")
+                    b.HasOne("App.Model.User", "RecBy")
                         .WithMany()
-                        .HasForeignKey("RecBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("RecById")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("App.Model.CloudTask", "Task")
                         .WithMany()
                         .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Task");
+                    b.Navigation("RecBy");
 
-                    b.Navigation("User");
+                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("App.Model.CloudTask", b =>
                 {
-                    b.HasOne("App.Model.User", "CompletedByUser")
+                    b.HasOne("App.Model.User", "CompletedBy")
                         .WithMany()
-                        .HasForeignKey("CompletedBy");
+                        .HasForeignKey("CompletedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("App.Model.User", "CreatedByUser")
+                    b.HasOne("App.Model.User", "ProccedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedBy");
+                        .HasForeignKey("ProccedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("App.Model.User", "ProcessedBy")
+                    b.HasOne("App.Model.User", "RecBy")
                         .WithMany()
-                        .HasForeignKey("ProccedBy");
-
-                    b.HasOne("App.Model.User", "RecordedBy")
-                        .WithMany()
-                        .HasForeignKey("RecBy")
+                        .HasForeignKey("RecById")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("App.Model.TaskType", "TaskType")
                         .WithMany()
                         .HasForeignKey("TaskTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("CompletedByUser");
+                    b.Navigation("CompletedBy");
 
-                    b.Navigation("CreatedByUser");
+                    b.Navigation("ProccedBy");
 
-                    b.Navigation("ProcessedBy");
-
-                    b.Navigation("RecordedBy");
+                    b.Navigation("RecBy");
 
                     b.Navigation("TaskType");
                 });
 
             modelBuilder.Entity("App.Model.TaskType", b =>
                 {
-                    b.HasOne("App.Model.User", "User")
+                    b.HasOne("App.Model.User", "RecBy")
                         .WithMany()
-                        .HasForeignKey("RecBy")
+                        .HasForeignKey("RecById")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("RecBy");
                 });
 #pragma warning restore 612, 618
         }

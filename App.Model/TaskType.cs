@@ -16,8 +16,8 @@ namespace App.Model
         public string TaskTypeName { get; set; }
         public char? RecStatus { get; set; } = Status.Active;
         public DateTime RecDate { get; set; } = DateTime.Now;
-        [ForeignKey("RecBy")]
-        public virtual User User { get; set; }
-        public int RecBy { get; set; }
+
+        public virtual User RecBy { get; set; }
+        public int RecById { get; set; }
     }
 }

@@ -15,16 +15,16 @@ namespace App.Model
     {
         public int Id { get; set; }
         public string TaskName { get; set; }
-        public virtual TaskType TaskType { get; set; }
+        public virtual TaskType? TaskType { get; set; }
         public int TaskTypeId { get; protected set; }
 
         public string ClientName { get; set; }
         public int? Priority { get; set; } = 0;
-        public DateTime TaskTime { get; set; }
+        public int TaskTime { get; set; }
         public string? CloudUrl { get; set; }
-        public string IssueOnPreviousSoftware { get; set; }
-        public string SoftwareVersionFrom { get; set; }
-        public string SoftwareVersionTo { get; set; }
+        public string? IssueOnPreviousSoftware { get; set; }
+        public string? SoftwareVersionFrom { get; set; }
+        public string? SoftwareVersionTo { get; set; }
 
         public string? Remarks { get; set; }
 

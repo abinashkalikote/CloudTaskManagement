@@ -10,11 +10,12 @@
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="~/adminlte/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="~/adminlte/plugins/fontawesome-free/css/all.min.css" asp-append-version="true">
     <!-- overlayScrollbars -->
-    <link rel="stylesheet" href="~/adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+    <link rel="stylesheet" href="~/adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css" asp-append-version="true">
     <!-- Theme style -->
-    <link rel="stylesheet" href="~/adminlte/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="~/adminlte/dist/css/adminlte.min.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 
 <body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm">
@@ -22,7 +23,7 @@
 
         <!-- Preloader -->
         <div class="preloader flex-column justify-content-center align-items-center">
-            <img class="animation__wobble" src="~/adminlte/dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
+            <img class="animation__wobble" src="~/adminlte/dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60" asp-append-version="true">
         </div>
 
         <!-- Navbar -->
@@ -157,7 +158,7 @@
 
                         <li class="nav-item">
                             <a href="#" class="nav-link">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <i class="nav-icon fas fa-tasks"></i>
                                 <p>
                                     Tasks
                                     <i class="right fas fa-angle-left"></i>
@@ -165,32 +166,20 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
+                                    <a asp-controller="Task" asp-action="CreateTask" class="nav-link">
+                                        <i class="far fa-plus nav-icon"></i>
                                         <p>Add Task</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Edit Task</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Remove Task</p>
                                     </a>
                                 </li>
                             </ul>
                         </li>
 
                         <li class="nav-item">
-                            <a asp-controller="Home" asp-action="Privacy" class="nav-link">
-                                <i class="nav-icon fas fa-th"></i>
+                            <a asp-controller="Home" asp-action="Logout" class="nav-link">
+                                <i class="nav-icon fa fa-sign-out"></i>
                                 <p>
-                                    Privacy
-                                    <span class="right badge badge-danger">New</span>
+                                    Log out
+                                    @* <span class="right badge badge-danger">New</span> *@
                                 </p>
                             </a>
                         </li>
@@ -247,7 +236,7 @@
     <!-- AdminLTE for demo purposes -->
     <!-- <script src="dist/js/demo.js"></script> -->
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-    <script src="~/adminlte/dist/js/pages/dashboard2.js"></script>
+    @* <script src="~/adminlte/dist/js/pages/dashboard2.js"></script> *@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 

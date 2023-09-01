@@ -55,7 +55,6 @@ namespace CTM.Data
                 .WithMany()
                 .HasForeignKey(e => e.TaskId)
                 .OnDelete(DeleteBehavior.NoAction);
-
         }
 
     }

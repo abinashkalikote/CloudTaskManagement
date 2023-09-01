@@ -75,7 +75,6 @@ namespace App.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("IssueOnPreviousSoftware")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Priority")
@@ -104,19 +103,17 @@ namespace App.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SoftwareVersionFrom")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SoftwareVersionTo")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TaskName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("TaskTime")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("TaskTime")
+                        .HasColumnType("int");
 
                     b.Property<int>("TaskTypeId")
                         .HasColumnType("int");
@@ -185,8 +182,9 @@ namespace App.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RecBy")
-                        .HasColumnType("int");
+                    b.Property<string>("RecBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("RecDate")
                         .HasColumnType("datetime2");

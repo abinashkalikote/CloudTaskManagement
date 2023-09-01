@@ -1,0 +1,110 @@
+﻿@{
+    ViewData["Title"] = "Create Task";
+}
+
+
+<form method="post">
+    <div class="card">
+        <div class="card-header">
+            <h1>Create Task</h1>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 mb-2">
+                    <label for="TaskTitle">Task Title</label>
+                    <input type="text" class="form-control form-control-border" id="TaskTitle" placeholder="Task Name" autofocus required>
+                </div>
+                <div class="col-12 mb-2">
+                    <label for="TaskType">Task Type</label>
+                    <select class="form-control form-control-border" id="TaskType" required>
+                        <option value="1">Software Update</option>
+                        <option value="2">New Client</option>
+                        <option value="3">Local To Cloud Update</option>
+                    </select>
+                </div>
+                <div class="col-12 mb-2">
+                    <label for="ClientName">Client Name</label>
+                    <input type="text" class="form-control form-control-border" id="ClientName" placeholder="Client Name" required />
+                </div>
+
+
+                @* <div class="col-1 d-flex mb-2">
+                    <div class="form-group">
+                        <label for="IsNewClient">New Client</label>
+                        <input type="checkbox" class="form-control form-control-border" id="IsNewClient" />
+                    </div>
+                </div> *@
+                <div class="col-12 mb-2">
+                    <label for="CloudURL">Cloud URL</label>
+                    <input type="text" class="form-control form-control-border" id="CloudURL" placeholder="Cloud URL" required />
+                </div>
+
+
+
+
+
+
+                <div class="col-1 d-flex mb-2">
+                    <div class="form-group">
+                        <label for="HighPriority">High Priority?</label>
+                        <input type="checkbox" class="form-control form-control-border" id="HighPriority" />
+                    </div>
+                </div>
+
+                <div class="col-11 mb-2">
+                    <label for="TaskTime">Task Time</label>
+                    <select class="form-control form-control-border" id="TaskTime" required>
+                        <option value="1">After a Hours</option>
+                        <option value="2">immediately</option>
+                    </select>
+                </div>
+
+
+
+
+                
+
+                <div class="col-6 mb-2">
+                    <div class="form-group">
+                        <label for="SoftwareVersionFrom">Software Version From</label>
+                        <input type="text" class="form-control form-control-border" placeholder="Software Version From" id="SoftwareVersionFrom" />
+                    </div>
+                </div>
+
+                <div class="col-6 mb-2">
+                    <div class="form-group">
+                        <label for="SoftwareVersionTo">Software Version To</label>
+                        <input type="text" class="form-control form-control-border" placeholder="Software Version To" id="SoftwareVersionTo" />
+                    </div>
+                </div>
+
+                <div class="col-6 mb-2">
+                    <div class="form-group">
+                        <label for="IssueOnPreviousSoftware">Issue On Previous Version</label>
+                        <input type="text" class="form-control form-control-border" placeholder="Issue On Previous Version" id="IssueOnPreviousSoftware" />
+                    </div>
+                </div>
+                
+                <div class="col-6 mb-2">
+                    <div class="form-group">
+                        <label for="Remarks">Remarks</label>
+                        <input type="text" class="form-control form-control-border" placeholder="Remarks" id="Remarks" />
+                    </div>
+                </div>
+
+                <div class="col-12 text-right mb-2">
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-primary" value="Add Task" />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+    <script src="~/js/site.js"></script>
+    <script src="~/js/createTask.js"></script>
+}

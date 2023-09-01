@@ -19,6 +19,7 @@ namespace App.Model
         public bool IsAdmin { get; set; } = false;
         public char? RecStatus { get; set; } = Status.Active;
         public DateTime RecDate { get; set; } = DateTime.Now;
-        public int RecBy { get; set; }
+        public string RecBy { get; set; }
+
     }
 }

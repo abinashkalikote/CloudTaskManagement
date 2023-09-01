@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace App.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230830111737_ChangeUserRecBy")]
-    partial class ChangeUserRecBy
+    [Migration("20230901120132_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -78,7 +78,6 @@ namespace App.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("IssueOnPreviousSoftware")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Priority")
@@ -107,19 +106,17 @@ namespace App.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SoftwareVersionFrom")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SoftwareVersionTo")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TaskName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("TaskTime")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("TaskTime")
+                        .HasColumnType("int");
 
                     b.Property<int>("TaskTypeId")
                         .HasColumnType("int");
@@ -188,8 +185,9 @@ namespace App.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RecBy")
-                        .HasColumnType("int");
+                    b.Property<string>("RecBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("RecDate")
                         .HasColumnType("datetime2");

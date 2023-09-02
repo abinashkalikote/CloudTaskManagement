@@ -1,12 +1,12 @@
 ﻿$(document).ready(()=>{
-    $("#TaskType").change((e) => {
+    $("#TaskTypeId").change((e) => {
 
-        if ($("#TaskType").val() == 2) {
+        if ($("#TaskTypeId").val() == 2) {
             ChangeCloudURLLabelToGDriveLabel();
             SoftwareVersionHide();
             RemarkHide();
 
-        } else if ($("#TaskType").val() == 3) {
+        } else if ($("#TaskTypeId").val() == 3) {
             ChangeCloudURLLabelToGDriveLabel();
             SoftwareVersionShow();
             RemarkShow();
@@ -33,12 +33,16 @@ function ChangeGDriveLabelToCloudURLLabel() {
 }
 
 function SoftwareVersionHide() {
+    $("#SoftwareVersionFrom").removeAttr("required");
+    $("#SoftwareVersionTo").removeAttr("required");
     $("#SoftwareVersionFrom").parent("div").hide("slow");
     $("#SoftwareVersionTo").parent("div").hide("slow");
     $("#IssueOnPreviousSoftware").parent("div").hide("slow");
 }
 
 function SoftwareVersionShow() {
+    $("#SoftwareVersionFrom").attr("required", true);
+    $("#SoftwareVersionTo").attr("required", true);
     $("#SoftwareVersionFrom").parent("div").show("slow");
     $("#SoftwareVersionTo").parent("div").show("slow");
     $("#IssueOnPreviousSoftware").parent("div").show("slow");

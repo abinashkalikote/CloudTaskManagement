@@ -82,7 +82,7 @@
                             <i class="fas fa-key mr-2"></i> Change Passowrd
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
+                        <a asp-controller="Home" asp-action="Logout" class="dropdown-item">
                             <i class="fas fa-sign-out-alt mr-2"></i> Log Out
                         </a>
                     </div>
@@ -174,15 +174,6 @@
                             </ul>
                         </li>
 
-                        <li class="nav-item">
-                            <a asp-controller="Home" asp-action="Logout" class="nav-link">
-                                <i class="nav-icon fa fa-sign-out"></i>
-                                <p>
-                                    Log out
-                                    @* <span class="right badge badge-danger">New</span> *@
-                                </p>
-                            </a>
-                        </li>
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->

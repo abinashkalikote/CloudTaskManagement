@@ -1,3 +1,7 @@
 input[type=disabled]{
     cursor: not-allowed;
 }
+
+input:-webkit-autofill {
+    -webkit-text-fill-color: inherit !important;
+}

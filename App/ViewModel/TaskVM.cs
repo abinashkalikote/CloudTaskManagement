@@ -17,7 +17,7 @@ namespace App.Web.ViewModel
 
         [Required]
         [DisplayName("Task Type")]
-        public int? TaskTypeId { get; set; }
+        public int TaskTypeId { get; set; }
 
         [Required]
         [DisplayName("Client Name")]
@@ -43,6 +43,16 @@ namespace App.Web.ViewModel
 
         [DisplayName("Remarks")]
         public string? Remarks { get; set; }
+
+
+
+        // For Display Purpose
+        public string? TaskTypeName { get; set; }
+        public string? RecDate { get; set; }
+        public string? RecBy { get; set; }
+        public string? ProccedBy { get; set; }
+        public string? CompletedBy { get; set; }
+
 
 
         /// <summary>

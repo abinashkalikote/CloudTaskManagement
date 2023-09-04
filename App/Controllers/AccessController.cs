@@ -67,6 +67,8 @@ namespace App.Web.Controllers
                 HttpContext.Session.SetString("Username", user.Username);
                 HttpContext.Session.SetString("Email", user.Email);
                 HttpContext.Session.SetString("FullName", user.FullName);
+                HttpContext.Session.SetString("UserID", Convert.ToString(user.Id));
+
 
                 var returnUrl = Request.Cookies["returnUrl"];
                 if (!string.IsNullOrEmpty(returnUrl))

@@ -1,4 +1,4 @@
-﻿using App.Base.Constants;
+﻿using App.Web.Constants;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
@@ -16,11 +16,11 @@ namespace App.Model
         public int Id { get; set; }
         public string TaskName { get; set; }
         public virtual TaskType? TaskType { get; set; }
-        public int TaskTypeId { get; protected set; }
+        public int TaskTypeId { get; set; }
 
         public string ClientName { get; set; }
-        public int? Priority { get; set; } = 0;
-        public int TaskTime { get; set; }
+        public char? Priority { get; set; } = 'Y';
+        public string TaskTime { get; set; }
         public string? CloudUrl { get; set; }
         public string? IssueOnPreviousSoftware { get; set; }
         public string? SoftwareVersionFrom { get; set; }
@@ -34,14 +34,14 @@ namespace App.Model
         public DateTime RecDate { get; set; } = DateTime.Now;
 
 
-        public virtual User RecBy { get; protected set; }
-        public int RecById { get; protected set; }
+        public virtual User RecBy { get; set; }
+        public int RecById { get; set; }
 
         public virtual User? ProccedBy { get; set; }
-        public int? ProccedById { get; protected set; }
+        public int? ProccedById { get; set; }
 
         public virtual User? CompletedBy { get; set; }
-        public int? CompletedById { get; protected set; }
+        public int? CompletedById { get; set; }
 
     }
 

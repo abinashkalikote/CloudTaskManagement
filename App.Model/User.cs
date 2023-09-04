@@ -1,4 +1,4 @@
-﻿using App.Base.Constants;
+﻿using App.Web.Constants;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

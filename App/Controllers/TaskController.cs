@@ -41,59 +41,72 @@ namespace App.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                using (var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+                try
                 {
-                    try
+                    var pr = 'N';
+                    if (taskVM.HighPriority == "true")
+                        pr = 'Y';
+
+                    CloudTask cloudTask = new()
                     {
-                        var pr = 'N';
-                        if (taskVM.HighPriority == "true")
-                            pr = 'Y';
+                        TaskName = taskVM.TaskTitle,
+                        TaskTypeId = taskVM.TaskTypeId,
+                        ClientName = taskVM.ClientName,
+                        CloudUrl = taskVM.CloudURL,
+                        Priority = pr,
+                        TaskTime = taskVM.TaskTime,
+                        SoftwareVersionFrom = taskVM.SoftwareVersionFrom ?? "Latest",
+                        SoftwareVersionTo = taskVM.SoftwareVersionTo ?? "Latest",
+                        IssueOnPreviousSoftware = taskVM.IssueOnPreviousSoftware ?? "",
+                        Remarks = taskVM.Remarks ?? "",
+                        RecAuditLog = "Task Created by " + HttpContext.Session.GetString("FullName"),
+                        RecById = Convert.ToInt32(HttpContext.Session.GetString("UserID"))
+                    };
 
-                        CloudTask cloudTask = new()
-                        {
-                            TaskName = taskVM.TaskTitle,
-                            TaskTypeId = taskVM.TaskTypeId,
-                            ClientName = taskVM.ClientName,
-                            CloudUrl = taskVM.CloudURL,
-                            Priority = pr,
-                            TaskTime = taskVM.TaskTime,
-                            SoftwareVersionFrom = taskVM.SoftwareVersionFrom ?? "Latest",
-                            SoftwareVersionTo = taskVM.SoftwareVersionTo ?? "Latest",
-                            IssueOnPreviousSoftware = taskVM.IssueOnPreviousSoftware ?? "",
-                            Remarks = taskVM.Remarks ?? "",
-                            RecAuditLog = "Task Created by "+HttpContext.Session.GetString("FullName"),
-                            RecById = Convert.ToInt32(HttpContext.Session.GetString("UserID"))
-                        };
+                    await _db.CloudTasks.AddAsync(cloudTask);
+                    await _db.SaveChangesAsync();
+                    transactionScope.Complete();
 
-                        await _db.CloudTasks.AddAsync(cloudTask);
-                        await _db.SaveChangesAsync();
-                        transactionScope.Complete();
-
-                        TempData["success"] = "Task Added Successfully !";
-                        return RedirectToAction("CreateTask", "Task");
-                    }
-                    catch (Exception ex)
-                    {
-                        transactionScope.Dispose();
-                        TempData["error"] = "Error occured while creating Task !";
-                        return RedirectToAction("CreateTask", "Task");
-                    }
+                    TempData["success"] = "Task Added Successfully !";
+                    return RedirectToAction("CreateTask", "Task");
+                }
+                catch (Exception ex)
+                {
+                    transactionScope.Dispose();
+                    TempData["error"] = "Error occured while creating Task !" + ex.Message;
+                    return RedirectToAction("CreateTask", "Task");
                 }
             }
             taskVM.taskTypes = await _db.TaskTypes.ToListAsync();
             return View(taskVM);
         }
 
+
+
         [HttpGet]
-        [Route("/Api/GetAllTasks")]
-        public async Task<IActionResult> GetAllTasks()
+        //[Route("/Api/GetAllTasks")]
+        public async Task<IActionResult> GetAllTask()
+        {
+            var taskReportVM = new TaskReportVM()
+            {
+                Users = await _db.Users.ToListAsync(),
+                taskTypes = await _db.TaskTypes.ToListAsync(),
+            };
+            return View(taskReportVM);
+        }
+
+        [HttpPost]
+        //[Route("/Api/GetAllTasks")]
+        public async Task<IActionResult> GetAllTask(TaskReportVM reportVM)
         {
             var data = await _db.CloudTasks.Include(e => e.TaskType)
                 .Include(e => e.RecBy)
                 .Include(e => e.ProccedBy)
                 .Include(e => e.CompletedBy)
                 .Where(e => e.RecStatus == Status.Active).ToListAsync();
-            List<TaskVM> taskVM = new List<TaskVM>();
+
+            List<TaskVM> taskVM = new();
             foreach (var item in data)
             {
                 var tempTVM = new TaskVM();
@@ -113,7 +126,13 @@ namespace App.Web.Controllers
                 taskVM.Add(tempTVM);
             }
 
-            return Ok(taskVM);
+            //return Ok(taskVM);
+            var taskReportVM = new TaskReportVM()
+            {
+                Users = await _db.Users.ToListAsync(),
+                taskTypes = await _db.TaskTypes.ToListAsync(),
+            };
+            return View(taskReportVM);
         }
     }
 }

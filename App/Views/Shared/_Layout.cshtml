@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor contextaccessor
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -119,10 +121,14 @@
                         <img src="~/adminlte/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="#" class="d-block">Abinash Kalikote</a>
+                        <a href="#" class="d-block" id="FullName">Abiansh kalikote</a>
                     </div>
                 </div>
 
+
+                <script>
+                    //$("#FullName").text(localStorage.getItem("FullName");
+                </script>
 
 
                 <!-- SidebarSearch Form -->
@@ -169,6 +175,34 @@
                                     <a asp-controller="Task" asp-action="CreateTask" class="nav-link">
                                         <i class="far fa-plus nav-icon"></i>
                                         <p>Add Task</p>
+                                    </a>
+                                </li>
+                                
+                                <li class="nav-item">
+                                    <a asp-controller="Task" asp-action="GetAllTask" class="nav-link">
+                                        <i class="fas fa-search fa-fw"></i>
+                                        <p>Search Task</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link">
+                                        <i class="fa-solid fa-signal"></i>
+                                        <p>Pending Task</p>
+                                    </a>
+                                </li>
+
+
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link">
+                                        <i class="fa-solid fa-hammer"></i>
+                                        <p>Working Task</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link">
+                                        <i class="fa-solid fa-check"></i>
+                                        <p>Completed Task</p>
                                     </a>
                                 </li>
                             </ul>

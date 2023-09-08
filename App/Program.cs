@@ -12,7 +12,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
     });
 
-builder.Services.AddSession();
+builder.Services.AddSession(option => option.IdleTimeout = TimeSpan.FromMinutes(20));
+
 builder.Services.AddHttpContextAccessor();
 
 // Add services to the container.
@@ -26,10 +27,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
 }
+
 app.UseStaticFiles();
 
 app.UseRouting();

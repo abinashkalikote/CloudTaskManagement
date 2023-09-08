@@ -106,32 +106,42 @@ namespace App.Web.Controllers
                 .Include(e => e.CompletedBy)
                 .Where(e => e.RecStatus == Status.Active).ToListAsync();
 
-            List<TaskVM> taskVM = new();
-            foreach (var item in data)
+            var taskReportVM = new TaskReportVM();
+
+            //set a data to a new ReportVM to send to view
+            taskReportVM.TaskTitle = reportVM.TaskTitle;
+            taskReportVM.TaskTypeId = reportVM.TaskTypeId;
+            taskReportVM.TaskTime = reportVM.TaskTime;
+            taskReportVM.ClientName = reportVM.ClientName;
+            taskReportVM.CreatedBy = reportVM.CreatedBy;
+
+            //Data need to add in TaskReportVM
+            if (data != null)
             {
-                var tempTVM = new TaskVM();
-                tempTVM.Id = item.Id;
-                tempTVM.TaskTitle = item.TaskName;
-                tempTVM.ClientName = item.ClientName;
-                tempTVM.CloudURL = item.CloudUrl;
-                tempTVM.TaskTypeName = item.TaskType != null ? item.TaskType.TaskTypeName : "Not Declared";
-                tempTVM.TaskTime = item.TaskTime;
-                tempTVM.SoftwareVersionFrom = item.SoftwareVersionFrom;
-                tempTVM.SoftwareVersionTo = item.SoftwareVersionTo;
-                tempTVM.IssueOnPreviousSoftware = item.IssueOnPreviousSoftware;
-                tempTVM.RecDate = item.RecDate.ToString("yyyy/MM/dd") +" "+ item.RecDate.ToString("dddd");
-                tempTVM.RecBy = item.RecBy.Username;
-                tempTVM.ProccedBy = item.ProccedBy != null ? item.ProccedBy.Username : "-- Not Assigned --";
-                tempTVM.CompletedBy = item.CompletedBy != null ? item.CompletedBy.Username : "-- Not Assigned --";
-                taskVM.Add(tempTVM);
+                foreach (var item in data)
+                {
+                    var tempTVM = new TaskTempVM();
+                    tempTVM.Id = item.Id;
+                    tempTVM.TaskTitle = item.TaskName;
+                    tempTVM.ClientName = item.ClientName;
+                    tempTVM.CloudURL = item.CloudUrl;
+                    tempTVM.TaskTypeName = item.TaskType != null ? item.TaskType.TaskTypeName : "Not Declared";
+                    tempTVM.TaskTime = item.TaskTime;
+                    tempTVM.HighPriority = item.Priority == 'Y' ? "Yes" : "No";
+                    tempTVM.SoftwareVersionFrom = item.SoftwareVersionFrom;
+                    tempTVM.SoftwareVersionTo = item.SoftwareVersionTo;
+                    tempTVM.IssueOnPreviousSoftware = item.IssueOnPreviousSoftware;
+                    tempTVM.RecDate = item.RecDate.ToString("yyyy/MM/dd") + " " + item.RecDate.ToString("dddd");
+                    tempTVM.RecBy = item.RecBy.Username;
+                    tempTVM.ProccedBy = item.ProccedBy != null ? item.ProccedBy.Username : "-- Not Assigned --";
+                    tempTVM.CompletedBy = item.CompletedBy != null ? item.CompletedBy.Username : "-- Not Assigned --";
+                    taskReportVM.Tasks.Add(tempTVM);
+                }
             }
 
-            //return Ok(taskVM);
-            var taskReportVM = new TaskReportVM()
-            {
-                Users = await _db.Users.ToListAsync(),
-                taskTypes = await _db.TaskTypes.ToListAsync(),
-            };
+            taskReportVM.taskTypes = await _db.TaskTypes.ToListAsync();
+            taskReportVM.Users = await _db.Users.Where(e => e.RecStatus == 'A').ToListAsync();
+
             return View(taskReportVM);
         }
     }

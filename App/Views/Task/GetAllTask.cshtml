@@ -11,7 +11,7 @@
         <form method="get">
             <div class="row mb-2">
                 <div class="col-3">
-                    <input type="text" id="TaskTitle" class="form-control form-control-border" placeholder="Task Name" autofocus>
+                    <input type="text" asp-for="TaskTitle" class="form-control form-control-border" placeholder="Task Name" autofocus>
                 </div>
                 <div class="col-3">
                     <select class="form-control form-control-border" asp-for="TaskTypeId" asp-items="@Model.TaskTypesList()">
@@ -32,7 +32,7 @@
 
             <div class="row">
                 <div class="col-8">
-                    <input type="text" id="ClientName" class="form-control form-control-border" placeholder="Client Name">
+                    <input type="text" asp-for="ClientName" class="form-control form-control-border" placeholder="Client Name">
                 </div>
 
                 <div class="col-4 d-flex justify-content-center align-items-center">

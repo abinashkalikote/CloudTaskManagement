@@ -4,9 +4,11 @@
     ViewData["Title"] = "All Tasks";
 }
 
+
+@* Filter Form *@
 <div class="card">
     <div class="card-body">
-        <form method="post">
+        <form method="get">
             <div class="row mb-2">
                 <div class="col-3">
                     <input type="text" id="TaskTitle" class="form-control form-control-border" placeholder="Task Name" autofocus>
@@ -42,45 +44,67 @@
 </div>
 
 
-<partial name="_DataTableCSS"/>
+<partial name="_DataTableCSS" />
 
 
 <div class="card">
     <div class="card-body">
-        <table id="datatable" class="table table-hover table-striped table-sm w-100">
-            <thead>
-                <tr>
-                    <th scope="col" style="width:10%;">#</th>
-                    <th scope="col" style="width:30%;">First</th>
-                    <th scope="col" style="width:35%;">Last</th>
-                    <th scope="col" style="width:25%;">Handle</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>mdo</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>fat</td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td>Larry</td>
-                    <td>the Bird</td>
-                    <td>twitter</td>
-                </tr>
-            </tbody>
-        </table>
+        @if (Model.Tasks.Count > 0)
+        {
+            <table id="datatable" class="table table-hover table-striped table-sm w-100 text-center">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Task Name</th>
+                        <th scope="col">Client Name</th>
+                        <th scope="col">Cloud URL</th>
+                        <th scope="col">Task Type</th>
+                        <th scope="col">Task Time</th>
+                        <th scope="col">High Priority</th>
+                        <th scope="col">Version From</th>
+                        <th scope="col">Version To</th>
+                        <th scope="col">IssueOnPreviousSoftware</th>
+                        <th scope="col">Created Date</th>
+                        <th scope="col">Created By</th>
+                        <th scope="col">Proceed By</th>
+                        <th scope="col">Completed By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int sn = 0;
+                    }
+                    @foreach (var item in Model.Tasks)
+                    {
+                        sn++;
+                        <tr>
+                            <td>@sn</td>
+                            <td>@item.TaskTitle</td>
+                            <td style="width:15%">@item.ClientName</td>
+                            <td><a href="@item.CloudURL" target="_blank">@item.CloudURL</a></td>
+                            <td>@item.TaskTypeName</td>
+                            <td>@item.TaskTime</td>
+                            <td>@item.HighPriority</td>
+                            <td>@item.SoftwareVersionFrom</td>
+                            <td>@item.SoftwareVersionTo</td>
+                            <td>@item.IssueOnPreviousSoftware</td>
+                            <td>@item.RecDate</td>
+                            <td>@item.RecBy</td>
+                            <td>@item.ProccedBy</td>
+                            <td>@item.CompletedBy</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <h4>No Records Found !</h4>
+        }
     </div>
 </div>
 
 
 @section Scripts{
-    <partial name="_DataTableJS">
-}
+    <partial name="_DataTableJS" />
+        }

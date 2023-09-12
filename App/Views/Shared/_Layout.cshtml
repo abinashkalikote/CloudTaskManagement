@@ -18,6 +18,7 @@
     <!-- Theme style -->
     <link rel="stylesheet" href="~/adminlte/dist/css/adminlte.min.css" asp-append-version="true">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
 </head>
 
 <body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm">
@@ -185,7 +186,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
+                                    <a asp-controller="Task" asp-action="GetAllPendingTask" class="nav-link">
                                         <i class="fa-solid fa-signal"></i>
                                         <p>Pending Task</p>
                                     </a>
@@ -193,16 +194,23 @@
 
 
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
+                                    <a asp-controller="Task" asp-action="GetAllWorkingTask" class="nav-link">
                                         <i class="fa-solid fa-hammer"></i>
                                         <p>Working Task</p>
                                     </a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
+                                    <a asp-controller="Task" asp-action="GetAllCompletedTask" class="nav-link">
                                         <i class="fa-solid fa-check"></i>
                                         <p>Completed Task</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a asp-controller="Task" asp-action="AuditTask" class="nav-link">
+                                        <i class="fa-solid fa-bug"></i>
+                                        <p>Audit Task</p>
                                     </a>
                                 </li>
                             </ul>
@@ -254,9 +262,55 @@
     <script src="~/adminlte/plugins/jquery-mousewheel/jquery.mousewheel.js"></script>
     <script src="~/adminlte/plugins/raphael/raphael.min.js"></script>
     <script src="~/adminlte/plugins/jquery-mapael/jquery.mapael.min.js"></script>
-    <script src="~/adminlte/plugins/jquery-mapael/maps/usa_states.min.js"></script>
+
+    <script src="~/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
+
+    @if (TempData["success"] != null)
+    {
+        <script>
+            $(function () {
+
+                var Toast = Swal.mixin({
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false,
+                    timer: 100000
+                });
+
+                Toast.fire({
+                    icon: 'success',
+                    title: '@TempData["success"]'
+                })
+            })
+        </script>
+    }
+
+    @if (TempData["error"] != null)
+    {
+        <script>
+            $(function () {
+
+                var Toast = Swal.mixin({
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+
+                $(function () {
+                    Toast.fire({
+                        icon: 'error',
+                        title: '@TempData["error"]'
+                    })
+                });
+            })
+        </script>
+    }
+
+
+
     <!-- ChartJS -->
-    <script src="~/adminlte/plugins/chart.js/Chart.min.js"></script>
+    @* <script src="~/adminlte/plugins/chart.js/Chart.min.js"></script> *@
 
     <!-- AdminLTE for demo purposes -->
     <!-- <script src="dist/js/demo.js"></script> -->

@@ -1,7 +1,7 @@
 ﻿@model TaskReportVM
 
 @{
-    ViewData["Title"] = "All Tasks";
+    ViewData["Title"] = "Working Tasks";
 }
 
 
@@ -49,7 +49,7 @@
 
 <div class="card">
     <div class="card-header">
-        <span class="card-title">All Tasks</span>
+        <h4>Working Tasks</h4>
     </div>
     <div class="card-body">
         @if (Model.Tasks.Count > 0)
@@ -71,7 +71,6 @@
                         <th scope="col">Created By</th>
                         <th scope="col">Proceed By</th>
                         <th scope="col">Completed By</th>
-                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -96,9 +95,6 @@
                             <td>@item.RecBy</td>
                             <td>@item.ProccedBy</td>
                             <td>@item.CompletedBy</td>
-                            <td>
-                                <button type="button" data-toggle="modal" data-target="#TaskModal-@item.Id" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i> Details</button>
-                            </td>
                         </tr>
                     }
                 </tbody>
@@ -111,33 +107,6 @@
     </div>
 </div>
 
-
-@foreach (var item in Model.Tasks)
-{
-    <div class="modal fade" id="TaskModal-@item.Id">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">@item.TaskTitle</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <b>Client Name : </b> @item.ClientName
-                    <br>
-                    <b>Cloud URL : </b> @item.CloudURL
-
-                </div>
-                <div class="modal-footer justify-content-end">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-}
 
 @section Scripts{
     <partial name="_DataTableJS" />

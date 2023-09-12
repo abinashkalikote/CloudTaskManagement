@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+using Microsoft.IdentityModel.Tokens;
 using System.Transactions;
 
 namespace App.Web.Controllers
@@ -28,16 +29,16 @@ namespace App.Web.Controllers
         [HttpGet]
         public IActionResult CreateTask()
         {
-            TaskVM taskVM = new()
+            TaskVM vm = new()
             {
                 taskTypes = _db.TaskTypes.ToList()
             };
-            return View(taskVM);
+            return View(vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateTask(TaskVM taskVM)
+        public async Task<IActionResult> CreateTask(TaskVM vm)
         {
             if (ModelState.IsValid)
             {
@@ -45,21 +46,21 @@ namespace App.Web.Controllers
                 try
                 {
                     var pr = 'N';
-                    if (taskVM.HighPriority == "true")
+                    if (vm.HighPriority == "true")
                         pr = 'Y';
 
                     CloudTask cloudTask = new()
                     {
-                        TaskName = taskVM.TaskTitle,
-                        TaskTypeId = taskVM.TaskTypeId,
-                        ClientName = taskVM.ClientName,
-                        CloudUrl = taskVM.CloudURL,
+                        TaskName = vm.TaskTitle,
+                        TaskTypeId = vm.TaskTypeId,
+                        ClientName = vm.ClientName,
+                        CloudUrl = vm.CloudURL,
                         Priority = pr,
-                        TaskTime = taskVM.TaskTime,
-                        SoftwareVersionFrom = taskVM.SoftwareVersionFrom ?? "Latest",
-                        SoftwareVersionTo = taskVM.SoftwareVersionTo ?? "Latest",
-                        IssueOnPreviousSoftware = taskVM.IssueOnPreviousSoftware ?? "",
-                        Remarks = taskVM.Remarks ?? "",
+                        TaskTime = vm.TaskTime,
+                        SoftwareVersionFrom = vm.SoftwareVersionFrom ?? "Latest",
+                        SoftwareVersionTo = vm.SoftwareVersionTo ?? "Latest",
+                        IssueOnPreviousSoftware = vm.IssueOnPreviousSoftware ?? "",
+                        Remarks = vm.Remarks ?? "",
                         RecAuditLog = "Task Created by " + HttpContext.Session.GetString("FullName"),
                         RecById = Convert.ToInt32(HttpContext.Session.GetString("UserID"))
                     };
@@ -78,76 +79,140 @@ namespace App.Web.Controllers
                     return RedirectToAction("CreateTask", "Task");
                 }
             }
-            taskVM.taskTypes = await _db.TaskTypes.ToListAsync();
-            return View(taskVM);
+            vm.taskTypes = await _db.TaskTypes.ToListAsync();
+            return View(vm);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AuditTask()
+        {
+            var vm = new TaskReportVM();
+            InitializeTaskVM(vm);
+            var query = await GetTaskQueryable(vm).ToListAsync();
+            vm.Tasks = PrepareTaskVms(query);
+            return View(vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AuditTask(TaskReportVM vm, int[] TaskId)
+        {
+            var data = await GetTaskQueryable(vm).ToListAsync();
+            return RedirectToAction(nameof(AuditTask));
+        }
+
+        
+        [HttpGet]
+        public IActionResult DeleteTask(int? TaskID)
+        {
+            return View("AuditTask");
+        }
+
+
+        [HttpGet]
+        //[Route("/Api/GetAllTasks")]
+        public async Task<IActionResult> GetAllTask(TaskReportVM vm)
+        {
+
+            InitializeTaskVM(vm);
+            var query = await GetTaskQueryable(vm).ToListAsync();
+            vm.Tasks = PrepareTaskVms(query);
+            return View(vm);
+        }
+        public async Task<IActionResult> GetAllPendingTask(TaskReportVM vm)
+        {
+
+            InitializeTaskVM(vm);
+            var query = await GetTaskQueryable(vm).Where(e => (e.ProccedById == null && e.CompletedById == null)).ToListAsync();
+            vm.Tasks = PrepareTaskVms(query);
+            return View(vm);
+        }
+        public async Task<IActionResult> GetAllWorkingTask(TaskReportVM vm)
+        {
+            InitializeTaskVM(vm);
+            var query = await GetTaskQueryable(vm).Where(e => (e.ProccedById != null && e.CompletedById == null)).ToListAsync();
+            vm.Tasks = PrepareTaskVms(query);
+            return View(vm);
+        }
+        public async Task<IActionResult> GetAllCompletedTask(TaskReportVM vm)
+        {
+            InitializeTaskVM(vm);
+            var query = await GetTaskQueryable(vm).Where(e => (e.ProccedById != null && e.CompletedById != null)).ToListAsync();
+            vm.Tasks = PrepareTaskVms(query);
+            return View(vm);
         }
 
 
 
-        //[HttpGet]
-        ////[Route("/Api/GetAllTasks")]
-        //public async Task<IActionResult> GetAllTask()
-        //{
-        //    var taskReportVM = new TaskReportVM()
-        //    {
-        //        Users = await _db.Users.ToListAsync(),
-        //        taskTypes = await _db.TaskTypes.ToListAsync(),
-        //    };
-        //    return View(taskReportVM);
-        //}
 
-        [HttpGet]
-        //[Route("/Api/GetAllTasks")]
-        public async Task<IActionResult> GetAllTask(TaskReportVM reportVM)
+
+
+
+        private IQueryable<CloudTask> GetTaskQueryable(TaskReportVM reportVM)
         {
-            var taskReportVM = new TaskReportVM();
-            
-            if(Request.QueryString.HasValue)
-            {
-                var data = await _db.CloudTasks.Include(e => e.TaskType)
+            var data = _db.CloudTasks.Include(e => e.TaskType)
                 .Include(e => e.RecBy)
                 .Include(e => e.ProccedBy)
                 .Include(e => e.CompletedBy)
-                .Where(e => e.RecStatus == Status.Active).ToListAsync();
+                .Where(e => e.RecStatus == Status.Active);
 
 
-                //set a data to a new ReportVM to send to view
-                taskReportVM.TaskTitle = reportVM.TaskTitle;
-                taskReportVM.TaskTypeId = reportVM.TaskTypeId;
-                taskReportVM.TaskTime = reportVM.TaskTime;
-                taskReportVM.ClientName = reportVM.ClientName;
-                taskReportVM.CreatedBy = reportVM.CreatedBy;
-
-                //Data need to add in TaskReportVM
-                if (data != null)
-                {
-                    foreach (var item in data)
-                    {
-                        var tempTVM = new TaskTempVM();
-                        tempTVM.Id = item.Id;
-                        tempTVM.TaskTitle = item.TaskName;
-                        tempTVM.ClientName = item.ClientName;
-                        tempTVM.CloudURL = item.CloudUrl;
-                        tempTVM.TaskTypeName = item.TaskType != null ? item.TaskType.TaskTypeName : "Not Declared";
-                        tempTVM.TaskTime = item.TaskTime;
-                        tempTVM.HighPriority = item.Priority == 'Y' ? "Yes" : "No";
-                        tempTVM.SoftwareVersionFrom = item.SoftwareVersionFrom;
-                        tempTVM.SoftwareVersionTo = item.SoftwareVersionTo;
-                        tempTVM.IssueOnPreviousSoftware = item.IssueOnPreviousSoftware;
-                        tempTVM.RecDate = item.RecDate.ToString("yyyy/MM/dd") + " " + item.RecDate.ToString("dddd");
-                        tempTVM.RecBy = item.RecBy.Username;
-                        tempTVM.ProccedBy = item.ProccedBy != null ? item.ProccedBy.Username : "-";
-                        tempTVM.CompletedBy = item.CompletedBy != null ? item.CompletedBy.Username : "-";
-                        taskReportVM.Tasks.Add(tempTVM);
-                    }
-                }
+            //Filter a data as per the passed data by form
+            if (!reportVM.ClientName.IsNullOrEmpty())
+            {
+                data = data.Where(e => e.ClientName.Contains(reportVM.ClientName));
             }
 
+            if (!reportVM.TaskTitle.IsNullOrEmpty())
+            {
+                data = data.Where(e => e.TaskName.Contains(reportVM.TaskTitle));
+            }
 
-            taskReportVM.taskTypes = await _db.TaskTypes.ToListAsync();
-            taskReportVM.Users = await _db.Users.Where(e => e.RecStatus == 'A').ToListAsync();
+            if (reportVM.TaskTypeId != null)
+            {
+                data = data.Where(e => e.TaskTypeId == reportVM.TaskTypeId);
+            }
 
-            return View(taskReportVM);
+            if (!reportVM.TaskTime.IsNullOrEmpty())
+            {
+                data = data.Where(e => e.TaskTime.Contains(reportVM.TaskTime));
+            }
+
+            if (reportVM.CreatedBy != null)
+            {
+                data = data.Where(e => e.RecById == reportVM.CreatedBy);
+            }
+            return data;
+        }
+
+        private List<TaskTempVM> PrepareTaskVms(List<CloudTask> data)
+        {
+            var list = new List<TaskTempVM>();
+            foreach (var item in data)
+            {
+                var vm = new TaskTempVM();
+                vm.Id = item.Id;
+                vm.TaskTitle = item.TaskName;
+                vm.ClientName = item.ClientName;
+                vm.CloudURL = item.CloudUrl;
+                vm.TaskTypeName = item.TaskType != null ? item.TaskType.TaskTypeName : "Not Declared";
+                vm.TaskTime = item.TaskTime;
+                vm.HighPriority = item.Priority == 'Y' ? "Yes" : "No";
+                vm.SoftwareVersionFrom = item.SoftwareVersionFrom;
+                vm.SoftwareVersionTo = item.SoftwareVersionTo;
+                vm.IssueOnPreviousSoftware = item.IssueOnPreviousSoftware;
+                vm.RecDate = item.RecDate.ToString("yyyy/MM/dd") + " " + item.RecDate.ToString("dddd");
+                vm.RecBy = item.RecBy.Username;
+                vm.ProccedBy = item.ProccedBy != null ? item.ProccedBy.Username : "-";
+                vm.CompletedBy = item.CompletedBy != null ? item.CompletedBy.Username : "-";
+                list.Add(vm);
+            }
+            return list;
+        }
+       
+        private void InitializeTaskVM(TaskReportVM vm)
+        {
+            vm.taskTypes = _db.TaskTypes.ToList();
+            vm.Users = _db.Users.Where(e => e.RecStatus == 'A').ToList();
         }
     }
 }

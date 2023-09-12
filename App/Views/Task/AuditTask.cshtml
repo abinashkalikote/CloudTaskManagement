@@ -1,7 +1,7 @@
 ﻿@model TaskReportVM
 
 @{
-    ViewData["Title"] = "All Tasks";
+    ViewData["Title"] = "Audit Tasks";
 }
 
 
@@ -62,16 +62,8 @@
                         <th scope="col">Client Name</th>
                         <th scope="col">Cloud URL</th>
                         <th scope="col">Task Type</th>
-                        <th scope="col">Task Time</th>
-                        <th scope="col">High Priority</th>
-                        <th scope="col">Version From</th>
-                        <th scope="col">Version To</th>
-                        <th scope="col">IssueOnPreviousSoftware</th>
                         <th scope="col">Created Date</th>
-                        <th scope="col">Created By</th>
-                        <th scope="col">Proceed By</th>
-                        <th scope="col">Completed By</th>
-                        <th></th>
+                        <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -87,16 +79,9 @@
                             <td style="width:15%">@item.ClientName</td>
                             <td><a href="@item.CloudURL" target="_blank">@item.CloudURL</a></td>
                             <td>@item.TaskTypeName</td>
-                            <td>@item.TaskTime</td>
-                            <td>@item.HighPriority</td>
-                            <td>@item.SoftwareVersionFrom</td>
-                            <td>@item.SoftwareVersionTo</td>
-                            <td>@item.IssueOnPreviousSoftware</td>
                             <td>@item.RecDate</td>
-                            <td>@item.RecBy</td>
-                            <td>@item.ProccedBy</td>
-                            <td>@item.CompletedBy</td>
                             <td>
+                                <a asp-action="DeleteTask" asp-controller="Task" onclick="e.preventDefault()">Reverse</a>
                                 <button type="button" data-toggle="modal" data-target="#TaskModal-@item.Id" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i> Details</button>
                             </td>
                         </tr>
@@ -104,15 +89,10 @@
                 </tbody>
             </table>
         }
-        @* else
-        {
-            <h4>No Records Found !</h4>
-        } *@
     </div>
 </div>
 
-
-@foreach (var item in Model.Tasks)
+@foreach(var item in Model.Tasks)
 {
     <div class="modal fade" id="TaskModal-@item.Id">
         <div class="modal-dialog modal-lg modal-dialog-centered">

@@ -47,6 +47,8 @@ namespace App.Web.ViewModel
         // For Display Purpose
         public string? TaskTypeName { get; set; }
         public string? RecDate { get; set; }
+        public string? ProccedTime { get; set; }
+        public string? CompleteTime { get; set; }
         public string? RecBy { get; set; }
         public string? ProccedBy { get; set; }
         public string? CompletedBy { get; set; }

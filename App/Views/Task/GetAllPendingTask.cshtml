@@ -52,7 +52,7 @@
         <h4>Pending Tasks</h4>
     </div>
     <div class="card-body">
-        @if (Model.Tasks.Count > 0)
+        @if (Model.Tasks != null && Model.Tasks.Count > 0)
         {
             <table id="datatable" class="table table-hover table-striped table-sm w-100">
                 <thead>
@@ -71,6 +71,7 @@
                         <th scope="col">Created By</th>
                         <th scope="col">Proceed By</th>
                         <th scope="col">Completed By</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>

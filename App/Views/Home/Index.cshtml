@@ -11,7 +11,7 @@
                 <div class="info-box-content">
                     <span class="info-box-text">Total Tasks</span>
                     <span class="info-box-number">
-                        305
+                        @ViewBag.TotalTaskCount
                     </span>
                 </div>
                 <!-- /.info-box-content -->
@@ -27,7 +27,7 @@
 
                 <div class="info-box-content">
                     <span class="info-box-text">Pending Tasks</span>
-                    <span class="info-box-number">150</span>
+                    <span class="info-box-number">@ViewBag.TotalPendingTaskCount</span>
                 </div>
                 <!-- /.info-box-content -->
             </div>
@@ -45,7 +45,7 @@
 
                 <div class="info-box-content">
                     <span class="info-box-text">Processing Tasks</span>
-                    <span class="info-box-number">50</span>
+                    <span class="info-box-number">@ViewBag.TotalWorkingTaskCount</span>
                 </div>
                 <!-- /.info-box-content -->
             </div>
@@ -60,7 +60,7 @@
 
                 <div class="info-box-content">
                     <span class="info-box-text">Completed Tasks</span>
-                    <span class="info-box-number">105</span>
+                    <span class="info-box-number">@ViewBag.TotalCompletedTaskCount</span>
                 </div>
                 <!-- /.info-box-content -->
             </div>

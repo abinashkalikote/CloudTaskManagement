@@ -88,23 +88,38 @@ namespace App.Web.Controllers
         {
             var vm = new TaskReportVM();
             InitializeTaskVM(vm);
-            var query = await GetTaskQueryable(vm).ToListAsync();
+            var query = await GetTaskQueryable(vm).Where(e => e.ProccedById != null || (e.ProccedById != null && e.CompletedById != null)).ToListAsync();
             vm.Tasks = PrepareTaskVms(query);
             return View(vm);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AuditTask(TaskReportVM vm, int[] TaskId)
+        public async Task<IActionResult> AuditTask(TaskReportVM vm)
         {
-            var data = await GetTaskQueryable(vm).ToListAsync();
+            var data = await GetTaskQueryable(vm).Where(e => e.ProccedById != null || (e.ProccedById != null && e.CompletedById != null)).ToListAsync();
             return RedirectToAction(nameof(AuditTask));
         }
 
         
         [HttpGet]
-        public IActionResult DeleteTask(int? TaskID)
+        public async Task<IActionResult> DeleteTask(int? TaskID)
         {
-            return View("AuditTask");
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            var Task = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID);
+            try { 
+                Task.RecStatus = Status.InActive;
+                _db.CloudTasks.Update(Task);
+
+                await _db.SaveChangesAsync();
+                scope.Complete();
+            }catch(Exception ex)
+            {
+                scope.Dispose();
+                TempData["error"] = "Task Cannot be updated !";
+                return RedirectToAction("AuditTask");
+            }
+
+            return RedirectToAction("AuditTask");
         }
 
 
@@ -145,7 +160,7 @@ namespace App.Web.Controllers
 
 
 
-
+        #region private methods
 
         private IQueryable<CloudTask> GetTaskQueryable(TaskReportVM reportVM)
         {

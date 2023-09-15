@@ -1,5 +1,4 @@
-﻿@using Microsoft.AspNetCore.Http
-@inject IHttpContextAccessor contextaccessor
+﻿@inject App.Web.Providers.Interface.IUserProvider _userProvider
 <!DOCTYPE html>
 <html lang="en">
 
@@ -79,7 +78,7 @@
                         <i class="far fa-user"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <span class="dropdown-item dropdown-header">Office</span>
+                        <span class="dropdown-item dropdown-header">@_userProvider.GetUsername()</span>
                         <div class="dropdown-divider"></div>
                         <a href="#" class="dropdown-item">
                             <i class="fas fa-key mr-2"></i> Change Passowrd
@@ -122,7 +121,7 @@
                         <img src="~/adminlte/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="#" class="d-block" id="FullName">Abiansh kalikote</a>
+                        <a href="#" class="d-block" id="FullName">@_userProvider.GetUsername()</a>
                     </div>
                 </div>
 

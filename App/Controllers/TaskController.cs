@@ -1,5 +1,5 @@
 ﻿using App.Model;
-using App.Web.Constants;
+using App.Base.Constants;
 using App.Web.ViewModel;
 using CTM.Data;
 using Humanizer;
@@ -229,5 +229,7 @@ namespace App.Web.Controllers
             vm.taskTypes = _db.TaskTypes.ToList();
             vm.Users = _db.Users.Where(e => e.RecStatus == 'A').ToList();
         }
+
+        #endregion private methods
     }
 }

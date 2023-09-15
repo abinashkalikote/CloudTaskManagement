@@ -1,4 +1,4 @@
-﻿using App.Web.Constants;
+﻿using App.Base.Constants;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;

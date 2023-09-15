@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
+using App.Base.Constants;
+using App.Model;
 
 namespace App.Web.Controllers
 {
@@ -40,7 +42,7 @@ namespace App.Web.Controllers
                 var user = await _db.Users.FirstOrDefaultAsync(e =>
                                 e.Email == loginVM.Email
                                 && e.Password == loginVM.Password
-                                && e.RecStatus == 'A');
+                                && e.RecStatus == Status.Active);
 
                 if (user == null)
                 {
@@ -52,7 +54,8 @@ namespace App.Web.Controllers
                 {
                     new Claim(ClaimTypes.Name, user.FullName),
                     new Claim("Email", user.Email),
-                    new Claim("Username", user.Username)
+                    new Claim("Username", user.Username),
+                    new Claim("UserID", Convert.ToString(user.Id))
                 };
 
                 AuthenticationProperties properties = new()

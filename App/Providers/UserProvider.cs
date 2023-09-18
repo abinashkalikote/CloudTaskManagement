@@ -4,6 +4,7 @@ using CTM.Data;
 using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using App.Model;
 
 namespace App.Web.Providers
 {
@@ -11,6 +12,8 @@ namespace App.Web.Providers
     {
         private readonly AppDbContext _db;
         public readonly HttpContext _context;
+
+        private User _currentUser;
 
         public UserProvider(
             AppDbContext db,
@@ -24,19 +27,25 @@ namespace App.Web.Providers
 
         public string? GetUsername()
         {
-            int id = 0;
-            var userIDClaim = _context.User.Claims.FirstOrDefault(e => e.Type == "UserID");
-            if (userIDClaim != null && int.TryParse(userIDClaim.Value, out id))
+            var user = GetCurrentUser();
+            return user?.Username;
+        }
+
+        private User? GetCurrentUser()
+        {
+            if (_currentUser == null)
             {
-                var user = _db.Users.FirstOrDefault(e => e.Id == id);
-                if (user != null)
+                var userId = GetUserId();
+                if (userId == null)
                 {
-                    return user.FullName;
+                    _currentUser = null;
+                }
+                else
+                {
+                    _currentUser = _db.Users.FirstOrDefault(e => e.Id == userId);
                 }
             }
-
-
-            return null;
+            return _currentUser;
         }
 
         public int? GetUserId()
@@ -46,8 +55,6 @@ namespace App.Web.Providers
             {
                 return id;
             }
-
-
             return null;
         }
     }

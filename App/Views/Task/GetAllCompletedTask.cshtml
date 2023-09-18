@@ -64,13 +64,11 @@
                         <th scope="col">Task Type</th>
                         <th scope="col">Task Time</th>
                         <th scope="col">High Priority</th>
-                        <th scope="col">Version From</th>
-                        <th scope="col">Version To</th>
-                        <th scope="col">IssueOnPreviousSoftware</th>
                         <th scope="col">Created Date</th>
                         <th scope="col">Created By</th>
                         <th scope="col">Proceed By</th>
                         <th scope="col">Completed By</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -88,13 +86,16 @@
                             <td>@item.TaskTypeName</td>
                             <td>@item.TaskTime</td>
                             <td>@item.HighPriority</td>
-                            <td>@item.SoftwareVersionFrom</td>
-                            <td>@item.SoftwareVersionTo</td>
-                            <td>@item.IssueOnPreviousSoftware</td>
                             <td>@item.RecDate</td>
                             <td>@item.RecBy</td>
                             <td>@item.ProccedBy</td>
                             <td>@item.CompletedBy</td>
+                            <td>
+                                <button type="button" data-toggle="modal" data-target="#TaskModal-@item.Id" class="btn btn-sm btn-primary">
+                                    Details
+                                    <i class="fa fa-eye"></i>
+                                </button>
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -108,6 +109,7 @@
 </div>
 
 
-@section Scripts{
-    <partial name="_DataTableJS" />
-        }
+
+@{
+    Html.RenderPartial("~/Views/Shared/TaskModal/_TaskModal.cshtml");
+}

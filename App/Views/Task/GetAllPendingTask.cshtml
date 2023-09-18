@@ -61,16 +61,10 @@
                         <th scope="col">Task Name</th>
                         <th scope="col">Client Name</th>
                         <th scope="col">Cloud URL</th>
-                        <th scope="col">Task Type</th>
                         <th scope="col">Task Time</th>
                         <th scope="col">High Priority</th>
-                        <th scope="col">Version From</th>
-                        <th scope="col">Version To</th>
-                        <th scope="col">IssueOnPreviousSoftware</th>
                         <th scope="col">Created Date</th>
                         <th scope="col">Created By</th>
-                        <th scope="col">Proceed By</th>
-                        <th scope="col">Completed By</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -86,18 +80,14 @@
                             <td>@item.TaskTitle</td>
                             <td style="width:15%">@item.ClientName</td>
                             <td><a href="@item.CloudURL" target="_blank">@item.CloudURL</a></td>
-                            <td>@item.TaskTypeName</td>
                             <td>@item.TaskTime</td>
                             <td>@item.HighPriority</td>
-                            <td>@item.SoftwareVersionFrom</td>
-                            <td>@item.SoftwareVersionTo</td>
-                            <td>@item.IssueOnPreviousSoftware</td>
                             <td>@item.RecDate</td>
                             <td>@item.RecBy</td>
-                            <td>@item.ProccedBy</td>
-                            <td>@item.CompletedBy</td>
                             <td>
                                 <button type="button" data-toggle="modal" data-target="#TaskModal-@item.Id" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i> Details</button>
+
+                                <a asp-action="ProccedTask" asp-controller="Task" asp-route-TaskID="@item.Id" class="btn btn-sm btn-success TaskBtn">Procced <i class="fa-solid fa-arrow-right"></i></a>
                             </td>
                         </tr>
                     }
@@ -113,35 +103,5 @@
 
 
 
-@foreach (var item in Model.Tasks)
-{
-    <div class="modal fade" id="TaskModal-@item.Id">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">@item.TaskTitle</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <b>Client Name : </b> @item.ClientName
-                    <br>
-                    <b>Cloud URL : </b> @item.CloudURL
 
-                </div>
-                <div class="modal-footer justify-content-end">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-}
-
-
-
-@section Scripts{
-    <partial name="_DataTableJS" />
-        }
+<Partial name="~/Views/Shared/TaskModal/_TaskModal.cshtml" />

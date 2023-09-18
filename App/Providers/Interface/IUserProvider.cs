@@ -9,6 +9,7 @@ namespace App.Web.Providers.Interface
 {
     public interface IUserProvider
     {
-        public string GetUsername();
+        public string? GetUsername();
+        public int? GetUserId();
     }
 }

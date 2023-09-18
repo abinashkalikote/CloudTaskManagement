@@ -14,3 +14,16 @@ labels.forEach(label => {
 
 
 
+//When clicking the link button confirm button show
+
+let TaskBtn = $(".TaskBtn");
+for (let name of TaskBtn) {
+    name.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (confirm("Are you sure?")) {
+            location.href = (name).attr("href");
+        } else {
+            return 0;
+        }
+    });
+}

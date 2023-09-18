@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using System.Transactions;
+using App.Web.Providers.Interface;
 
 namespace App.Web.Controllers
 {
@@ -17,9 +18,15 @@ namespace App.Web.Controllers
     {
         private readonly AppDbContext _db;
 
-        public TaskController(AppDbContext db)
+        private readonly IUserProvider _userProvider;
+
+        public TaskController(
+            AppDbContext db,
+            IUserProvider userProvider
+            )
         {
             _db = db;
+            _userProvider = userProvider;
         }
         public IActionResult Index()
         {
@@ -123,6 +130,8 @@ namespace App.Web.Controllers
         }
 
 
+
+        #region TaskReportMethod
         [HttpGet]
         //[Route("/Api/GetAllTasks")]
         public async Task<IActionResult> GetAllTask(TaskReportVM vm)
@@ -155,6 +164,49 @@ namespace App.Web.Controllers
             vm.Tasks = PrepareTaskVms(query);
             return View(vm);
         }
+        #endregion TaskReportMethod
+
+
+
+        public async Task<IActionResult> ProccedTask(int? TaskID)
+        {
+            if (TaskID == null)
+                return RedirectToAction(nameof(GetAllPendingTask));
+
+            var pendingTask = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID && (e.ProccedById == null && e.CompletedById == null));
+
+            if (pendingTask == null)
+                return RedirectToAction(nameof(GetAllPendingTask));
+
+            pendingTask.ProccedById = _userProvider.GetUserId();
+            pendingTask.ProccedTime = DateTime.UtcNow;
+
+            _db.CloudTasks.Update(pendingTask);
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(GetAllWorkingTask));
+        }
+
+
+        public async Task<IActionResult> CompletedTask(int? TaskID)
+        {
+            if (TaskID == null)
+                return RedirectToAction(nameof(GetAllWorkingTask));
+
+            var pendingTask = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID && (e.ProccedById != null && e.CompletedById == null));
+
+            if (pendingTask == null)
+                return RedirectToAction(nameof(GetAllWorkingTask));
+
+            pendingTask.CompletedById = _userProvider.GetUserId();
+            pendingTask.ProccedTime = DateTime.Now;
+
+            _db.CloudTasks.Update(pendingTask);
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(GetAllCompletedTask));
+        }
+
 
 
 

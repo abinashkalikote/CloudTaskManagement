@@ -13,6 +13,8 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+
+		<PackageReference Include="Pioneer.Pagination" Version="3.0.0" />
 	</ItemGroup>
 
 </Project>

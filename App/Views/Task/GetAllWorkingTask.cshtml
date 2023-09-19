@@ -1,9 +1,11 @@
 ﻿@model TaskReportVM
+@using NepDate
 
 @{
     ViewData["Title"] = "Working Tasks";
 }
 
+<partial name="_HideSideBar"/>
 
 @* Filter Form *@
 <div class="card">
@@ -85,11 +87,11 @@
                             <td>@item.TaskTypeName</td>
                             <td>@item.TaskTime</td>
                             <td>@item.HighPriority</td>
-                            <td>@item.RecDate</td>
+                            <td title="@item.RecDate">@Convert.ToDateTime(item.RecDate).ToNepaliDate().ToString()</td>
                             <td>@item.RecBy</td>
                             <td>@item.ProccedBy</td>
 
-                            <td>
+                            <td style="width: 20%;">
                                 <button type="button" data-toggle="modal" data-target="#TaskModal-@item.Id" class="btn btn-sm btn-primary">
                                     Details
                                     <i class="fa fa-eye"></i>

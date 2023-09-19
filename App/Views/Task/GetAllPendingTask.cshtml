@@ -1,4 +1,5 @@
 ﻿@model TaskReportVM
+@using NepDate
 
 @{
     ViewData["Title"] = "Pending Tasks";
@@ -82,7 +83,7 @@
                             <td><a href="@item.CloudURL" target="_blank">@item.CloudURL</a></td>
                             <td>@item.TaskTime</td>
                             <td>@item.HighPriority</td>
-                            <td>@item.RecDate</td>
+                            <td>@Convert.ToDateTime(item.RecDate).ToNepaliDate().ToString()</td>
                             <td>@item.RecBy</td>
                             <td>
                                 <button type="button" data-toggle="modal" data-target="#TaskModal-@item.Id" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i> Details</button>

@@ -1,0 +1,7 @@
+﻿@model Pioneer.Pagination.PaginatedMetaModel
+@if (ViewBag.TotalCount >= 1 && Model.Pages.Count() > 1)
+{
+    <div class="no-print">
+        <pioneer-pagination info="@Model" route="@ViewBag.Path" previous-page-text="<<" next-page-text=">>"></pioneer-pagination>
+    </div>
+}

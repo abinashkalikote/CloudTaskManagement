@@ -1,4 +1,6 @@
 ﻿@model TaskReportVM
+@using Humanizer;
+@using NepDate
 
 @{
     ViewData["Title"] = "Completed Tasks";
@@ -86,7 +88,7 @@
                             <td>@item.TaskTypeName</td>
                             <td>@item.TaskTime</td>
                             <td>@item.HighPriority</td>
-                            <td>@item.RecDate</td>
+                            <td>@Convert.ToDateTime(item.RecDate).ToNepaliDate().ToString()</td>
                             <td>@item.RecBy</td>
                             <td>@item.ProccedBy</td>
                             <td>@item.CompletedBy</td>

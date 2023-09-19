@@ -1,4 +1,5 @@
-﻿using App.Model;
+﻿using App.Base.ValueObject;
+using App.Model;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace App.Web.ViewModel
@@ -17,7 +18,7 @@ namespace App.Web.ViewModel
 
 
         //List of Task Send to show in Table
-        public List<TaskTempVM>? Tasks { get; set; } = new();
+        public List<TaskTempVM>? Tasks { get; set; }
 
 
 

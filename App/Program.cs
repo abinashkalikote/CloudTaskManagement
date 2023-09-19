@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using App.Web.Providers.Interface;
 using App.Web.Providers;
 using System;
+using Pioneer.Pagination;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddSession(option => option.IdleTimeout = TimeSpan.FromMinutes(20));
 
 builder.Services.AddScoped<IUserProvider, UserProvider>();
+builder.Services.AddTransient<IPaginatedMetaService, PaginatedMetaService>();
 
 builder.Services.AddControllersWithViews();
 

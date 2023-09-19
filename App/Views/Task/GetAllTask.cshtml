@@ -1,9 +1,12 @@
 ﻿@model TaskReportVM
+@using NepDate
 
 @{
     ViewData["Title"] = "All Tasks";
 }
 
+
+<partial name="_HideSideBar"/>
 
 @* Filter Form *@
 <div class="card">
@@ -92,7 +95,7 @@
                             <td>@item.SoftwareVersionFrom</td>
                             <td>@item.SoftwareVersionTo</td>
                             <td>@item.IssueOnPreviousSoftware</td>
-                            <td>@item.RecDate</td>
+                            <td>@Convert.ToDateTime(item.RecDate).ToNepaliDate().ToString()</td>
                             <td>@item.RecBy</td>
                             <td>@item.ProccedBy</td>
                             <td>@item.CompletedBy</td>

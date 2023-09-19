@@ -10,6 +10,8 @@ using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using System.Transactions;
 using App.Web.Providers.Interface;
+using App.Base.Extensions;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace App.Web.Controllers
 {
@@ -103,7 +105,7 @@ namespace App.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AuditTask(TaskReportVM vm)
         {
-            var data = await GetTaskQueryable(vm).Where(e => e.ProccedById != null || (e.ProccedById != null && e.CompletedById != null)).ToListAsync();
+            var data = await GetTaskQueryable(vm).Where(e => e.ProccedById == null && e.CompletedById == null).ToListAsync();
             return RedirectToAction(nameof(AuditTask));
         }
 
@@ -111,22 +113,27 @@ namespace App.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> DeleteTask(int? TaskID)
         {
-            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-            var Task = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID);
-            try { 
-                Task.RecStatus = Status.InActive;
-                _db.CloudTasks.Update(Task);
+            if(TaskID == null)
+                return RedirectToAction(nameof(AuditTask));
 
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            var task = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID);
+            try {
+                task.RecStatus = Status.InActive;
+
+                _db.CloudTasks.Update(task);
                 await _db.SaveChangesAsync();
                 scope.Complete();
-            }catch(Exception ex)
+
+                TempData["success"] = "Task Reversed successfully !";
+                return RedirectToAction(nameof(AuditTask));
+            }
+            catch (Exception)
             {
                 scope.Dispose();
-                TempData["error"] = "Task Cannot be updated !";
-                return RedirectToAction("AuditTask");
+                TempData["error"] = "Task Cannot be Delete !";
+                return RedirectToAction(nameof(AuditTask));
             }
-
-            return RedirectToAction("AuditTask");
         }
 
 
@@ -170,21 +177,34 @@ namespace App.Web.Controllers
 
         public async Task<IActionResult> ProccedTask(int? TaskID)
         {
-            if (TaskID == null)
+            if (TaskID == null) { 
+                TempData["error"] = "Something Went Wrong !";
                 return RedirectToAction(nameof(GetAllPendingTask));
+            }
 
-            var pendingTask = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID && (e.ProccedById == null && e.CompletedById == null));
+            
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            try
+            {
 
-            if (pendingTask == null)
+                var pendingTask = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID && (e.ProccedById == null && e.CompletedById == null));
+
+                pendingTask.ProccedById = _userProvider.GetUserId();
+                pendingTask.ProccedTime = DateTime.Now;
+
+                _db.CloudTasks.Update(pendingTask);
+                await _db.SaveChangesAsync();
+
+                scope.Complete();
+                TempData["success"] = "Task has been Procced Successfully !";
+                return RedirectToAction(nameof(GetAllWorkingTask));
+            }
+            catch (Exception)
+            {
+                scope.Dispose();
+                TempData["error"] = "Something Went Wrong !";
                 return RedirectToAction(nameof(GetAllPendingTask));
-
-            pendingTask.ProccedById = _userProvider.GetUserId();
-            pendingTask.ProccedTime = DateTime.UtcNow;
-
-            _db.CloudTasks.Update(pendingTask);
-            await _db.SaveChangesAsync();
-
-            return RedirectToAction(nameof(GetAllWorkingTask));
+            }
         }
 
 
@@ -193,18 +213,30 @@ namespace App.Web.Controllers
             if (TaskID == null)
                 return RedirectToAction(nameof(GetAllWorkingTask));
 
-            var pendingTask = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID && (e.ProccedById != null && e.CompletedById == null));
 
-            if (pendingTask == null)
+
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+            try
+            {
+                var workingTask = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID && (e.ProccedById != null && e.CompletedById == null));
+
+                workingTask.CompletedById = _userProvider.GetUserId();
+                workingTask.ProccedTime = DateTime.Now;
+
+                _db.CloudTasks.Update(workingTask);
+                await _db.SaveChangesAsync();
+
+                scope.Complete();
+                TempData["success"] = "Task has been Procced Successfully !";
+                return RedirectToAction(nameof(GetAllCompletedTask));
+            }
+            catch (Exception)
+            {
+                scope.Dispose();
+                TempData["error"] = "Something Went Wrong !";
                 return RedirectToAction(nameof(GetAllWorkingTask));
-
-            pendingTask.CompletedById = _userProvider.GetUserId();
-            pendingTask.ProccedTime = DateTime.Now;
-
-            _db.CloudTasks.Update(pendingTask);
-            await _db.SaveChangesAsync();
-
-            return RedirectToAction(nameof(GetAllCompletedTask));
+            }
         }
 
 

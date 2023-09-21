@@ -73,6 +73,9 @@ namespace App.Data.Migrations
                     RecVersion = table.Column<int>(type: "int", nullable: false),
                     RecStatus = table.Column<string>(type: "nvarchar(1)", nullable: true),
                     RecDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TSKStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProccedTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CompleteTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RecById = table.Column<int>(type: "int", nullable: false),
                     ProccedById = table.Column<int>(type: "int", nullable: true),
                     CompletedById = table.Column<int>(type: "int", nullable: true)

@@ -21,7 +21,7 @@ for (let name of TaskBtn) {
     name.addEventListener('click', (e) => {
         e.preventDefault();
         if (confirm("Are you sure?")) {
-            location.href = (name).attr("href");
+            location.href = $(name).attr("href");
         } else {
             return 0;
         }

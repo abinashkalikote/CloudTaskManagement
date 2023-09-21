@@ -32,6 +32,7 @@ namespace App.Model
         public int RecVersion { get; set; } = 1;
         public char? RecStatus { get; set; } = Status.Active;
         public DateTime RecDate { get; set; } = DateTime.Now;
+        public string TSKStatus { get; set; }
         public DateTime? ProccedTime { get; set; }
         public DateTime? CompleteTime { get; set; }
 

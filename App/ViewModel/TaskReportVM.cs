@@ -1,4 +1,5 @@
-﻿using App.Base.ValueObject;
+﻿using App.Base.Constants;
+using App.Base.ValueObject;
 using App.Model;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -15,10 +16,16 @@ namespace App.Web.ViewModel
         public string? TaskTime { get; set; }
         public int? CreatedBy { get; set; }
         public string? ClientName { get; set; }
+        public string? TSKStatus { get; set; }
+
+
 
 
         //List of Task Send to show in Table
         public List<TaskTempVM>? Tasks { get; set; }
+
+
+
 
 
 
@@ -28,6 +35,8 @@ namespace App.Web.ViewModel
         public List<TaskType>? taskTypes { get; set; }
         public SelectList TaskTypesList() => new SelectList(taskTypes, nameof(TaskType.Id), nameof(TaskType.TaskTypeName), TaskTypeId);
 
+
+        public SelectList TaskStatusList() => new SelectList(CloudTaskStatus.TaskStatusList, nameof(TStatus.TsStatus), nameof(TStatus.TsStatus), TSKStatus);
 
 
         public SelectList TaskTimeList() => new SelectList(new List<TaskTimeVM>()

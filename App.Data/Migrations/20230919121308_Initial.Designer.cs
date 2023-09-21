@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace App.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230904024342_Initial")]
+    [Migration("20230919121308_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -74,6 +74,9 @@ namespace App.Data.Migrations
                     b.Property<string>("CloudUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("CompleteTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<int?>("CompletedById")
                         .HasColumnType("int");
 
@@ -85,6 +88,9 @@ namespace App.Data.Migrations
 
                     b.Property<int?>("ProccedById")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("ProccedTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("RecAuditLog")
                         .IsRequired()
@@ -109,6 +115,10 @@ namespace App.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SoftwareVersionTo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TSKStatus")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TaskName")

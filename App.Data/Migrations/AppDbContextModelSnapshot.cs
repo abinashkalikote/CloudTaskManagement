@@ -114,6 +114,10 @@ namespace App.Data.Migrations
                     b.Property<string>("SoftwareVersionTo")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("TSKStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("TaskName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

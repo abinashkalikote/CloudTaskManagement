@@ -43,6 +43,10 @@ namespace App.Web.ViewModel
         public string? Remarks { get; set; }
 
 
+        public bool IsInPending { get; set; }
+        public bool IsInProgress { get; set; }
+
+
 
         // For Display Purpose
         public string? TaskTypeName { get; set; }

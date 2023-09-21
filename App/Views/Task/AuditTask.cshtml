@@ -1,4 +1,5 @@
-﻿@model TaskReportVM
+﻿@using Humanizer;
+@model TaskReportVM
 
 @{
     ViewData["Title"] = "Audit Tasks";
@@ -44,9 +45,6 @@
 </div>
 
 
-<partial name="_DataTableCSS" />
-
-
 <div class="card">
     <div class="card-header">
         <span class="card-title">All Tasks</span>
@@ -62,6 +60,7 @@
                         <th scope="col">Client Name</th>
                         <th scope="col">Cloud URL</th>
                         <th scope="col">Task Type</th>
+                        <th scope="col">Task Time</th>
                         <th scope="col">Created Date</th>
                         <th scope="col"></th>
                     </tr>
@@ -79,6 +78,7 @@
                                 <td style="width:15%">@item.ClientName</td>
                                 <td><a title="@item.CloudURL" href="@item.CloudURL" target="_blank">@item.CloudURL</a></td>
                                 <td>@item.TaskTypeName</td>
+                                <td>@Convert.ToDateTime(item.RecDate).Humanize()</td>
                                 <td>@item.RecDate</td>
                                 <td>
                                     <a asp-action="DeleteTask" asp-controller="Task" asp-route-TaskID="@item.Id" class="btn btn-danger btn-sm me-1 TaskBtn">Revoke</a>

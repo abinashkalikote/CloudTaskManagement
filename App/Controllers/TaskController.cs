@@ -71,7 +71,8 @@ namespace App.Web.Controllers
                         IssueOnPreviousSoftware = vm.IssueOnPreviousSoftware ?? "",
                         Remarks = vm.Remarks ?? "",
                         RecAuditLog = "Task Created by " + HttpContext.Session.GetString("FullName"),
-                        RecById = Convert.ToInt32(HttpContext.Session.GetString("UserID"))
+                        RecById = Convert.ToInt32(HttpContext.Session.GetString("UserID")),
+                        TSKStatus = "Pending"
                     };
 
                     await _db.CloudTasks.AddAsync(cloudTask);
@@ -97,7 +98,7 @@ namespace App.Web.Controllers
         {
             var vm = new TaskReportVM();
             InitializeTaskVM(vm);
-            var query = await GetTaskQueryable(vm).Where(e => e.ProccedById != null || (e.ProccedById != null && e.CompletedById != null)).ToListAsync();
+            var query = await GetTaskQueryable(vm).Where(e => e.ProccedById == null && e.CompletedById == null).ToListAsync();
             vm.Tasks = PrepareTaskVms(query);
             return View(vm);
         }
@@ -119,7 +120,7 @@ namespace App.Web.Controllers
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             var task = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID);
             try {
-                task.RecStatus = Status.InActive;
+                task.TSKStatus = "Canceled";
 
                 _db.CloudTasks.Update(task);
                 await _db.SaveChangesAsync();
@@ -138,9 +139,10 @@ namespace App.Web.Controllers
 
 
 
+
         #region TaskReportMethod
         [HttpGet]
-        //[Route("/Api/GetAllTasks")]
+        //[Route("/Api/GetAllTasks?Status=pending")]
         public async Task<IActionResult> GetAllTask(TaskReportVM vm)
         {
 
@@ -149,29 +151,8 @@ namespace App.Web.Controllers
             vm.Tasks = PrepareTaskVms(query);
             return View(vm);
         }
-        public async Task<IActionResult> GetAllPendingTask(TaskReportVM vm)
-        {
-
-            InitializeTaskVM(vm);
-            var query = await GetTaskQueryable(vm).Where(e => (e.ProccedById == null && e.CompletedById == null)).ToListAsync();
-            vm.Tasks = PrepareTaskVms(query);
-            return View(vm);
-        }
-        public async Task<IActionResult> GetAllWorkingTask(TaskReportVM vm)
-        {
-            InitializeTaskVM(vm);
-            var query = await GetTaskQueryable(vm).Where(e => (e.ProccedById != null && e.CompletedById == null)).ToListAsync();
-            vm.Tasks = PrepareTaskVms(query);
-            return View(vm);
-        }
-        public async Task<IActionResult> GetAllCompletedTask(TaskReportVM vm)
-        {
-            InitializeTaskVM(vm);
-            var query = await GetTaskQueryable(vm).Where(e => (e.ProccedById != null && e.CompletedById != null)).ToListAsync();
-            vm.Tasks = PrepareTaskVms(query);
-            return View(vm);
-        }
         #endregion TaskReportMethod
+
 
 
 
@@ -179,7 +160,7 @@ namespace App.Web.Controllers
         {
             if (TaskID == null) { 
                 TempData["error"] = "Something Went Wrong !";
-                return RedirectToAction(nameof(GetAllPendingTask));
+                return RedirectToAction(nameof(GetAllTask));
             }
 
             
@@ -187,31 +168,31 @@ namespace App.Web.Controllers
             try
             {
 
-                var pendingTask = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID && (e.ProccedById == null && e.CompletedById == null));
+                var pendingTask = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID && e.TSKStatus == "Pending");
 
                 pendingTask.ProccedById = _userProvider.GetUserId();
                 pendingTask.ProccedTime = DateTime.Now;
+                pendingTask.TSKStatus = "InProgress";
 
                 _db.CloudTasks.Update(pendingTask);
                 await _db.SaveChangesAsync();
 
                 scope.Complete();
                 TempData["success"] = "Task has been Procced Successfully !";
-                return RedirectToAction(nameof(GetAllWorkingTask));
+                return RedirectToAction(nameof(GetAllTask));
             }
             catch (Exception)
             {
                 scope.Dispose();
                 TempData["error"] = "Something Went Wrong !";
-                return RedirectToAction(nameof(GetAllPendingTask));
+                return RedirectToAction(nameof(GetAllTask));
             }
         }
-
 
         public async Task<IActionResult> CompletedTask(int? TaskID)
         {
             if (TaskID == null)
-                return RedirectToAction(nameof(GetAllWorkingTask));
+                return RedirectToAction(nameof(GetAllTask));
 
 
 
@@ -219,23 +200,24 @@ namespace App.Web.Controllers
 
             try
             {
-                var workingTask = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID && (e.ProccedById != null && e.CompletedById == null));
+                var workingTask = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID && e.TSKStatus == "InProgress");
 
                 workingTask.CompletedById = _userProvider.GetUserId();
                 workingTask.ProccedTime = DateTime.Now;
+                workingTask.TSKStatus = "Completed";
 
                 _db.CloudTasks.Update(workingTask);
                 await _db.SaveChangesAsync();
 
                 scope.Complete();
-                TempData["success"] = "Task has been Procced Successfully !";
-                return RedirectToAction(nameof(GetAllCompletedTask));
+                TempData["success"] = "Task has been Completed Successfully !";
+                return RedirectToAction(nameof(GetAllTask));
             }
             catch (Exception)
             {
                 scope.Dispose();
                 TempData["error"] = "Something Went Wrong !";
-                return RedirectToAction(nameof(GetAllWorkingTask));
+                return RedirectToAction(nameof(GetAllTask));
             }
         }
 
@@ -280,6 +262,13 @@ namespace App.Web.Controllers
             {
                 data = data.Where(e => e.RecById == reportVM.CreatedBy);
             }
+
+            if (reportVM.TSKStatus != null)
+            {
+                data = data.Where(e => e.TSKStatus == reportVM.TSKStatus);
+            }
+
+
             return data;
         }
 
@@ -303,6 +292,8 @@ namespace App.Web.Controllers
                 vm.RecBy = item.RecBy.Username;
                 vm.ProccedBy = item.ProccedBy != null ? item.ProccedBy.Username : "-";
                 vm.CompletedBy = item.CompletedBy != null ? item.CompletedBy.Username : "-";
+                vm.IsInPending = item.TSKStatus == "Pending";
+                vm.IsInProgress = item.TSKStatus == "InProgress";
                 list.Add(vm);
             }
             return list;

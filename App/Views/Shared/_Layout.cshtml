@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="~/adminlte/dist/css/adminlte.min.css" asp-append-version="true">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css" asp-append-version="true">
+    <partial name="_DataTableCSS"/>
 </head>
 
 <body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm" id="body">
@@ -161,58 +162,46 @@
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a asp-controller="Task" asp-action="CreateTask" class="nav-link">
+                                <i class="far fa-plus nav-icon"></i>
+                                <p>Add Task</p>
+                            </a>
+                        </li>
 
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon fas fa-tasks"></i>
-                                <p>
-                                    Tasks
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
+                            <a asp-controller="Task" asp-action="GetAllTask" class="nav-link">
+                                <i class="fas fa-search fa-fw nav-icon"></i>
+                                <p>Search Task</p>
                             </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a asp-controller="Task" asp-action="CreateTask" class="nav-link">
-                                        <i class="far fa-plus nav-icon"></i>
-                                        <p>Add Task</p>
-                                    </a>
-                                </li>
-                                
-                                <li class="nav-item">
-                                    <a asp-controller="Task" asp-action="GetAllTask" class="nav-link">
-                                        <i class="fas fa-search fa-fw nav-icon"></i>
-                                        <p>Search Task</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a asp-controller="Task" asp-action="GetAllPendingTask" class="nav-link">
-                                        <i class="fas fa-solid fa-clock nav-icon"></i>
-                                        <p>Pending Task</p>
-                                    </a>
-                                </li>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Task" asp-action="GetAllTask" asp-route-TSKStatus="Pending" class="nav-link">
+                                <i class="fas fa-solid fa-clock nav-icon"></i>
+                                <p>Pending Task</p>
+                            </a>
+                        </li>
 
 
-                                <li class="nav-item">
-                                    <a asp-controller="Task" asp-action="GetAllWorkingTask" class="nav-link">
-                                        <i class="fas fa-solid fa-hammer nav-icon"></i>
-                                        <p>Working Task</p>
-                                    </a>
-                                </li>
+                        <li class="nav-item">
+                            <a asp-controller="Task" asp-action="GetAllTask" asp-route-TSKStatus="InProgress" class="nav-link">
+                                <i class="fas fa-solid fa-hammer nav-icon"></i>
+                                <p>Working Task</p>
+                            </a>
+                        </li>
 
-                                <li class="nav-item">
-                                    <a asp-controller="Task" asp-action="GetAllCompletedTask" class="nav-link">
-                                        <i class="fas fa-solid fa-check nav-icon"></i>
-                                        <p>Completed Task</p>
-                                    </a>
-                                </li>
+                        <li class="nav-item">
+                            <a asp-controller="Task" asp-action="GetAllTask" asp-route-TSKStatus="Completed" class="nav-link">
+                                <i class="fas fa-solid fa-check nav-icon"></i>
+                                <p>Completed Task</p>
+                            </a>
+                        </li>
 
-                                <li class="nav-item">
-                                    <a asp-controller="Task" asp-action="AuditTask" class="nav-link">
-                                        <i class="fas fa-solid fa-bug nav-icon"></i>
-                                        <p>Audit Task</p>
-                                    </a>
-                                </li>
-                            </ul>
+                        <li class="nav-item">
+                            <a asp-controller="Task" asp-action="AuditTask" class="nav-link">
+                                <i class="fas fa-solid fa-bug nav-icon"></i>
+                                <p>Audit Task</p>
+                            </a>
                         </li>
 
                     </ul>
@@ -262,7 +251,7 @@
     <script src="~/adminlte/plugins/jquery-mousewheel/jquery.mousewheel.js" asp-append-version="true"></script>
     <script src="~/adminlte/plugins/raphael/raphael.min.js" asp-append-version="true"></script>
     <script src="~/adminlte/plugins/jquery-mapael/jquery.mapael.min.js" asp-append-version="true"></script>
-    
+
     <script src="~/adminlte/plugins/sweetalert2/sweetalert2.min.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 

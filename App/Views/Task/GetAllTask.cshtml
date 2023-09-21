@@ -1,12 +1,12 @@
 ﻿@model TaskReportVM
-@using NepDate
+@using Humanizer
 
 @{
     ViewData["Title"] = "All Tasks";
 }
 
 
-<partial name="_HideSideBar"/>
+<partial name="_HideSideBar" />
 
 @* Filter Form *@
 <div class="card">
@@ -34,8 +34,14 @@
             </div>
 
             <div class="row">
-                <div class="col-8">
+                <div class="col-6">
                     <input type="text" asp-for="ClientName" class="form-control form-control-border" placeholder="Client Name">
+                </div>
+
+                <div class="col-2">
+                    <select class="form-control form-control-border" asp-for="TSKStatus" asp-items="@Model.TaskStatusList()">
+                        <option value="">-- Select Task Status --</option>
+                    </select>
                 </div>
 
                 <div class="col-4 d-flex justify-content-center align-items-center">
@@ -46,8 +52,6 @@
     </div>
 </div>
 
-
-<partial name="_DataTableCSS" />
 
 
 <div class="card">
@@ -66,53 +70,55 @@
                         <th scope="col">Cloud URL</th>
                         <th scope="col">Task Type</th>
                         <th scope="col">Task Time</th>
-                        <th scope="col">High Priority</th>
-                        <th scope="col">Version From</th>
-                        <th scope="col">Version To</th>
-                        <th scope="col">IssueOnPreviousSoftware</th>
                         <th scope="col">Created Date</th>
-                        <th scope="col">Created By</th>
-                        <th scope="col">Proceed By</th>
-                        <th scope="col">Completed By</th>
-                        <th></th>
+                        <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
                     @{
                         int sn = 0;
-                    }
-                    @foreach (var item in Model.Tasks)
-                    {
-                        sn++;
-                        <tr>
-                            <td>@sn</td>
-                            <td>@item.TaskTitle</td>
-                            <td style="width:15%">@item.ClientName</td>
-                            <td><a href="@item.CloudURL" target="_blank">@item.CloudURL</a></td>
-                            <td>@item.TaskTypeName</td>
-                            <td>@item.TaskTime</td>
-                            <td>@item.HighPriority</td>
-                            <td>@item.SoftwareVersionFrom</td>
-                            <td>@item.SoftwareVersionTo</td>
-                            <td>@item.IssueOnPreviousSoftware</td>
-                            <td>@Convert.ToDateTime(item.RecDate).ToNepaliDate().ToString()</td>
-                            <td>@item.RecBy</td>
-                            <td>@item.ProccedBy</td>
-                            <td>@item.CompletedBy</td>
-                            <td>
-                                <button type="button" data-toggle="modal" data-target="#TaskModal-@item.Id" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i> Details</button>
-                            </td>
-                        </tr>
+
+                        foreach (var item in Model.Tasks)
+                        {
+                            sn++;
+                            <tr>
+                                <td>@sn</td>
+                                <td>@item.TaskTitle</td>
+                                <td style="width:15%">@item.ClientName</td>
+                                <td><a title="@item.CloudURL" href="@item.CloudURL" target="_blank">@item.CloudURL</a></td>
+                                <td>@item.TaskTypeName</td>
+                                <td>@Convert.ToDateTime(item.RecDate).Humanize()</td>
+                                <td>@item.RecDate</td>
+                                <td>
+                                    @if (item.IsInPending)
+                                    {
+                                        <a asp-action="ProccedTask" asp-controller="Task" asp-route-TaskID="@item.Id" class="btn btn-danger btn-sm me-1 TaskBtn">
+                                            Process <i class="fa-solid fa-arrow-right"></i>
+                                        </a>
+                                    }
+                                    else if (item.IsInProgress)
+                                    {
+                                        <a asp-action="CompletedTask" asp-controller="Task" asp-route-TaskID="@item.Id" class="btn btn-danger btn-sm me-1 TaskBtn">
+                                            Complete <i class="fa-regular fa-circle-check"></i>
+                                        </a>
+                                    }
+
+
+
+                                    <button type="button" data-toggle="modal" data-target="#TaskModal-@item.Id" class="btn btn-sm btn-primary">
+                                        Details
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>
         }
-        @* else
-        {
-            <h4>No Records Found !</h4>
-        } *@
     </div>
 </div>
+
 
 
 <Partial name="~/Views/Shared/TaskModal/_TaskModal.cshtml" />

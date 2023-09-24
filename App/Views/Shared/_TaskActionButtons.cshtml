@@ -1,0 +1,40 @@
+﻿@* @model App.Web.ViewModel.TaskTempV *@
+
+
+
+@if (Model.IsInPending)
+{
+    <a asp-action="ProccedTask" asp-controller="Task" asp-route-TaskID="@Model?.Id" class="btn btn-danger btn-sm me-1 TaskBtn">
+        Process <i class="fa-solid fa-arrow-right"></i>
+    </a>
+}
+else if (Model.IsInProgress)
+{
+    <a asp-action="CompletedTask" asp-controller="Task" asp-route-TaskID="@Model?.Id" class="btn btn-success btn-sm me-1 TaskBtn">
+        Complete <i class="fa-regular fa-circle-check"></i>
+    </a>
+}
+else if (Model.IsCompleted)
+{
+    <i class="text-center">Completed <i class="fa fa-solid fa-check"></i></i>
+}
+else
+{
+    <i class="text-center">Canceled <i class="fa fa-solid fa-times"></i></i>
+}
+
+
+
+
+@if (Model.IsShowDetailsPeekButton != null && Model.IsShowDetailsPeekButton == true)
+{
+    <button type="button" data-toggle="modal" data-target="#TaskModal-@Model?.Id" class="btn btn-sm btn-primary">
+        Peek <i class="fa fa-eye"></i>
+    </button>
+
+
+
+    <a asp-action="TaskDetails" asp-controller="Task" asp-route-TaskID="@Model?.Id" class="btn btn-secondary btn-sm me-1">
+        Details <i class="fa fa-solid fa-circle-info"></i>
+    </a>
+}

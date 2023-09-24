@@ -90,25 +90,8 @@
                                 <td>@Convert.ToDateTime(item.RecDate).Humanize()</td>
                                 <td>@item.RecDate</td>
                                 <td>
-                                    @if (item.IsInPending)
-                                    {
-                                        <a asp-action="ProccedTask" asp-controller="Task" asp-route-TaskID="@item.Id" class="btn btn-danger btn-sm me-1 TaskBtn">
-                                            Process <i class="fa-solid fa-arrow-right"></i>
-                                        </a>
-                                    }
-                                    else if (item.IsInProgress)
-                                    {
-                                        <a asp-action="CompletedTask" asp-controller="Task" asp-route-TaskID="@item.Id" class="btn btn-danger btn-sm me-1 TaskBtn">
-                                            Complete <i class="fa-regular fa-circle-check"></i>
-                                        </a>
-                                    }
-
-
-
-                                    <button type="button" data-toggle="modal" data-target="#TaskModal-@item.Id" class="btn btn-sm btn-primary">
-                                        Details
-                                        <i class="fa fa-eye"></i>
-                                    </button>
+                                    @{ item.IsShowDetailsPeekButton = true; }
+                                    <partial name="_TaskActionButtons" model="@item" />
                                 </td>
                             </tr>
                         }

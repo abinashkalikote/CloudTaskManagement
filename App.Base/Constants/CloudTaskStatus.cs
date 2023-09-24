@@ -8,7 +8,13 @@ namespace App.Base.Constants
 {
     public static class CloudTaskStatus
     {
-        public static List<TStatus> TaskStatusList = new List<TStatus>()
+
+        public static string Pending { get; set; } = "Pending";
+        public static string InProgress { get; set; } = "InProgress";
+        public static string Completed { get; set; } = "Completed";
+        public static string Canceled { get; set; } = "Canceled";
+
+        public static List<TStatus> TaskStatusList = new()
         {
             new TStatus { TsStatus = "Pending"},
             new TStatus { TsStatus = "InProgress"},

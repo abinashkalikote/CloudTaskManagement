@@ -70,9 +70,9 @@ namespace App.Web.Controllers
                         SoftwareVersionTo = vm.SoftwareVersionTo ?? "Latest",
                         IssueOnPreviousSoftware = vm.IssueOnPreviousSoftware ?? "",
                         Remarks = vm.Remarks ?? "",
-                        RecAuditLog = "Task Created by " + HttpContext.Session.GetString("FullName"),
-                        RecById = Convert.ToInt32(HttpContext.Session.GetString("UserID")),
-                        TSKStatus = "Pending"
+                        RecAuditLog = "Task Created by " + _userProvider.GetUsername(),
+                        RecById = Convert.ToInt32(_userProvider.GetUserId()),
+                        TSKStatus = CloudTaskStatus.Pending
                     };
 
                     await _db.CloudTasks.AddAsync(cloudTask);
@@ -98,7 +98,7 @@ namespace App.Web.Controllers
         {
             var vm = new TaskReportVM();
             InitializeTaskVM(vm);
-            var query = await GetTaskQueryable(vm).Where(e => e.ProccedById == null && e.CompletedById == null).ToListAsync();
+            var query = await GetTaskQueryable(vm).Where(e => e.TSKStatus == CloudTaskStatus.Pending).ToListAsync();
             vm.Tasks = PrepareTaskVms(query);
             return View(vm);
         }
@@ -106,21 +106,22 @@ namespace App.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AuditTask(TaskReportVM vm)
         {
-            var data = await GetTaskQueryable(vm).Where(e => e.ProccedById == null && e.CompletedById == null).ToListAsync();
+            var data = await GetTaskQueryable(vm).Where(e => e.TSKStatus == CloudTaskStatus.Pending).ToListAsync();
             return RedirectToAction(nameof(AuditTask));
         }
 
-        
+
         [HttpGet]
         public async Task<IActionResult> DeleteTask(int? TaskID)
         {
-            if(TaskID == null)
+            if (TaskID == null)
                 return RedirectToAction(nameof(AuditTask));
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             var task = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID);
-            try {
-                task.TSKStatus = "Canceled";
+            try
+            {
+                task.TSKStatus = CloudTaskStatus.Canceled;
 
                 _db.CloudTasks.Update(task);
                 await _db.SaveChangesAsync();
@@ -151,6 +152,41 @@ namespace App.Web.Controllers
             vm.Tasks = PrepareTaskVms(query);
             return View(vm);
         }
+
+        public async Task<IActionResult> TaskDetails(int? TaskID)
+        {
+            if (TaskID == null)
+                throw new Exception("Task Not Found !");
+
+            var data = await _db.CloudTasks.Include(e => e.TaskType)
+                .Include(e => e.RecBy)
+                .Include(e => e.ProccedBy)
+                .Include(e => e.CompletedBy)
+                .Where(e => e.RecStatus == Status.Active && e.Id == TaskID).FirstOrDefaultAsync() ?? throw new Exception("Task Not Found !");
+
+            var vm = new TaskTempVM();
+
+            vm.Id = data.Id;
+            vm.TaskTitle = data.TaskName;
+            vm.ClientName = data.ClientName;
+            vm.CloudURL = data.CloudUrl;
+            vm.TaskTypeName = data.TaskType != null ? data.TaskType.TaskTypeName : "Not Declared";
+            vm.TaskTime = data.TaskTime;
+            vm.HighPriority = data.Priority == 'Y' ? "Yes" : "No";
+            vm.SoftwareVersionFrom = data.SoftwareVersionFrom;
+            vm.SoftwareVersionTo = data.SoftwareVersionTo;
+            vm.IssueOnPreviousSoftware = data.IssueOnPreviousSoftware;
+            vm.RecDate = data.RecDate.ToString("yyyy/MM/dd") + " " + data.RecDate.ToString("dddd");
+            vm.RecBy = data.RecBy.Username;
+            vm.ProccedBy = data.ProccedBy != null ? data.ProccedBy.Username : "-";
+            vm.CompletedBy = data.CompletedBy != null ? data.CompletedBy.Username : "-";
+            vm.IsInPending = data.TSKStatus == CloudTaskStatus.Pending;
+            vm.IsInProgress = data.TSKStatus == CloudTaskStatus.InProgress;
+            vm.IsCompleted = data.TSKStatus == CloudTaskStatus.Completed;
+            vm.IsCanceled = data.TSKStatus == CloudTaskStatus.Canceled;
+
+            return View(vm);
+        }
         #endregion TaskReportMethod
 
 
@@ -158,21 +194,22 @@ namespace App.Web.Controllers
 
         public async Task<IActionResult> ProccedTask(int? TaskID)
         {
-            if (TaskID == null) { 
+            if (TaskID == null)
+            {
                 TempData["error"] = "Something Went Wrong !";
                 return RedirectToAction(nameof(GetAllTask));
             }
 
-            
+
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             try
             {
 
-                var pendingTask = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID && e.TSKStatus == "Pending");
+                var pendingTask = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID && e.TSKStatus == CloudTaskStatus.Pending);
 
                 pendingTask.ProccedById = _userProvider.GetUserId();
                 pendingTask.ProccedTime = DateTime.Now;
-                pendingTask.TSKStatus = "InProgress";
+                pendingTask.TSKStatus = CloudTaskStatus.InProgress;
 
                 _db.CloudTasks.Update(pendingTask);
                 await _db.SaveChangesAsync();
@@ -200,11 +237,14 @@ namespace App.Web.Controllers
 
             try
             {
-                var workingTask = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID && e.TSKStatus == "InProgress");
+                var workingTask = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskID && e.TSKStatus == CloudTaskStatus.InProgress);
+
+                if (workingTask == null)
+                    throw new Exception("Task Not Found !");
 
                 workingTask.CompletedById = _userProvider.GetUserId();
-                workingTask.ProccedTime = DateTime.Now;
-                workingTask.TSKStatus = "Completed";
+                workingTask.CompleteTime = DateTime.Now;
+                workingTask.TSKStatus = CloudTaskStatus.Completed;
 
                 _db.CloudTasks.Update(workingTask);
                 await _db.SaveChangesAsync();
@@ -292,13 +332,16 @@ namespace App.Web.Controllers
                 vm.RecBy = item.RecBy.Username;
                 vm.ProccedBy = item.ProccedBy != null ? item.ProccedBy.Username : "-";
                 vm.CompletedBy = item.CompletedBy != null ? item.CompletedBy.Username : "-";
-                vm.IsInPending = item.TSKStatus == "Pending";
-                vm.IsInProgress = item.TSKStatus == "InProgress";
+                vm.IsInPending = item.TSKStatus == CloudTaskStatus.Pending;
+                vm.IsInProgress = item.TSKStatus == CloudTaskStatus.InProgress;
+                vm.IsCompleted = item.TSKStatus == CloudTaskStatus.Completed;
+                vm.IsCanceled = item.TSKStatus == CloudTaskStatus.Canceled;
+                vm.IsShowDetailsPeekButton = true;
                 list.Add(vm);
             }
             return list;
         }
-       
+
         private void InitializeTaskVM(TaskReportVM vm)
         {
             vm.taskTypes = _db.TaskTypes.ToList();

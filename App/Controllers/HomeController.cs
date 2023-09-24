@@ -1,4 +1,5 @@
-﻿using App.Models;
+﻿using App.Base.Constants;
+using App.Models;
 using CTM.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -30,9 +31,10 @@ namespace App.Controllers
         public IActionResult Index()
         {
             ViewBag.TotalTaskCount = _db.CloudTasks.Count();
-            ViewBag.TotalPendingTaskCount = _db.CloudTasks.Where(e => (e.ProccedById == null && e.CompletedById == null)).Count();
-            ViewBag.TotalWorkingTaskCount = _db.CloudTasks.Where(e => (e.ProccedById != null && e.CompletedById == null)).Count();
-            ViewBag.TotalCompletedTaskCount = _db.CloudTasks.Where(e => (e.ProccedById != null && e.CompletedById != null)).Count();
+            ViewBag.TotalPendingTaskCount = _db.CloudTasks.Where(e => e.TSKStatus == CloudTaskStatus.Pending).Count();
+            ViewBag.TotalWorkingTaskCount = _db.CloudTasks.Where(e => e.TSKStatus == CloudTaskStatus.InProgress).Count();
+            ViewBag.TotalCompletedTaskCount = _db.CloudTasks.Where(e => e.TSKStatus == CloudTaskStatus.Completed).Count();
+            ViewBag.TotalCanceledTaskCount = _db.CloudTasks.Where(e => e.TSKStatus == CloudTaskStatus.Canceled).Count();
             return View();
         }
 

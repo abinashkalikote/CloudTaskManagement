@@ -1,0 +1,67 @@
+﻿@model TaskTempVM
+@{
+    ViewData["Title"] = "Task Details";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h2>Task Details</h2>
+    </div>
+    <div class="card-body">
+        @if (Model != null)
+        {
+            <div class="row">
+                <div class="col-7">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Client Name</th>
+                            <td>@Model.ClientName</td>
+                        </tr>
+                        <tr>
+                            <th>Cloud URL</th>
+                            <td>
+                                <button type="button" class="btn btn-primary btn-xs" style="font-size: 10px !important;" ctm-copy="copy" ctm-copy-for="copy-cloud-url" title="Copy Cloud URL"><i class="fa-solid fa-copy"></i></button>
+                                <span id="copy-cloud-url">
+                                    <a href="@Model.CloudURL" target="_blank">@Model.CloudURL</a>
+                                    </span>
+                                </td>
+                        </tr>
+                        <tr>
+                            <th>Task Type</th>
+                            <td>@Model.TaskTypeName</td>
+                        </tr>
+                        <tr>
+                            <th>Task Name</th>
+                            <td>@Model.TaskTitle</td>
+                        </tr>
+                        <tr>
+                            <th>Task Time</th>
+                            <td>@Model.TaskTime</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-5">
+                    sdfsdf
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $("[ctm-copy=copy]").click(function () {
+                var id = $(this).attr('ctm-copy-for');
+                var el = document.getElementById(id);
+                var range = document.createRange();
+                range.selectNodeContents(el);
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                document.execCommand('copy');
+                return false;
+            });
+        });
+    </script>
+}

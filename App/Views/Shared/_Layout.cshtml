@@ -1,4 +1,5 @@
 ﻿@inject App.Web.Providers.Interface.IUserProvider _userProvider
+@using App.Base.Constants
 <!DOCTYPE html>
 <html lang="en">
 
@@ -176,7 +177,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a asp-controller="Task" asp-action="GetAllTask" asp-route-TSKStatus="Pending" class="nav-link">
+                            <a asp-controller="Task" asp-action="GetAllTask" asp-route-TSKStatus="@CloudTaskStatus.Pending" class="nav-link">
                                 <i class="fas fa-solid fa-clock nav-icon"></i>
                                 <p>Pending Task</p>
                             </a>
@@ -184,14 +185,14 @@
 
 
                         <li class="nav-item">
-                            <a asp-controller="Task" asp-action="GetAllTask" asp-route-TSKStatus="InProgress" class="nav-link">
+                            <a asp-controller="Task" asp-action="GetAllTask" asp-route-TSKStatus="@CloudTaskStatus.InProgress" class="nav-link">
                                 <i class="fas fa-solid fa-hammer nav-icon"></i>
                                 <p>Working Task</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a asp-controller="Task" asp-action="GetAllTask" asp-route-TSKStatus="Completed" class="nav-link">
+                            <a asp-controller="Task" asp-action="GetAllTask" asp-route-TSKStatus="@CloudTaskStatus.Completed" class="nav-link">
                                 <i class="fas fa-solid fa-check nav-icon"></i>
                                 <p>Completed Task</p>
                             </a>

@@ -177,9 +177,9 @@ namespace App.Web.Controllers
             vm.SoftwareVersionTo = data.SoftwareVersionTo;
             vm.IssueOnPreviousSoftware = data.IssueOnPreviousSoftware;
             vm.RecDate = data.RecDate.ToString("yyyy/MM/dd") + " " + data.RecDate.ToString("dddd");
-            vm.RecBy = data.RecBy.Username;
-            vm.ProccedBy = data.ProccedBy != null ? data.ProccedBy.Username : "-";
-            vm.CompletedBy = data.CompletedBy != null ? data.CompletedBy.Username : "-";
+            vm.RecBy = data.RecBy.FullName;
+            vm.ProccedBy = data.ProccedBy != null ? data.ProccedBy.FullName : "-";
+            vm.CompletedBy = data.CompletedBy != null ? data.CompletedBy.FullName : "-";
             vm.IsInPending = data.TSKStatus == CloudTaskStatus.Pending;
             vm.IsInProgress = data.TSKStatus == CloudTaskStatus.InProgress;
             vm.IsCompleted = data.TSKStatus == CloudTaskStatus.Completed;
@@ -329,9 +329,9 @@ namespace App.Web.Controllers
                 vm.SoftwareVersionTo = item.SoftwareVersionTo;
                 vm.IssueOnPreviousSoftware = item.IssueOnPreviousSoftware;
                 vm.RecDate = item.RecDate.ToString("yyyy/MM/dd") + " " + item.RecDate.ToString("dddd");
-                vm.RecBy = item.RecBy.Username;
-                vm.ProccedBy = item.ProccedBy != null ? item.ProccedBy.Username : "-";
-                vm.CompletedBy = item.CompletedBy != null ? item.CompletedBy.Username : "-";
+                vm.RecBy = item.RecBy.FullName;
+                vm.ProccedBy = item.ProccedBy != null ? item.ProccedBy.FullName : "-";
+                vm.CompletedBy = item.CompletedBy != null ? item.CompletedBy.FullName : "-";
                 vm.IsInPending = item.TSKStatus == CloudTaskStatus.Pending;
                 vm.IsInProgress = item.TSKStatus == CloudTaskStatus.InProgress;
                 vm.IsCompleted = item.TSKStatus == CloudTaskStatus.Completed;

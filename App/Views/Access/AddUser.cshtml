@@ -1,0 +1,58 @@
+﻿@model UserVM
+@{
+    ViewData["Title"] = "Add User";
+}
+
+<form method="post">
+    <div class="card">
+        <div class="card-header">
+            <h1>Add User</h1>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 mb-2">
+                    <label asp-for="FullName"></label>
+                    <input asp-for="FullName" class="form-control form-control-border" placeholder="Full Name" autofocus>
+                    <span class="text-danger" asp-validation-for="FullName"></span>
+                </div>
+
+                <div class="col-12 mb-2">
+                    <label asp-for="Email"></label>
+                    <input asp-for="Email" class="form-control form-control-border" placeholder="Email" >
+                    <span class="text-danger" asp-validation-for="Email"></span>
+                </div>
+
+                <div class="col-6 mb-2">
+                    <label asp-for="Password"></label>
+                    <input type="password" asp-for="Password" class="form-control form-control-border" placeholder="Password" >
+                    <span class="text-danger" asp-validation-for="Password"></span>
+                </div>
+
+                <div class="col-6 mb-2">
+                    <label for="ConfirmPassword"></label>
+                    <input type="password" asp-for="ConfirmPassword" class="form-control form-control-border" placeholder="Confirm Password">
+                    <span class="text-danger" asp-validation-for="ConfirmPassword"></span>
+                </div>
+
+                <div class="col-2 d-flex mb-2">
+                    <div class="form-group">
+                        <label asp-for="IsAdmin"></label>
+                        <input type="checkbox" class="form-control form-control-border" asp-for="IsAdmin" />
+                    </div>
+                </div>
+
+
+                <div class="col-12 text-right mb-2">
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-primary" value="Add User" />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

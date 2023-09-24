@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace App.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230919121308_Initial")]
+    [Migration("20230924122506_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -189,8 +189,13 @@ namespace App.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("bit");
+                    b.Property<string>("IsAdmin")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(1)");
+
+                    b.Property<string>("IsNewPassword")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(1)");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -205,10 +210,6 @@ namespace App.Data.Migrations
 
                     b.Property<string>("RecStatus")
                         .HasColumnType("nvarchar(1)");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using App.Base.Constants;
 using App.Model;
+using App.Web.Providers.Interface;
+using System.Transactions;
+using BC = BCrypt.Net.BCrypt;
 
 namespace App.Web.Controllers
 {
@@ -14,9 +17,15 @@ namespace App.Web.Controllers
     {
         private readonly AppDbContext _db;
 
-        public AccessController(AppDbContext db)
+        private readonly IUserProvider _userProvider;
+
+        public AccessController(
+            AppDbContext db,
+            IUserProvider userProvider
+            )
         {
             _db = db;
+            _userProvider = userProvider;
         }
 
         [HttpGet]
@@ -40,9 +49,7 @@ namespace App.Web.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _db.Users.FirstOrDefaultAsync(e =>
-                                e.Email == loginVM.Email
-                                && e.Password == loginVM.Password
-                                && e.RecStatus == Status.Active);
+                                e.Email == loginVM.Email && e.RecStatus == Status.Active);
 
                 if (user == null)
                 {
@@ -50,12 +57,19 @@ namespace App.Web.Controllers
                     return View();
                 }
 
+                if(!BC.EnhancedVerify(loginVM.Password, user.Password))
+                {
+                    TempData["error"] = "Password Not Matched !";
+                    return View();
+                }
+
                 List<Claim> claims = new()
                 {
                     new Claim(ClaimTypes.Name, user.FullName),
                     new Claim("Email", user.Email),
-                    new Claim("Username", user.Username),
-                    new Claim("UserID", Convert.ToString(user.Id))
+                    new Claim("Username", user.FullName),
+                    new Claim("UserID", Convert.ToString(user.Id)),
+                    new Claim("IsAdmin", Convert.ToString(user.IsAdmin))
                 };
 
                 AuthenticationProperties properties = new()
@@ -67,11 +81,12 @@ namespace App.Web.Controllers
                 ClaimsIdentity identity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), properties);
-                HttpContext.Session.SetString("Username", user.Username);
+                HttpContext.Session.SetString("Username", user.FullName);
                 HttpContext.Session.SetString("Email", user.Email);
                 HttpContext.Session.SetString("FullName", user.FullName);
                 HttpContext.Session.SetString("UserID", Convert.ToString(user.Id));
 
+                TempData["success"] = "User Successfully Logged In!";
 
                 var returnUrl = Request.Cookies["returnUrl"];
                 if (!string.IsNullOrEmpty(returnUrl))
@@ -85,5 +100,107 @@ namespace App.Web.Controllers
 
             return View();
         }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> AllUsers()
+        {
+            var users = await _db.Users.Where(e => e.Id != SuperAdmin.Admin).ToListAsync();
+            var userVM = new List<UserVM>();
+
+            foreach (var user in users)
+            {
+                var u = new UserVM();
+                u.Id = user.Id;
+                u.FullName = user.FullName;
+                u.Email = user.Email;
+                u.IsAdmin = user.IsAdmin == 'Y' ? "Yes" : "No" ;
+                u.Status = user.RecStatus == 'A' ? "Active" : "InActive";
+                userVM.Add(u);
+
+            }
+            return View(userVM);
+        }
+
+
+
+        [HttpGet]
+        public IActionResult AddUser()
+        {
+            if (!_userProvider.IsAdmin())
+            {
+                TempData["error"] = "Permission Denied ! \\n You don't have permission to Access : "+Request.Path;
+                return RedirectToAction("Index", "Home");
+            }
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddUser(UserVM user)
+        {
+            if (!_userProvider.IsAdmin())
+            {
+                TempData["error"] = "Permission Denied ! \\n You don't have permission to Access : " + Request.Path;
+                return RedirectToAction("Index", "Home");
+            }
+            if (ModelState.IsValid)
+            {
+
+                if (IsUniqueEmail(user))
+                {
+                    ModelState.AddModelError("Email", "Email is already Used !");
+                }
+
+                var admin = 'N';
+                if (user.IsAdmin == "true")
+                    admin = 'Y';
+
+
+                using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+                try
+                {
+                    var newUser = new User();
+                    newUser.FullName = user.FullName;
+                    newUser.Email = user.Email;
+                    newUser.Password = BC.EnhancedHashPassword(user.Password);
+                    newUser.IsNewPassword = 'Y';
+                    newUser.RecBy = _userProvider.GetUsername();
+                    newUser.IsAdmin = admin;
+
+                    await _db.Users.AddAsync(newUser);
+                    await _db.SaveChangesAsync();
+                    scope.Complete();
+
+                    TempData["success"] = "User Added Successfully !";
+                    return RedirectToAction(nameof(AddUser));
+                }
+                catch (Exception)
+                {
+                    scope.Dispose();
+                    throw new Exception("Something went wrong while User Add !");
+                }
+
+            }
+                
+            return View(user);
+        }
+
+
+
+
+        #region PrivateMethods
+        private bool IsUniqueEmail(UserVM vm)
+        {
+            var email = vm.Email;
+            var data = _db.Users.FirstOrDefault(e => e.Email == email);
+            if(data == null)
+            {
+                return true;
+            }
+            return false;
+        }
+        #endregion PrivateMethods
     }
 }

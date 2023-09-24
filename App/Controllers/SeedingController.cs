@@ -2,6 +2,7 @@
 using CTM.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using BC = BCrypt.Net.BCrypt;
 
 namespace App.Web.Controllers
 {
@@ -48,7 +49,7 @@ namespace App.Web.Controllers
 
         public List<User> UsersData = new()
         {
-            new User { FullName="Office", Username="Office", Email="info@prathamit.com", Password="test", IsAdmin=true, RecBy="AutoAdmin" }
+            new User { FullName="Office", Email="info@prathamit.com", IsNewPassword='N', Password=BC.EnhancedHashPassword("test"), IsAdmin='Y', RecBy="AutoAdmin" }
         };
     }
 }

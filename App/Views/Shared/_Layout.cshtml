@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="~/adminlte/dist/css/adminlte.min.css" asp-append-version="true">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css" asp-append-version="true">
-    <partial name="_DataTableCSS"/>
+    <partial name="_DataTableCSS" />
 </head>
 
 <body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm" id="body">
@@ -40,6 +40,26 @@
                 <li class="nav-item d-none d-sm-inline-block">
                     <a asp-controller="Home" asp-action="Index" class="nav-link">Home</a>
                 </li>
+
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Users
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item nav-link" asp-action="AllUsers" asp-controller="Access">Users</a>
+                        @if (_userProvider.IsAdmin())
+                        {
+                            <a class="dropdown-item nav-link" asp-action="AddUser" asp-controller="Access">Add User</a>
+                        }
+                        <a class="dropdown-item nav-link" href="#">Password Reset</a>
+                        @*<div  class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Something else here</a> *@
+                    </div>
+                </li>
+
+
+
             </ul>
 
             <!-- Right navbar links -->

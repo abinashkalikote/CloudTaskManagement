@@ -11,5 +11,6 @@ namespace App.Web.Providers.Interface
     {
         public string? GetUsername();
         public int? GetUserId();
+        public bool IsAdmin();
     }
 }

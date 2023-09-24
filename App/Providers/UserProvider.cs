@@ -28,7 +28,7 @@ namespace App.Web.Providers
         public string? GetUsername()
         {
             var user = GetCurrentUser();
-            return user?.Username;
+            return user?.FullName;
         }
 
         private User? GetCurrentUser()
@@ -56,6 +56,20 @@ namespace App.Web.Providers
                 return id;
             }
             return null;
+        }
+
+        public bool IsAdmin()
+        {
+            var IsAdmin = _context.User.Claims.FirstOrDefault(e => e.Type == "IsAdmin");
+            if (IsAdmin != null)
+            {
+                if(IsAdmin.Value == "Y")
+                {
+                    return true;
+                }
+                return false;
+            }
+            return false;
         }
     }
 }

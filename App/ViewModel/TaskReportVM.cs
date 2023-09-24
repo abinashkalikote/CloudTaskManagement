@@ -47,7 +47,7 @@ namespace App.Web.ViewModel
 
 
         public List<User>? Users { get; set; }
-        public SelectList UserList() => new SelectList(Users, nameof(User.Id), nameof(User.Username), CreatedBy);
+        public SelectList UserList() => new SelectList(Users, nameof(User.Id), nameof(User.FullName), CreatedBy);
 
     }
 }

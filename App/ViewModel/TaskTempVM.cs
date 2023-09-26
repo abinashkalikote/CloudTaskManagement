@@ -60,5 +60,6 @@ namespace App.Web.ViewModel
         public string? RecBy { get; set; }
         public string? ProccedBy { get; set; }
         public string? CompletedBy { get; set; }
+        public DateTime? TimeSpan { get; set; }
     }
 }

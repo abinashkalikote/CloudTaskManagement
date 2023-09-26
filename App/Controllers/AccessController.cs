@@ -9,6 +9,7 @@ using App.Base.Constants;
 using App.Model;
 using App.Web.Providers.Interface;
 using System.Transactions;
+using System.Text.Json;
 using BC = BCrypt.Net.BCrypt;
 
 namespace App.Web.Controllers
@@ -63,13 +64,19 @@ namespace App.Web.Controllers
                     return View();
                 }
 
+                SessionUserVM vm = new()
+                {
+                    Email = user.Email,
+                    IsAdmin = user.IsAdmin,
+                    UserId = user.Id,
+                    UserName = user.FullName
+                };
+
+                var data = JsonSerializer.Serialize(vm);
                 List<Claim> claims = new()
                 {
-                    new Claim(ClaimTypes.Name, user.FullName),
-                    new Claim("Email", user.Email),
-                    new Claim("Username", user.FullName),
-                    new Claim("UserID", Convert.ToString(user.Id)),
-                    new Claim("IsAdmin", Convert.ToString(user.IsAdmin))
+                    new Claim("SessionUser", data),
+
                 };
 
                 AuthenticationProperties properties = new()
@@ -81,10 +88,6 @@ namespace App.Web.Controllers
                 ClaimsIdentity identity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), properties);
-                HttpContext.Session.SetString("Username", user.FullName);
-                HttpContext.Session.SetString("Email", user.Email);
-                HttpContext.Session.SetString("FullName", user.FullName);
-                HttpContext.Session.SetString("UserID", Convert.ToString(user.Id));
 
                 TempData["success"] = "User Successfully Logged In!";
 

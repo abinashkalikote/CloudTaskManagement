@@ -12,6 +12,7 @@ using System.Transactions;
 using App.Web.Providers.Interface;
 using App.Base.Extensions;
 using static System.Formats.Asn1.AsnWriter;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace App.Web.Controllers
 {
@@ -51,7 +52,7 @@ namespace App.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+                using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
                 try
                 {
                     var pr = 'N';
@@ -77,14 +78,14 @@ namespace App.Web.Controllers
 
                     await _db.CloudTasks.AddAsync(cloudTask);
                     await _db.SaveChangesAsync();
-                    transactionScope.Complete();
+                    scope.Complete();
 
                     TempData["success"] = "Task Added Successfully !";
                     return RedirectToAction("CreateTask", "Task");
                 }
                 catch (Exception ex)
                 {
-                    transactionScope.Dispose();
+                    scope.Dispose();
                     TempData["error"] = "Error occured while creating Task !" + ex.Message;
                     return RedirectToAction("CreateTask", "Task");
                 }
@@ -93,12 +94,55 @@ namespace App.Web.Controllers
             return View(vm);
         }
 
+
+        [HttpGet]
+        public IActionResult EditTask(int TaskID)
+        {
+            if (TaskID == null)
+                throw new Exception($"TaskID {TaskID} can't found !");
+
+
+            var task = _db.CloudTasks.FirstOrDefault(e => e.Id == TaskID);
+
+            if (task == null)
+                throw new Exception($"Task not found !");
+
+            if(task.TSKStatus == CloudTaskStatus.InProgress || 
+                task.TSKStatus == CloudTaskStatus.Completed)
+                throw new Exception($"Task Is Alreday in Progress or Completed, You can't Edit this task !");
+
+
+            TaskVM vm = new()
+            {
+                Id = task.Id,
+                TaskTitle = task.TaskName,
+                TaskTypeId = task.TaskTypeId,
+                ClientName = task.ClientName,
+                CloudURL = task.CloudUrl,
+                HighPriority = task.Priority == 'Y' ? "true" : "false",
+                TaskTime = task.TaskTime,
+                SoftwareVersionFrom = task.SoftwareVersionFrom,
+                SoftwareVersionTo = task.SoftwareVersionTo,
+                IssueOnPreviousSoftware = task.IssueOnPreviousSoftware,
+                Remarks = task.Remarks ?? "",
+                taskTypes = _db.TaskTypes.ToList()
+            };
+            return View(vm);
+        }
+
+
+
+
+
         [HttpGet]
         public async Task<IActionResult> AuditTask()
         {
             var vm = new TaskReportVM();
             InitializeTaskVM(vm);
-            var query = await GetTaskQueryable(vm).Where(e => e.TSKStatus == CloudTaskStatus.Pending).ToListAsync();
+            var query = await GetTaskQueryable(vm)
+                .Where(e => e.TSKStatus == CloudTaskStatus.Pending)
+                .ToListAsync();
+
             vm.Tasks = PrepareTaskVms(query);
             return View(vm);
         }
@@ -106,7 +150,9 @@ namespace App.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AuditTask(TaskReportVM vm)
         {
-            var data = await GetTaskQueryable(vm).Where(e => e.TSKStatus == CloudTaskStatus.Pending).ToListAsync();
+            var data = await GetTaskQueryable(vm)
+                .Where(e => e.TSKStatus == CloudTaskStatus.Pending)
+                .ToListAsync();
             return RedirectToAction(nameof(AuditTask));
         }
 
@@ -143,7 +189,6 @@ namespace App.Web.Controllers
 
         #region TaskReportMethod
         [HttpGet]
-        //[Route("/Api/GetAllTasks?Status=pending")]
         public async Task<IActionResult> GetAllTask(TaskReportVM vm)
         {
 
@@ -329,6 +374,7 @@ namespace App.Web.Controllers
                 vm.SoftwareVersionTo = item.SoftwareVersionTo;
                 vm.IssueOnPreviousSoftware = item.IssueOnPreviousSoftware;
                 vm.RecDate = item.RecDate.ToString("yyyy/MM/dd") + " " + item.RecDate.ToString("dddd");
+                vm.TimeSpan = item.RecDate;
                 vm.RecBy = item.RecBy.FullName;
                 vm.ProccedBy = item.ProccedBy != null ? item.ProccedBy.FullName : "-";
                 vm.CompletedBy = item.CompletedBy != null ? item.CompletedBy.FullName : "-";

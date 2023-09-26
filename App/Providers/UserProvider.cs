@@ -5,71 +5,62 @@ using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using App.Model;
+using System.Text.Json;
 
 namespace App.Web.Providers
 {
     public class UserProvider : IUserProvider
     {
-        private readonly AppDbContext _db;
         public readonly HttpContext _context;
 
-        private User _currentUser;
-
         public UserProvider(
-            AppDbContext db,
             IHttpContextAccessor httpContextAccessor
             )
         {
-            _db = db;
             _context = httpContextAccessor.HttpContext;
         }
 
 
         public string? GetUsername()
         {
-            var user = GetCurrentUser();
-            return user?.FullName;
+            var user = GetSessionUser();
+            return user?.UserName;
         }
 
-        private User? GetCurrentUser()
-        {
-            if (_currentUser == null)
-            {
-                var userId = GetUserId();
-                if (userId == null)
-                {
-                    _currentUser = null;
-                }
-                else
-                {
-                    _currentUser = _db.Users.FirstOrDefault(e => e.Id == userId);
-                }
-            }
-            return _currentUser;
-        }
 
         public int? GetUserId()
         {
-            var userIDClaim = _context.User.Claims.FirstOrDefault(e => e.Type == "UserID");
-            if (userIDClaim != null && int.TryParse(userIDClaim.Value, out int id))
+            var sessionUser = GetSessionUser();
+            if (sessionUser != null)
             {
-                return id;
+                return sessionUser.UserId;
             }
             return null;
         }
 
         public bool IsAdmin()
         {
-            var IsAdmin = _context.User.Claims.FirstOrDefault(e => e.Type == "IsAdmin");
-            if (IsAdmin != null)
+            var sessionUser = GetSessionUser();
+            if (sessionUser != null)
             {
-                if(IsAdmin.Value == "Y")
+                if(sessionUser.IsAdmin == 'Y')
                 {
                     return true;
                 }
                 return false;
             }
             return false;
+        }
+
+        public SessionUserVM GetSessionUser()
+        {
+            var userIDClaim = _context.User.Claims.FirstOrDefault(e => e.Type == "SessionUser");
+            if(userIDClaim != null)
+            {
+                var sessionUser = JsonSerializer.Deserialize<SessionUserVM>(userIDClaim.Value);
+                return sessionUser;
+            }
+            return new SessionUserVM();
         }
     }
 }

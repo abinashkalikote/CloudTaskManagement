@@ -87,7 +87,7 @@
                                 <td style="width:15%">@item.ClientName</td>
                                 <td><a title="@item.CloudURL" href="@item.CloudURL" target="_blank">@item.CloudURL</a></td>
                                 <td>@item.TaskTypeName</td>
-                                <td>@Convert.ToDateTime(item.RecDate).Humanize()</td>
+                                <td>@Convert.ToDateTime(item.TimeSpan).Humanize()</td>
                                 <td>@item.RecDate</td>
                                 <td>
                                     @{ item.IsShowDetailsPeekButton = true; }

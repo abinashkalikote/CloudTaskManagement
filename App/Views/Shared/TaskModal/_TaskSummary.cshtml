@@ -1,0 +1,81 @@
+﻿@using NepDate
+@model TaskTempVM
+
+
+@if(Model.TaskTypeId == 1)
+{
+    <div class="card">
+        <div class="card-body">
+            <div><b>Date:</b> @Convert.ToDateTime(Model.TimeSpan).ToNepaliDate()</div>
+
+            <hr class="m-1" />
+
+            @* <div><b>Task 1 :</b></div> *@
+            <div><b>To do :</b> @Model.TaskTypeName </div>
+            <div>
+                <b>Software Version :</b>  <b>From</b> @Model.SoftwareVersionFrom <b>To </b>@Model.SoftwareVersionTo
+            </div>
+            <div>
+                @if (string.IsNullOrEmpty(Model.HighPriority))
+                {
+                    <b>Update Time : </b> @Model.TaskTime
+                }
+                else
+                {
+                    <b>Priority :</b> @Model.HighPriority
+                }
+            </div>
+
+            <hr class="m-1" />
+
+            <div>
+                <b>
+                    Client :
+                </b> @Model.ClientName
+            </div>
+            <div>
+                <b>
+                    Cloud URL :
+                </b>   <a href="@Model.CloudURL" target="_blank">@Model.CloudURL</a>
+            </div>
+            <div>
+                <b>Issue :</b> @Model.IssueOnPreviousSoftware.
+            </div>
+        </div>
+    </div>
+}else if(Model.TaskTypeId == 2)
+{
+    <div class="card">
+        <div class="card-body">
+            <div><b>Date:</b> @Convert.ToDateTime(Model.TimeSpan).ToNepaliDate()</div>
+
+            <hr class="m-1" />
+
+            @* <div><b>Task 1 :</b></div> *@
+            <div><b>To do :</b> @Model.TaskTitle</div>
+            <div>
+                @if (string.IsNullOrEmpty(Model.HighPriority))
+                {
+                    <b>Update Time : </b> @Model.TaskTime
+                }
+                else
+                {
+                    <b>Priority :</b> @Model.HighPriority
+                }
+            </div>
+
+            <hr class="m-1" />
+
+            <div>
+                <b>
+                    Client :
+                </b> @Model.ClientName
+            </div>
+            <div>
+                <b>
+                    Cloud URL :
+                </b>   <a href="@Model.CloudURL" target="_blank">@Model.CloudURL</a>
+            </div>
+        </div>
+    </div>
+}

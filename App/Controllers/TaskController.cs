@@ -96,7 +96,7 @@ namespace App.Web.Controllers
 
 
         [HttpGet]
-        public IActionResult EditTask(int TaskID)
+        public IActionResult EditTask(int? TaskID)
         {
             if (TaskID == null)
                 throw new Exception($"TaskID {TaskID} can't found !");
@@ -215,9 +215,11 @@ namespace App.Web.Controllers
             vm.TaskTitle = data.TaskName;
             vm.ClientName = data.ClientName;
             vm.CloudURL = data.CloudUrl;
+            vm.TaskTypeId = data.TaskType.Id;
             vm.TaskTypeName = data.TaskType != null ? data.TaskType.TaskTypeName : "Not Declared";
             vm.TaskTime = data.TaskTime;
-            vm.HighPriority = data.Priority == 'Y' ? "Yes" : "No";
+            vm.TimeSpan = data.RecDate;
+            vm.HighPriority = data.Priority == 'Y' ? "Urgent" : "";
             vm.SoftwareVersionFrom = data.SoftwareVersionFrom;
             vm.SoftwareVersionTo = data.SoftwareVersionTo;
             vm.IssueOnPreviousSoftware = data.IssueOnPreviousSoftware;

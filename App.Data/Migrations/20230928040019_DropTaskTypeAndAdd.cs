@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace App.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class DropTaskTypeAndAdd : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -133,6 +133,34 @@ namespace App.Data.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "CloudTasksLog",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CloudTaskId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    CloudTaskStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RecDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CloudTasksLog", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CloudTasksLog_CloudTasks_CloudTaskId",
+                        column: x => x.CloudTaskId,
+                        principalTable: "CloudTasks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CloudTasksLog_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AuditTasks_RecById",
                 table: "AuditTasks",
@@ -164,6 +192,16 @@ namespace App.Data.Migrations
                 column: "TaskTypeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CloudTasksLog_CloudTaskId",
+                table: "CloudTasksLog",
+                column: "CloudTaskId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CloudTasksLog_UserId",
+                table: "CloudTasksLog",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TaskTypes_RecById",
                 table: "TaskTypes",
                 column: "RecById");
@@ -174,6 +212,9 @@ namespace App.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AuditTasks");
+
+            migrationBuilder.DropTable(
+                name: "CloudTasksLog");
 
             migrationBuilder.DropTable(
                 name: "CloudTasks");

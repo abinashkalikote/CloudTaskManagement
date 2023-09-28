@@ -15,6 +15,7 @@ namespace CTM.Data
         public DbSet<TaskType> TaskTypes { get; set; }
         public DbSet<CloudTask> CloudTasks { get; set; }
         public DbSet<AuditTask> AuditTasks { get; set; }
+        public DbSet<CloudTaskLog> CloudTasksLog { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -55,6 +56,13 @@ namespace CTM.Data
                 .WithMany()
                 .HasForeignKey(e => e.TaskId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<CloudTaskLog>()
+                .HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
         }
 
     }

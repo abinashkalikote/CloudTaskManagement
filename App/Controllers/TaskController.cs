@@ -76,6 +76,16 @@ namespace App.Web.Controllers
                         TSKStatus = CloudTaskStatus.Pending
                     };
 
+                    //Cloud Task Log a Log
+                    CloudTaskLog cloudTaskLog = new()
+                    {
+                        Remarks = vm.Remarks ?? "",
+                        CloudTaskStatus = CloudTaskStatus.Pending,
+                        UserId = Convert.ToInt32(_userProvider.GetUserId())
+                    };
+
+                    cloudTask.CloudTaskLogs.Add(cloudTaskLog);
+
                     await _db.CloudTasks.AddAsync(cloudTask);
                     await _db.SaveChangesAsync();
                     scope.Complete();
@@ -170,6 +180,17 @@ namespace App.Web.Controllers
                 task.TSKStatus = CloudTaskStatus.Canceled;
 
                 _db.CloudTasks.Update(task);
+
+                //Adding a Log
+                CloudTaskLog cloudTaskLog = new()
+                {
+                    Remarks = "",
+                    CloudTaskStatus = CloudTaskStatus.Canceled,
+                    UserId = Convert.ToInt32(_userProvider.GetUserId())
+                };
+
+                task.CloudTaskLogs.Add(cloudTaskLog);
+
                 await _db.SaveChangesAsync();
                 scope.Complete();
 
@@ -183,8 +204,6 @@ namespace App.Web.Controllers
                 return RedirectToAction(nameof(AuditTask));
             }
         }
-
-
 
 
         #region TaskReportMethod

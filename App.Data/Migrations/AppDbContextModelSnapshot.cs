@@ -142,6 +142,39 @@ namespace App.Data.Migrations
                     b.ToTable("CloudTasks");
                 });
 
+            modelBuilder.Entity("App.Model.CloudTaskLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CloudTaskId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CloudTaskStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RecDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CloudTaskId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CloudTasksLog");
+                });
+
             modelBuilder.Entity("App.Model.TaskType", b =>
                 {
                     b.Property<int>("Id")
@@ -265,6 +298,25 @@ namespace App.Data.Migrations
                     b.Navigation("TaskType");
                 });
 
+            modelBuilder.Entity("App.Model.CloudTaskLog", b =>
+                {
+                    b.HasOne("App.Model.CloudTask", "CloudTask")
+                        .WithMany("CloudTaskLogs")
+                        .HasForeignKey("CloudTaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("App.Model.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("CloudTask");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("App.Model.TaskType", b =>
                 {
                     b.HasOne("App.Model.User", "RecBy")
@@ -274,6 +326,11 @@ namespace App.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("RecBy");
+                });
+
+            modelBuilder.Entity("App.Model.CloudTask", b =>
+                {
+                    b.Navigation("CloudTaskLogs");
                 });
 #pragma warning restore 612, 618
         }

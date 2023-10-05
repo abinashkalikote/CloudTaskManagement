@@ -15,6 +15,7 @@ using Humanizer;
 using System.Configuration;
 using App.Web.Services;
 using App.Web.Models;
+using Microsoft.Build.Execution;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddScoped<DbContext, AppDbContext>();
+
+
 
 builder.Services.AddHttpContextAccessor();
 
@@ -48,6 +53,8 @@ builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSet
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+app.Services.CreateScope().ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
 
 if (app.Environment.IsDevelopment())
 {

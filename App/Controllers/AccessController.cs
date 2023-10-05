@@ -193,6 +193,8 @@ namespace App.Web.Controllers
 
 
 
+        #region ChangePassword
+
         [HttpGet]
         public IActionResult ChangePassword()
         {
@@ -249,6 +251,7 @@ namespace App.Web.Controllers
             return RedirectToAction(nameof(ChangePassword)); ;
         }
 
+        #endregion ChangePassword
 
 
         #region PrivateMethods

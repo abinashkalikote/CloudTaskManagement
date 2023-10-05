@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using App.Model;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace App.Web.ViewModel
@@ -61,5 +62,7 @@ namespace App.Web.ViewModel
         public string? ProccedBy { get; set; }
         public string? CompletedBy { get; set; }
         public DateTime? TimeSpan { get; set; }
+
+        public List<CloudTaskLogVM>? cloudTaskLogs { get; set; } = new List<CloudTaskLogVM>();
     }
 }

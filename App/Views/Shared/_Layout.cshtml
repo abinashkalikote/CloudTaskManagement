@@ -28,7 +28,8 @@
 
         <!-- Preloader -->
         <div class="preloader flex-column justify-content-center align-items-center">
-            <img class="animation__wobble" src="~/adminlte/dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60" asp-append-version="true">
+            @* ~/adminlte/dist/img/AdminLTELogo.png *@
+            <img class="animation__wobble rounded-circle" src="~/Images/loading.jpg" alt="AdminLTELogo" height="60" width="60" asp-append-version="true">
         </div>
 
         <!-- Navbar -->
@@ -103,7 +104,7 @@
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                         <span class="dropdown-item dropdown-header">@_userProvider.GetUsername()</span>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
+                        <a asp-action="ChangePassword" asp-controller="Access" class="dropdown-item">
                             <i class="fas fa-key mr-2"></i> Change Passowrd
                         </a>
                         <div class="dropdown-divider"></div>
@@ -131,7 +132,7 @@
             <!-- Brand Logo -->
             <a asp-controller="Home" asp-action="Index" class="brand-link">
                 <img src="~/Images/company_logo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
-                     style="opacity: .8">
+                     style="opacity: .8;">
                 <span class="brand-text font-weight-light">Cloud Task Management</span>
             </a>
 

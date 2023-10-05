@@ -11,6 +11,10 @@ using App.Web.Providers.Interface;
 using App.Web.Providers;
 using System;
 using Pioneer.Pagination;
+using Humanizer;
+using System.Configuration;
+using App.Web.Services;
+using App.Web.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +36,14 @@ builder.Services.AddSession(option => option.IdleTimeout = TimeSpan.FromMinutes(
 
 builder.Services.AddScoped<IUserProvider, UserProvider>();
 builder.Services.AddTransient<IPaginatedMetaService, PaginatedMetaService>();
+
+
+
+builder.Services.AddScoped<TelegramService>();
+builder.Services.AddHttpClient();
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+
+
 
 builder.Services.AddControllersWithViews();
 

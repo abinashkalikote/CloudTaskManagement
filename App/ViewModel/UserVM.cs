@@ -15,7 +15,7 @@ namespace App.Web.ViewModel
         public string Email { get; set; }
 
         [Required]
-        [MinLength(8)]
+        [MinLength(4)]
         public string? Password { get; set; }
 
         [Required]

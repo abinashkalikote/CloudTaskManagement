@@ -11,6 +11,7 @@ using App.Web.Providers.Interface;
 using System.Transactions;
 using System.Text.Json;
 using BC = BCrypt.Net.BCrypt;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace App.Web.Controllers
 {
@@ -58,7 +59,7 @@ namespace App.Web.Controllers
                     return View();
                 }
 
-                if(!BC.EnhancedVerify(loginVM.Password, user.Password))
+                if (!VerifyPassword(loginVM.Password, user.Password))
                 {
                     TempData["error"] = "Password Not Matched !";
                     return View();
@@ -82,7 +83,7 @@ namespace App.Web.Controllers
                 AuthenticationProperties properties = new()
                 {
                     AllowRefresh = true,
-                    IsPersistent = true
+                    IsPersistent = false
                 };
 
                 ClaimsIdentity identity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -118,7 +119,7 @@ namespace App.Web.Controllers
                 u.Id = user.Id;
                 u.FullName = user.FullName;
                 u.Email = user.Email;
-                u.IsAdmin = user.IsAdmin == 'Y' ? "Yes" : "No" ;
+                u.IsAdmin = user.IsAdmin == 'Y' ? "Yes" : "No";
                 u.Status = user.RecStatus == 'A' ? "Active" : "InActive";
                 userVM.Add(u);
 
@@ -133,7 +134,7 @@ namespace App.Web.Controllers
         {
             if (!_userProvider.IsAdmin())
             {
-                TempData["error"] = "Permission Denied ! \\n You don't have permission to Access : "+Request.Path;
+                TempData["error"] = "Permission Denied ! \\n You don't have permission to Access : " + Request.Path;
                 return RedirectToAction("Index", "Home");
             }
             return View();
@@ -186,10 +187,67 @@ namespace App.Web.Controllers
                 }
 
             }
-                
+
             return View(user);
         }
 
+
+
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordVM vm)
+        {
+            if (ModelState.IsValid)
+            {
+                if (!NewAndConfirmPasswordSame(vm.NewPassword, vm.ConfirmPassword))
+                {
+                    ModelState.AddModelError("ConfirmPassword", "Password & Confirm Password not matched !");
+                    return View();
+                }
+
+
+                using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+                try
+                {
+                    var user = await _db.Users.FirstOrDefaultAsync(e => e.Id == _userProvider.GetUserId());
+
+                    if (user != null)
+                    {
+
+                        if (!VerifyPassword(vm.OldPassword, user.Password))
+                        {
+                            ModelState.AddModelError("OldPassword", "Recent Password not mached !");
+                            return View();
+                        }
+
+
+                        user.Password = BC.EnhancedHashPassword(vm.NewPassword);
+                        _db.Users.Update(user);
+                        await _db.SaveChangesAsync();
+                        scope.Complete();
+
+                        TempData["success"] = "Password Change Succssfully !";
+                        return RedirectToAction("Logout", "Home");
+                    }
+                    scope.Dispose();
+                    return RedirectToAction(nameof(ChangePassword));
+
+                }
+                catch (Exception ex)
+                {
+                    scope.Dispose();
+                    throw new Exception("Something Went Wrong !\n" + ex.Message);
+                }
+
+            }
+            return RedirectToAction(nameof(ChangePassword)); ;
+        }
 
 
 
@@ -198,11 +256,35 @@ namespace App.Web.Controllers
         {
             var email = vm.Email;
             var data = _db.Users.FirstOrDefault(e => e.Email == email);
-            if(data == null)
+            if (data == null)
             {
                 return true;
             }
             return false;
+        }
+
+        private bool VerifyPassword(string Password, string HashPassword)
+        {
+            if (BC.EnhancedVerify(Password, HashPassword))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private bool NewAndConfirmPasswordSame(string NewPassword, string ConfirmPassword)
+        {
+            if (NewPassword == ConfirmPassword)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         #endregion PrivateMethods
     }

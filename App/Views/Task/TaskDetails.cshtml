@@ -1,4 +1,7 @@
-﻿@model TaskTempVM
+﻿@using Humanizer
+@using NepDate
+@using App.Base.Constants
+@model TaskTempVM
 
 @{
     ViewData["Title"] = "Task Details";
@@ -42,12 +45,129 @@
                     </table>
                 </div>
                 <div class="col-md-5 col-sm-12">
-                    <partial name="~/Views/Shared/TaskModal/_TaskSummary.cshtml"/>
+                    <partial name="~/Views/Shared/TaskModal/_TaskSummary.cshtml" />
                 </div>
             </div>
         }
     </div>
 </div>
+
+@if (Model.cloudTaskLogs != null && Model.cloudTaskLogs.Count > 0)
+{
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+
+            <h1 class="h2">Timeline</h1>
+            <hr/>
+
+            <!-- Timelime example  -->
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- The time line -->
+                    <div class="timeline">
+
+
+                        @foreach (var cloudTaskLog in Model.cloudTaskLogs)
+                        {
+                            if (cloudTaskLog.CloudTaskStatus == CloudTaskStatus.Pending)
+                            {
+                                <!-- timeline time label -->
+                                <div class="time-label">
+                                    <span class="bg-purple">
+                                        @* @cloudTaskLog.RecDate.ToString("dd MMM yyyy") *@
+                                        @cloudTaskLog.RecDate.ToNepaliDate()
+                                        </span>
+                                </div>
+                                <!-- /.timeline-label -->
+                                <!-- timeline item -->
+                                <div>
+                                    <i class="fas fa-solid fa-clock bg-purple"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fas fa-clock"></i> @Convert.ToDateTime(cloudTaskLog.RecDate).Humanize()</span>
+
+                                        <h3 class="timeline-header no-border"><a href="#">@cloudTaskLog.UserName</a> created a task. </h3>
+                                    </div>
+                                </div>
+                                <!-- END timeline item -->
+                            }
+                            else if (cloudTaskLog.CloudTaskStatus == CloudTaskStatus.InProgress)
+                            {
+                                <!-- timeline time label -->
+                                <div class="time-label">
+                                    <span class="bg-yellow">
+                                        @cloudTaskLog.RecDate.ToNepaliDate()
+                                    </span>
+                                </div>
+                                <!-- /.timeline-label -->
+                                <!-- timeline item -->
+                                <div>
+                                    <i class="fas fa-solid fa-hammer bg-yellow"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fas fa-clock"></i> @Convert.ToDateTime(cloudTaskLog.RecDate).Humanize()</span>
+
+                                        <h3 class="timeline-header no-border"><a href="#">@cloudTaskLog.UserName</a> start a task. </h3>
+                                    </div>
+                                </div>
+                                <!-- END timeline item -->
+                            }
+                            else if (cloudTaskLog.CloudTaskStatus == CloudTaskStatus.Completed)
+                            {
+                                <!-- timeline time label -->
+                                <div class="time-label">
+                                    <span class="bg-green">
+                                        @cloudTaskLog.RecDate.ToNepaliDate()
+                                    </span>
+                                </div>
+                                <!-- /.timeline-label -->
+                                <!-- timeline item -->
+                                <div>
+                                    <i class="fas fa-solid fa-check bg-green"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fas fa-clock"></i> @Convert.ToDateTime(cloudTaskLog.RecDate).Humanize()</span>
+
+                                        <h3 class="timeline-header no-border"><a href="#">@cloudTaskLog.UserName</a> completed a task. </h3>
+                                    </div>
+                                </div>
+                                <!-- END timeline item -->
+                            }
+                            else if (cloudTaskLog.CloudTaskStatus == CloudTaskStatus.Canceled)
+                            {
+                                <!-- timeline time label -->
+                                <div class="time-label">
+                                    <span class="bg-dark">
+                                        @cloudTaskLog.RecDate.ToNepaliDate()
+                                    </span>
+                                </div>
+                                <!-- /.timeline-label -->
+                                <!-- timeline item -->
+                                <div>
+                                    <i class="fas fa-solid fa-times bg-dark"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fas fa-clock"></i> @Convert.ToDateTime(cloudTaskLog.RecDate).Humanize()</span>
+
+                                        <h3 class="timeline-header no-border"><a href="#">@cloudTaskLog.UserName</a> canceled a task. </h3>
+                                    </div>
+                                </div>
+                                <!-- END timeline item -->
+                            }
+                        }
+
+                        <div>
+                            <i class="fas fa-clock bg-gray"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col -->
+            </div>
+        </div>
+        <!-- /.timeline -->
+
+    </section>
+    <!-- /.content -->
+}
+
+
 
 @section Scripts{
     <script>

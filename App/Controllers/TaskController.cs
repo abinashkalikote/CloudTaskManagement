@@ -13,6 +13,8 @@ using App.Web.Providers.Interface;
 using App.Base.Extensions;
 using static System.Formats.Asn1.AsnWriter;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using System.Threading.Tasks;
+using App.Web.Services;
 
 namespace App.Web.Controllers
 {
@@ -22,14 +24,17 @@ namespace App.Web.Controllers
         private readonly AppDbContext _db;
 
         private readonly IUserProvider _userProvider;
+        private readonly TelegramService _telegramService;
 
         public TaskController(
             AppDbContext db,
-            IUserProvider userProvider
+            IUserProvider userProvider,
+            TelegramService telegramService
             )
         {
             _db = db;
             _userProvider = userProvider;
+            _telegramService = telegramService;
         }
         public IActionResult Index()
         {
@@ -90,6 +95,10 @@ namespace App.Web.Controllers
                     await _db.SaveChangesAsync();
                     scope.Complete();
 
+
+                   await _telegramService.SendMessageAsync("@CloudTaskManagementBot", "Hello everyone");
+
+
                     TempData["success"] = "Task Added Successfully !";
                     return RedirectToAction("CreateTask", "Task");
                 }
@@ -117,7 +126,7 @@ namespace App.Web.Controllers
             if (task == null)
                 throw new Exception($"Task not found !");
 
-            if(task.TSKStatus == CloudTaskStatus.InProgress || 
+            if (task.TSKStatus == CloudTaskStatus.InProgress ||
                 task.TSKStatus == CloudTaskStatus.Completed)
                 throw new Exception($"Task Is Alreday in Progress or Completed, You can't Edit this task !");
 
@@ -179,7 +188,6 @@ namespace App.Web.Controllers
             {
                 task.TSKStatus = CloudTaskStatus.Canceled;
 
-                _db.CloudTasks.Update(task);
 
                 //Adding a Log
                 CloudTaskLog cloudTaskLog = new()
@@ -191,6 +199,7 @@ namespace App.Web.Controllers
 
                 task.CloudTaskLogs.Add(cloudTaskLog);
 
+                _db.CloudTasks.Update(task);
                 await _db.SaveChangesAsync();
                 scope.Complete();
 
@@ -226,7 +235,10 @@ namespace App.Web.Controllers
                 .Include(e => e.RecBy)
                 .Include(e => e.ProccedBy)
                 .Include(e => e.CompletedBy)
-                .Where(e => e.RecStatus == Status.Active && e.Id == TaskID).FirstOrDefaultAsync() ?? throw new Exception("Task Not Found !");
+                .Include(e => e.CloudTaskLogs)
+                .ThenInclude(cl => cl.User)
+                .Where(e => e.RecStatus == Status.Active && e.Id == TaskID)
+                .FirstOrDefaultAsync() ?? throw new Exception("Task Not Found !");
 
             var vm = new TaskTempVM();
 
@@ -250,6 +262,21 @@ namespace App.Web.Controllers
             vm.IsInProgress = data.TSKStatus == CloudTaskStatus.InProgress;
             vm.IsCompleted = data.TSKStatus == CloudTaskStatus.Completed;
             vm.IsCanceled = data.TSKStatus == CloudTaskStatus.Canceled;
+
+            if (data.CloudTaskLogs.Count > 0)
+            {
+                foreach (var log in data.CloudTaskLogs)
+                {
+                    CloudTaskLogVM cloudTaskLogVM = new()
+                    {
+                        UserId = log.UserId,
+                        UserName = log.User.FullName,
+                        CloudTaskStatus = log.CloudTaskStatus,
+                        RecDate = log.RecDate
+                    };
+                    vm.cloudTaskLogs.Add(cloudTaskLogVM);
+                }
+            }
 
             return View(vm);
         }
@@ -276,6 +303,17 @@ namespace App.Web.Controllers
                 pendingTask.ProccedById = _userProvider.GetUserId();
                 pendingTask.ProccedTime = DateTime.Now;
                 pendingTask.TSKStatus = CloudTaskStatus.InProgress;
+
+
+                //Adding a Log
+                CloudTaskLog cloudTaskLog = new()
+                {
+                    Remarks = "",
+                    CloudTaskStatus = CloudTaskStatus.InProgress,
+                    UserId = Convert.ToInt32(_userProvider.GetUserId())
+                };
+
+                pendingTask.CloudTaskLogs.Add(cloudTaskLog);
 
                 _db.CloudTasks.Update(pendingTask);
                 await _db.SaveChangesAsync();
@@ -311,6 +349,17 @@ namespace App.Web.Controllers
                 workingTask.CompletedById = _userProvider.GetUserId();
                 workingTask.CompleteTime = DateTime.Now;
                 workingTask.TSKStatus = CloudTaskStatus.Completed;
+
+
+                //Adding a Log
+                CloudTaskLog cloudTaskLog = new()
+                {
+                    Remarks = "",
+                    CloudTaskStatus = CloudTaskStatus.Completed,
+                    UserId = Convert.ToInt32(_userProvider.GetUserId())
+                };
+
+                workingTask.CloudTaskLogs.Add(cloudTaskLog);
 
                 _db.CloudTasks.Update(workingTask);
                 await _db.SaveChangesAsync();

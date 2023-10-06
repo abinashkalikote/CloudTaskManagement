@@ -11,10 +11,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Transactions;
 using App.Web.Providers.Interface;
 using App.Base.Extensions;
-using static System.Formats.Asn1.AsnWriter;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using System.Threading.Tasks;
 using App.Web.Services;
+using NepDate;
 
 namespace App.Web.Controllers
 {
@@ -95,8 +95,10 @@ namespace App.Web.Controllers
                     await _db.SaveChangesAsync();
                     scope.Complete();
 
+                    var pri = cloudTask.Priority == 'Y' ? "Urgent" : "";
 
-                   await _telegramService.SendMessageAsync("@CloudTaskManagementBot", "Hello everyone");
+                    string message = $"Date: {@Convert.ToDateTime(cloudTask.RecDate).ToNepaliDate()}\r\nTo do : {cloudTask.TaskName}\r\nPriority : { pri }\r\nClient : {cloudTask.ClientName}\r\nCloud URL : {cloudTask.CloudUrl}";
+                    await _telegramService.SendMessageAsync(message);
 
 
                     TempData["success"] = "Task Added Successfully !";

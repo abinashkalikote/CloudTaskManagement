@@ -1,5 +1,6 @@
 ﻿using App.Base.Constants;
 using App.Models;
+using App.Web.Services;
 using CTM.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -16,6 +17,8 @@ namespace App.Controllers
         private readonly ILogger<HomeController> _logger;
 
         private readonly AppDbContext _db;
+
+        public TelegramService _telegramService { get; }
 
         public HomeController(
             ILogger<HomeController> logger, 
@@ -38,7 +41,7 @@ namespace App.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public async Task<IActionResult> Privacy()
         {
             return View();
         }

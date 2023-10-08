@@ -69,7 +69,7 @@ namespace App.Web.Controllers
                         TaskName = vm.TaskTitle,
                         TaskTypeId = vm.TaskTypeId,
                         ClientName = vm.ClientName,
-                        CloudUrl = vm.CloudURL,
+                        CloudUrl = vm.CloudURL ?? "",
                         Priority = pr,
                         TaskTime = vm.TaskTime,
                         SoftwareVersionFrom = vm.SoftwareVersionFrom ?? "Latest",
@@ -97,7 +97,16 @@ namespace App.Web.Controllers
 
                     var pri = cloudTask.Priority == 'Y' ? "Urgent" : "";
 
-                    string message = $"Date: {@Convert.ToDateTime(cloudTask.RecDate).ToNepaliDate()}\r\nTo do : {cloudTask.TaskName}\r\nPriority : { pri }\r\nClient : {cloudTask.ClientName}\r\nCloud URL : {cloudTask.CloudUrl}";
+                    string message = $"------------------------------------------------------\r\n" +
+                        $"Date: {@Convert.ToDateTime(cloudTask.RecDate).ToNepaliDate()}\r\n" +
+                        $"------------------------------------------------------\r\n" +
+                        $"To do : {cloudTask.TaskName}\r\n" +
+                        $"Priority : {pri}\r\n" +
+                        $"------------------------------------------------------\r\n" +
+                        $"Client : {cloudTask.ClientName}\r\n" +
+                        $"Cloud URL : {cloudTask.CloudUrl}";
+
+
                     await _telegramService.SendMessageAsync(message);
 
 
@@ -223,7 +232,10 @@ namespace App.Web.Controllers
         {
 
             InitializeTaskVM(vm);
-            var query = await GetTaskQueryable(vm).ToListAsync();
+            var query = await GetTaskQueryable(vm)
+                .OrderByDescending(e => e.RecDate)
+                .ThenBy(e=> e.ProccedTime).ToListAsync();
+
             vm.Tasks = PrepareTaskVms(query);
             return View(vm);
         }

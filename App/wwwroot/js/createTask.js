@@ -3,17 +3,20 @@
 
         if ($("#TaskTypeId").val() == 2) {
             ChangeCloudURLLabelToGDriveLabel();
+            CloudURLHide();
             SoftwareVersionHide();
             RemarkHide();
 
         } else if ($("#TaskTypeId").val() == 3) {
             ChangeCloudURLLabelToGDriveLabel();
             SoftwareVersionShow();
+            CloudURLShow();
             RemarkShow();
 
         } else {
             ChangeGDriveLabelToCloudURLLabel();
             SoftwareVersionShow();
+            CloudURLShow();
             RemarkShow();
         }
     });
@@ -54,4 +57,14 @@ function RemarkHide() {
 
 function RemarkShow() {
     $("#Remarks").parent("div").show("slow");
+}
+
+function CloudURLHide() {
+    $("#CloudURL").removeAttr("required");
+    $("#CloudURL").parent("div").hide("slow");
+}
+
+function CloudURLShow() {
+    $("#CloudURL").attr("required", true);
+    $("#CloudURL").parent("div").show("slow");
 }

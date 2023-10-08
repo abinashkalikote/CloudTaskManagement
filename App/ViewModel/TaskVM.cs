@@ -46,6 +46,16 @@ namespace App.Web.ViewModel
 
 
 
+        [DisplayName("PAN No.")]
+        public string? PANNo { get; set; }
+
+        [DisplayName("License Date")]
+        public string? LicDate { get; set; }
+
+        [DisplayName("Address")]
+        public string? ClientAddress { get; set; }
+
+
         // For Display Purpose
         public string? TaskTypeName { get; set; }
         public string? RecDate { get; set; }

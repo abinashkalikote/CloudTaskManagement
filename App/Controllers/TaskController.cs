@@ -76,6 +76,9 @@ namespace App.Web.Controllers
                         SoftwareVersionTo = vm.SoftwareVersionTo ?? "Latest",
                         IssueOnPreviousSoftware = vm.IssueOnPreviousSoftware ?? "",
                         Remarks = vm.Remarks ?? "",
+                        PANNo = vm.PANNo ?? "",
+                        ClientAddress = vm.ClientAddress ?? "",
+                        LicDate = vm.LicDate ?? "",
                         RecAuditLog = "Task Created by " + _userProvider.GetUsername(),
                         RecById = Convert.ToInt32(_userProvider.GetUserId()),
                         TSKStatus = CloudTaskStatus.Pending
@@ -155,6 +158,9 @@ namespace App.Web.Controllers
                 SoftwareVersionTo = task.SoftwareVersionTo,
                 IssueOnPreviousSoftware = task.IssueOnPreviousSoftware,
                 Remarks = task.Remarks ?? "",
+                PANNo = task.PANNo ?? "",
+                ClientAddress = task.ClientAddress ?? "",
+                LicDate = task.LicDate ?? "",
                 taskTypes = _db.TaskTypes.ToList()
             };
             return View(vm);
@@ -459,6 +465,11 @@ namespace App.Web.Controllers
                 vm.IssueOnPreviousSoftware = item.IssueOnPreviousSoftware;
                 vm.RecDate = item.RecDate.ToString("yyyy/MM/dd") + " " + item.RecDate.ToString("dddd");
                 vm.TimeSpan = item.RecDate;
+
+                vm.LicDate = item.LicDate;
+                vm.PANNo = item.PANNo;
+                vm.ClientAddress = item.ClientAddress;
+
                 vm.RecBy = item.RecBy.FullName;
                 vm.ProccedBy = item.ProccedBy != null ? item.ProccedBy.FullName : "-";
                 vm.CompletedBy = item.CompletedBy != null ? item.CompletedBy.FullName : "-";

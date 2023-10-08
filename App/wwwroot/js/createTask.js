@@ -1,25 +1,31 @@
-﻿$(document).ready(()=>{
-    $("#TaskTypeId").change((e) => {
+﻿$(document).ready(() => {
+    CreateTaskFunc();
 
+    $("#TaskTypeId").change((e) => {
+        CreateTaskFunc();
+    });
+    function CreateTaskFunc() {
         if ($("#TaskTypeId").val() == 2) {
             ChangeCloudURLLabelToGDriveLabel();
             CloudURLHide();
             SoftwareVersionHide();
             RemarkHide();
+            PanLicDateAddressShow();
 
         } else if ($("#TaskTypeId").val() == 3) {
             ChangeCloudURLLabelToGDriveLabel();
             SoftwareVersionShow();
             CloudURLShow();
             RemarkShow();
-
+            PanLicDateAddressHide();
         } else {
             ChangeGDriveLabelToCloudURLLabel();
             SoftwareVersionShow();
             CloudURLShow();
             RemarkShow();
+            PanLicDateAddressHide();
         }
-    });
+    }
 });
 
 
@@ -67,4 +73,28 @@ function CloudURLHide() {
 function CloudURLShow() {
     $("#CloudURL").attr("required", true);
     $("#CloudURL").parent("div").show("slow");
+}
+
+function PanLicDateAddressHide() {
+    //PAN Hide
+    $("#PANNo").removeAttr("required");
+    $("#PANNo").parent("div").hide("slow");
+    //LicDate Hide
+    $("#LicDate").removeAttr("required");
+    $("#LicDate").parent("div").hide("slow");
+    //ClientAddress Hide
+    $("#ClientAddress").removeAttr("required");
+    $("#ClientAddress").parent("div").hide("slow");
+}
+
+function PanLicDateAddressShow() {
+    //PAN Hide
+    $("#PANNo").attr("required", true);
+    $("#PANNo").parent("div").show("slow");
+    //LicDate Hide
+    $("#LicDate").attr("required", true);
+    $("#LicDate").parent("div").show("slow");
+    //ClientAddress Hide
+    $("#ClientAddress").attr("required", true);
+    $("#ClientAddress").parent("div").show("slow");
 }

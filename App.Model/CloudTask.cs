@@ -28,6 +28,13 @@ namespace App.Model
 
         public string? Remarks { get; set; }
 
+        //For New client Setup on cloud
+        public string? PANNo { get; set; }
+        public string? LicDate { get; set; }
+        public string? ClientAddress { get; set; }
+
+
+
         public string RecAuditLog { get; set; } = "";
         public int RecVersion { get; set; } = 1;
         public char? RecStatus { get; set; } = Status.Active;

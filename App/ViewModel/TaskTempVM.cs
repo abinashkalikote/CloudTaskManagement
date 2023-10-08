@@ -44,6 +44,17 @@ namespace App.Web.ViewModel
         public string? Remarks { get; set; }
 
 
+
+        [DisplayName("PAN No.")]
+        public string? PANNo { get; set; }
+
+        [DisplayName("License Date")]
+        public string? LicDate { get; set; }
+
+        [DisplayName("Address")]
+        public string? ClientAddress { get; set; }
+
+
         public bool IsInPending { get; set; }
         public bool IsInProgress { get; set; }
         public bool IsCompleted { get; set; }

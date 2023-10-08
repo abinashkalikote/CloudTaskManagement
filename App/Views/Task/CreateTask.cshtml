@@ -38,6 +38,28 @@
                 </div>
 
 
+                @* If In case of New Client *@
+                
+                <div class="col-12 mb-2" style="display: none;">
+                    <label asp-for="PANNo"></label>
+                    <input asp-for="PANNo" class="form-control form-control-border" placeholder="PAN No." />
+                    <span class="text-danger" asp-validation-for="PANNo"></span>
+                </div>
+                <div class="col-12 mb-2" style="display: none;">
+                    <label asp-for="LicDate"></label>
+                    <input asp-for="LicDate" class="form-control form-control-border" placeholder="License Date" />
+                    <span class="text-danger" asp-validation-for="LicDate"></span>
+                </div>
+                <div class="col-12 mb-2" style="display: none;">
+                    <label asp-for="ClientAddress"></label>
+                    <input asp-for="ClientAddress" class="form-control form-control-border" placeholder="Address" />
+                    <span class="text-danger" asp-validation-for="ClientAddress"></span>
+                </div>
+
+                @* If In case of New Clien *@
+
+
+
                 <div class="col-2 d-flex mb-2">
                     <div class="form-group">
                         <label asp-for="HighPriority"></label>

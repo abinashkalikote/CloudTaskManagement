@@ -11,6 +11,7 @@
             SoftwareVersionHide();
             RemarkHide();
             PanLicDateAddressShow();
+            $("#TaskTitle").val("Need to Setup FinAstra on Server with domain and License");
 
         } else if ($("#TaskTypeId").val() == 3) {
             ChangeCloudURLLabelToGDriveLabel();
@@ -18,12 +19,14 @@
             CloudURLShow();
             RemarkShow();
             PanLicDateAddressHide();
+            $("#TaskTitle").val("Need to Setup NextGen FinAstra on Server with given database, Content File & domain");
         } else {
             ChangeGDriveLabelToCloudURLLabel();
             SoftwareVersionShow();
             CloudURLShow();
             RemarkShow();
             PanLicDateAddressHide();
+            $("#TaskTitle").val("Need to Update Application");
         }
     }
 });
@@ -81,6 +84,7 @@ function PanLicDateAddressHide() {
     $("#PANNo").parent("div").hide("slow");
     //LicDate Hide
     $("#LicDate").removeAttr("required");
+    $("#LicDate").removeAttr("minlength");
     $("#LicDate").parent("div").hide("slow");
     //ClientAddress Hide
     $("#ClientAddress").removeAttr("required");
@@ -94,6 +98,7 @@ function PanLicDateAddressShow() {
     //LicDate Hide
     $("#LicDate").attr("required", true);
     $("#LicDate").parent("div").show("slow");
+    $("#LicDate").attr("minlength", 10);
     //ClientAddress Hide
     $("#ClientAddress").attr("required", true);
     $("#ClientAddress").parent("div").show("slow");

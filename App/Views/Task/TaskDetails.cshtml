@@ -21,15 +21,18 @@
                             <th>Client Name</th>
                             <td>@Model.ClientName</td>
                         </tr>
-                        <tr>
-                            <th>Cloud URL</th>
-                            <td>
-                                <button type="button" class="btn btn-primary btn-xs" style="font-size: 10px !important;" ctm-copy="copy" ctm-copy-for="copy-cloud-url" title="Copy Cloud URL"><i class="fa-solid fa-copy"></i></button>
-                                <span id="copy-cloud-url">
-                                    <a href="@Model.CloudURL" target="_blank">@Model.CloudURL</a>
-                                </span>
-                            </td>
-                        </tr>
+                        @if (!string.IsNullOrEmpty(Model.CloudURL))
+                        {
+                            <tr>
+                                <th>Cloud URL</th>
+                                <td>
+                                    <button type="button" class="btn btn-primary btn-xs" style="font-size: 10px !important;" ctm-copy="copy" ctm-copy-for="copy-cloud-url" title="Copy Cloud URL"><i class="fa-solid fa-copy"></i></button>
+                                    <span id="copy-cloud-url">
+                                        <a href="@Model.CloudURL" target="_blank">@Model.CloudURL</a>
+                                    </span>
+                                </td>
+                            </tr>
+                        }
                         <tr>
                             <th>Task Type</th>
                             <td>@Model.TaskTypeName</td>

@@ -73,8 +73,18 @@
             </div>
             <div>
                 <b>
-                    Cloud URL :
-                </b>   <a href="@Model.CloudURL" target="_blank">@Model.CloudURL</a>
+                    PAN No :
+                </b>
+                <button type="button" class="btn btn-primary btn-xs" style="font-size: 10px !important;" ctm-copy="copy" ctm-copy-for="copy-PANNo" title="Copy PAN No."><i class="fa-solid fa-copy"></i></button>
+                <span id="copy-PANNo">
+                    @Model.PANNo
+                </span>
+                
+            </div>
+            <div>
+                <b>
+                    Licesnse Date :
+                </b>   @Model.LicDate
             </div>
         </div>
     </div>

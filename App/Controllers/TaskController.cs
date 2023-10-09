@@ -270,6 +270,13 @@ namespace App.Web.Controllers
             vm.TaskTypeName = data.TaskType != null ? data.TaskType.TaskTypeName : "Not Declared";
             vm.TaskTime = data.TaskTime;
             vm.TimeSpan = data.RecDate;
+
+
+            vm.LicDate = data.LicDate;
+            vm.PANNo = data.PANNo;
+            vm.ClientAddress = data.ClientAddress;
+
+
             vm.HighPriority = data.Priority == 'Y' ? "Urgent" : "";
             vm.SoftwareVersionFrom = data.SoftwareVersionFrom;
             vm.SoftwareVersionTo = data.SoftwareVersionTo;

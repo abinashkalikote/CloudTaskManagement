@@ -94,24 +94,81 @@ namespace App.Web.Controllers
 
                     cloudTask.CloudTaskLogs.Add(cloudTaskLog);
 
-                    await _db.CloudTasks.AddAsync(cloudTask);
-                    await _db.SaveChangesAsync();
+                    var TaskId = await _db.CloudTasks.AddAsync(cloudTask);
+                     await _db.SaveChangesAsync();
+
+
+
+
+                    //Sending a message to telegram
+                    #region SendingTelegramMessage
+                    var user = await _db.Users.FirstOrDefaultAsync(e => e.Id == cloudTask.RecById);
+
+
+                    string TaskCreatedBy = "";
+                    if (user != null)
+                        TaskCreatedBy = $"## Task Created by <b>{user.FullName}</b> ##";
+                    else
+                        TaskCreatedBy = "";
+
+
+
+                    string pri = "";
+                    if (cloudTask.Priority == 'Y')
+                        pri = $"<b>Priority :</b> Urgent\r\n";
+                    else
+                        pri = "";
+
+
+                    string message = "";
+                    if (cloudTask.TaskTypeId == 1)
+                    {
+                        message =
+                        $"<b>Date:</b> {@Convert.ToDateTime(cloudTask.RecDate).ToNepaliDate()}\r\n" +
+                        $"------------------------------------------------------\r\n" +
+                        $"<b>To do :</b> {cloudTask.TaskName}\r\n" +
+                        $"<b>Software Version :</b> <b>From</b> {cloudTask.SoftwareVersionFrom} <b>To</b> {cloudTask.SoftwareVersionTo}\r\n" +
+                        pri +
+                        $"<b>Update Time :</b> {cloudTask.TaskTime} \r\n" +
+                        $"------------------------------------------------------\r\n" +
+                        $"<b>Client :</b> {cloudTask.ClientName}\r\n" +
+                        $"<b>Cloud URL :</b> {cloudTask.CloudUrl}\r\n" +
+                        $"<b>Issue :</b> {cloudTask.IssueOnPreviousSoftware} \r\n\r\n" +
+                        TaskCreatedBy;
+                    }
+                    else if (cloudTask.TaskTypeId == 2)
+                    {
+                        message =
+                        $"<b>Date:</b> {@Convert.ToDateTime(cloudTask.RecDate).ToNepaliDate()}\r\n" +
+                        $"------------------------------------------------------\r\n" +
+                        $"<b>To do :</b> {cloudTask.TaskName}\r\n" +
+                        pri +
+                        $"<b>Update Time :</b> {cloudTask.TaskTime} \r\n" +
+                        $"------------------------------------------------------\r\n" +
+                        $"<b>Client :</b> {cloudTask.ClientName}\r\n" +
+                        $"<b>PAN No :</b> {cloudTask.PANNo}\r\n" +
+                        $"<b>License Date :</b> {cloudTask.LicDate}\r\n\r\n" +
+                        TaskCreatedBy;
+                    }
+                    else if (cloudTask.TaskTypeId == 3)
+                    {
+                        message =
+                        $"<b>Date:</b> {@Convert.ToDateTime(cloudTask.RecDate).ToNepaliDate()}\r\n" +
+                        $"------------------------------------------------------\r\n" +
+                        $"<b>To do :</b> {cloudTask.TaskName}\r\n" +
+                        pri +
+                        $"<b>Update Time :</b> {cloudTask.TaskTime} \r\n" +
+                        $"------------------------------------------------------\r\n" +
+                        $"<b>Client :</b> {cloudTask.ClientName}\r\n" +
+                        $"<b>Cloud URL :</b> {cloudTask.CloudUrl}\r\n\r\n" +
+                        TaskCreatedBy;
+                    }
+
+
+                   await _telegramService.SendMessageAsync(message, TaskId.Entity.Id);
                     scope.Complete();
 
-                    var pri = cloudTask.Priority == 'Y' ? "Urgent" : "";
-
-                    string message = $"------------------------------------------------------\r\n" +
-                        $"Date: {@Convert.ToDateTime(cloudTask.RecDate).ToNepaliDate()}\r\n" +
-                        $"------------------------------------------------------\r\n" +
-                        $"To do : {cloudTask.TaskName}\r\n" +
-                        $"Priority : {pri}\r\n" +
-                        $"------------------------------------------------------\r\n" +
-                        $"Client : {cloudTask.ClientName}\r\n" +
-                        $"Cloud URL : {cloudTask.CloudUrl}";
-
-
-                    await _telegramService.SendMessageAsync(message);
-
+                    #endregion SendingTelegramMessage
 
                     TempData["success"] = "Task Added Successfully !";
                     return RedirectToAction("CreateTask", "Task");
@@ -240,7 +297,7 @@ namespace App.Web.Controllers
             InitializeTaskVM(vm);
             var query = await GetTaskQueryable(vm)
                 .OrderByDescending(e => e.RecDate)
-                .ThenBy(e=> e.ProccedTime).ToListAsync();
+                .ThenBy(e => e.ProccedTime).ToListAsync();
 
             vm.Tasks = PrepareTaskVms(query);
             return View(vm);

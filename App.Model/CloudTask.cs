@@ -53,6 +53,8 @@ namespace App.Model
         public virtual User? CompletedBy { get; set; }
         public int? CompletedById { get; set; }
 
+        public int? TelegramMessageId { get; set; }
+
 
 
         public virtual List<CloudTaskLog> CloudTaskLogs { get; set; } = new List<CloudTaskLog>();

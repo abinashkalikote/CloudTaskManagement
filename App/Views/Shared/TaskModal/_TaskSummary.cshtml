@@ -89,3 +89,44 @@
         </div>
     </div>
 }
+else if (Model.TaskTypeId == 3)
+{
+    <div class="card">
+        <div class="card-body">
+            <div><b>Date:</b> @Convert.ToDateTime(Model.TimeSpan).ToNepaliDate()</div>
+
+            <hr class="m-1" />
+
+            @* <div><b>Task 1 :</b></div> *@
+            <div><b>To do :</b> @Model.TaskTitle</div>
+            <div>
+                @if (string.IsNullOrEmpty(Model.HighPriority))
+                {
+                    <b>Update Time : </b> @Model.TaskTime
+                }
+                else
+                {
+                    <b>Priority :</b> @Model.HighPriority
+                }
+            </div>
+
+            <hr class="m-1" />
+
+            <div>
+                <b>
+                    Client :
+                </b> @Model.ClientName
+            </div>
+            <div>
+                <b>
+                    Cloud URL :
+                </b>
+                <button type="button" class="btn btn-primary btn-xs" style="font-size: 10px !important;" ctm-copy="copy" ctm-copy-for="copy-PANNo" title="Copy PAN No."><i class="fa-solid fa-copy"></i></button>
+                <span id="copy-PANNo">
+                    <a href="@Model.CloudURL" class="link" target="_blank">@Model.CloudURL</a>
+                </span>
+
+            </div>
+        </div>
+    </div>
+}

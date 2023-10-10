@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Telegram.Bot.Types.Enums;
-using App.Data;
 using CTM.Data;
 using System.Text.Json;
 using App.Web.ViewModel;

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace App.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class DropTaskTypeAndAdd : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -69,6 +69,9 @@ namespace App.Data.Migrations
                     SoftwareVersionFrom = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SoftwareVersionTo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PANNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LicDate = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RecAuditLog = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RecVersion = table.Column<int>(type: "int", nullable: false),
                     RecStatus = table.Column<string>(type: "nvarchar(1)", nullable: true),
@@ -78,7 +81,8 @@ namespace App.Data.Migrations
                     CompleteTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RecById = table.Column<int>(type: "int", nullable: false),
                     ProccedById = table.Column<int>(type: "int", nullable: true),
-                    CompletedById = table.Column<int>(type: "int", nullable: true)
+                    CompletedById = table.Column<int>(type: "int", nullable: true),
+                    TelegramMessageId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {

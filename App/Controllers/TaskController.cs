@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using System.Threading.Tasks;
 using App.Web.Services;
 using NepDate;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace App.Web.Controllers
 {
@@ -96,9 +97,9 @@ namespace App.Web.Controllers
 
                     var TaskId = await _db.CloudTasks.AddAsync(cloudTask);
                      await _db.SaveChangesAsync();
+                    
 
-
-
+                    
 
                     //Sending a message to telegram
                     #region SendingTelegramMessage
@@ -119,6 +120,13 @@ namespace App.Web.Controllers
                     else
                         pri = "";
 
+                    // Get the current HttpContext
+                    var httpContext = HttpContext;
+                    var scheme = httpContext.Request.Scheme;
+                    var host = httpContext.Request.Host.Host;
+                    var port = httpContext.Request.Host.Port;
+                    var baseUrl = $"{scheme}://{host}:{port}/Task/TaskDetails?TaskID="+TaskId.Entity.Id;
+
 
                     string message = "";
                     if (cloudTask.TaskTypeId == 1)
@@ -133,7 +141,8 @@ namespace App.Web.Controllers
                         $"------------------------------------------------------\r\n" +
                         $"<b>Client :</b> {cloudTask.ClientName}\r\n" +
                         $"<b>Cloud URL :</b> {cloudTask.CloudUrl}\r\n" +
-                        $"<b>Issue :</b> {cloudTask.IssueOnPreviousSoftware} \r\n\r\n" +
+                        $"<b>Issue :</b> {cloudTask.IssueOnPreviousSoftware} \r\n\r\n\r\n" +
+                        $"<b>Task Link</b> : <a href=\"{baseUrl}\">{baseUrl}</a> \r\n\r\n"+
                         TaskCreatedBy;
                     }
                     else if (cloudTask.TaskTypeId == 2)
@@ -148,6 +157,7 @@ namespace App.Web.Controllers
                         $"<b>Client :</b> {cloudTask.ClientName}\r\n" +
                         $"<b>PAN No :</b> {cloudTask.PANNo}\r\n" +
                         $"<b>License Date :</b> {cloudTask.LicDate}\r\n\r\n" +
+                        $"<b>Task Link</b> : <a href=\"{baseUrl}\">{baseUrl}</a> \r\n\r\n" +
                         TaskCreatedBy;
                     }
                     else if (cloudTask.TaskTypeId == 3)
@@ -161,6 +171,7 @@ namespace App.Web.Controllers
                         $"------------------------------------------------------\r\n" +
                         $"<b>Client :</b> {cloudTask.ClientName}\r\n" +
                         $"<b>Cloud URL :</b> {cloudTask.CloudUrl}\r\n\r\n" +
+                        $"<b>Task Link</b> : <a href='\"{baseUrl}\">{baseUrl}</a> \r\n\r\n" +
                         TaskCreatedBy;
                     }
 
@@ -275,6 +286,11 @@ namespace App.Web.Controllers
 
                 _db.CloudTasks.Update(task);
                 await _db.SaveChangesAsync();
+
+                //Sending Message To Telegram
+                string message = "### Task has been <b>" + CloudTaskStatus.Canceled + "</b> ###";
+                await _telegramService.SendMessageAsync(message, null, task.TelegramMessageId);
+
                 scope.Complete();
 
                 TempData["success"] = "Task Reversed successfully !";
@@ -402,6 +418,11 @@ namespace App.Web.Controllers
                 _db.CloudTasks.Update(pendingTask);
                 await _db.SaveChangesAsync();
 
+                //Sending Message To Telegram
+                string message = "### <b>" + _userProvider.GetUsername() + "</b> is working on it. ###";
+                await _telegramService.SendMessageAsync(message, null, pendingTask.TelegramMessageId);
+
+
                 scope.Complete();
                 TempData["success"] = "Task has been Procced Successfully !";
                 return RedirectToAction(nameof(GetAllTask));
@@ -448,6 +469,10 @@ namespace App.Web.Controllers
                 _db.CloudTasks.Update(workingTask);
                 await _db.SaveChangesAsync();
 
+                //Sending Message To Telegram
+                string message = "### Task completed by <b>" + _userProvider.GetUsername() + "</b> ###";
+                await _telegramService.SendMessageAsync(message, null, workingTask.TelegramMessageId);
+
                 scope.Complete();
                 TempData["success"] = "Task has been Completed Successfully !";
                 return RedirectToAction(nameof(GetAllTask));
@@ -459,9 +484,6 @@ namespace App.Web.Controllers
                 return RedirectToAction(nameof(GetAllTask));
             }
         }
-
-
-
 
 
 

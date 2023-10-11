@@ -5,3 +5,9 @@ input[type=disabled]{
 input:-webkit-autofill {
     -webkit-text-fill-color: inherit !important;
 }
+
+.truncate-text {
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+}

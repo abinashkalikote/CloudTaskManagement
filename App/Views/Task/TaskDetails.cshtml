@@ -49,6 +49,16 @@
                 </div>
                 <div class="col-md-5 col-sm-12">
                     <partial name="~/Views/Shared/TaskModal/_TaskSummary.cshtml" />
+                    <div class="card">
+                        <div class="card-body p-2">
+                            @{
+                                Model.IsShowPeekButton = false;
+                                Model.IsShowActionButton = true;
+                                Model.IsShowDetailsButton = false;
+                            }
+                            <partial name="_TaskActionButtons" model="@Model" />
+                        </div>
+                    </div>
                 </div>
             </div>
         }

@@ -23,20 +23,23 @@ namespace App.Web.Controllers
     public class TaskController : Controller
     {
         private readonly AppDbContext _db;
-
         private readonly IUserProvider _userProvider;
         private readonly TelegramService _telegramService;
+        private readonly HttpContext _httpContext;
 
         public TaskController(
             AppDbContext db,
             IUserProvider userProvider,
-            TelegramService telegramService
+            TelegramService telegramService,
+            IHttpContextAccessor httpContextAccessor
             )
         {
             _db = db;
             _userProvider = userProvider;
             _telegramService = telegramService;
+            _httpContext = httpContextAccessor.HttpContext;
         }
+
         public IActionResult Index()
         {
             return View();
@@ -95,91 +98,17 @@ namespace App.Web.Controllers
 
                     cloudTask.CloudTaskLogs.Add(cloudTaskLog);
 
-                    var TaskId = await _db.CloudTasks.AddAsync(cloudTask);
+                    var result = await _db.CloudTasks.AddAsync(cloudTask);
                      await _db.SaveChangesAsync();
-                    
 
-                    
+
+
 
                     //Sending a message to telegram
-                    #region SendingTelegramMessage
-                    var user = await _db.Users.FirstOrDefaultAsync(e => e.Id == cloudTask.RecById);
-
-
-                    string TaskCreatedBy = "";
-                    if (user != null)
-                        TaskCreatedBy = $"## Task Created by <b>{user.FullName}</b> ##";
-                    else
-                        TaskCreatedBy = "";
-
-
-
-                    string pri = "";
-                    if (cloudTask.Priority == 'Y')
-                        pri = $"<b>Priority :</b> Urgent\r\n";
-                    else
-                        pri = "";
-
-                    // Get the current HttpContext
-                    var httpContext = HttpContext;
-                    var scheme = httpContext.Request.Scheme;
-                    var host = httpContext.Request.Host.Host;
-                    var port = httpContext.Request.Host.Port;
-                    var baseUrl = $"{scheme}://{host}:{port}/Task/TaskDetails?TaskID="+TaskId.Entity.Id;
-
-
-                    string message = "";
-                    if (cloudTask.TaskTypeId == 1)
-                    {
-                        message =
-                        $"<b>Date:</b> {@Convert.ToDateTime(cloudTask.RecDate).ToNepaliDate()}\r\n" +
-                        $"------------------------------------------------------\r\n" +
-                        $"<b>To do :</b> {cloudTask.TaskName}\r\n" +
-                        $"<b>Software Version :</b> <b>From</b> {cloudTask.SoftwareVersionFrom} <b>To</b> {cloudTask.SoftwareVersionTo}\r\n" +
-                        pri +
-                        $"<b>Update Time :</b> {cloudTask.TaskTime} \r\n" +
-                        $"------------------------------------------------------\r\n" +
-                        $"<b>Client :</b> {cloudTask.ClientName}\r\n" +
-                        $"<b>Cloud URL :</b> {cloudTask.CloudUrl}\r\n" +
-                        $"<b>Issue :</b> {cloudTask.IssueOnPreviousSoftware} \r\n\r\n\r\n" +
-                        $"<b>Task Link</b> : <a href=\"{baseUrl}\">{baseUrl}</a> \r\n\r\n"+
-                        TaskCreatedBy;
-                    }
-                    else if (cloudTask.TaskTypeId == 2)
-                    {
-                        message =
-                        $"<b>Date:</b> {@Convert.ToDateTime(cloudTask.RecDate).ToNepaliDate()}\r\n" +
-                        $"------------------------------------------------------\r\n" +
-                        $"<b>To do :</b> {cloudTask.TaskName}\r\n" +
-                        pri +
-                        $"<b>Update Time :</b> {cloudTask.TaskTime} \r\n" +
-                        $"------------------------------------------------------\r\n" +
-                        $"<b>Client :</b> {cloudTask.ClientName}\r\n" +
-                        $"<b>PAN No :</b> {cloudTask.PANNo}\r\n" +
-                        $"<b>License Date :</b> {cloudTask.LicDate}\r\n\r\n" +
-                        $"<b>Task Link</b> : <a href=\"{baseUrl}\">{baseUrl}</a> \r\n\r\n" +
-                        TaskCreatedBy;
-                    }
-                    else if (cloudTask.TaskTypeId == 3)
-                    {
-                        message =
-                        $"<b>Date:</b> {@Convert.ToDateTime(cloudTask.RecDate).ToNepaliDate()}\r\n" +
-                        $"------------------------------------------------------\r\n" +
-                        $"<b>To do :</b> {cloudTask.TaskName}\r\n" +
-                        pri +
-                        $"<b>Update Time :</b> {cloudTask.TaskTime} \r\n" +
-                        $"------------------------------------------------------\r\n" +
-                        $"<b>Client :</b> {cloudTask.ClientName}\r\n" +
-                        $"<b>Cloud URL :</b> {cloudTask.CloudUrl}\r\n\r\n" +
-                        $"<b>Task Link</b> : <a href='\"{baseUrl}\">{baseUrl}</a> \r\n\r\n" +
-                        TaskCreatedBy;
-                    }
-
-
-                   await _telegramService.SendMessageAsync(message, TaskId.Entity.Id);
+                    await SendNewTaskMessageToTelegram(cloudTask, result.Entity.Id);
+                    
                     scope.Complete();
 
-                    #endregion SendingTelegramMessage
 
                     TempData["success"] = "Task Added Successfully !";
                     return RedirectToAction("CreateTask", "Task");
@@ -288,8 +217,8 @@ namespace App.Web.Controllers
                 await _db.SaveChangesAsync();
 
                 //Sending Message To Telegram
-                string message = "### Task has been <b>" + CloudTaskStatus.Canceled + "</b> ###";
-                await _telegramService.SendMessageAsync(message, null, task.TelegramMessageId);
+                string message = "### Deleted :  <b>" + CloudTaskStatus.Canceled + "</b> ###";
+                await _telegramService.SendReplyMessageAsync(message, task.TelegramMessageId);
 
                 scope.Complete();
 
@@ -419,11 +348,11 @@ namespace App.Web.Controllers
                 await _db.SaveChangesAsync();
 
                 //Sending Message To Telegram
-                string message = "### <b>" + _userProvider.GetUsername() + "</b> is working on it. ###";
-                await _telegramService.SendMessageAsync(message, null, pendingTask.TelegramMessageId);
-
-
+                string message = "### Action on it : <b>" + _userProvider.GetUsername() + "</b>  . ###";
+                await _telegramService.SendReplyMessageAsync(message, pendingTask.TelegramMessageId);
                 scope.Complete();
+
+
                 TempData["success"] = "Task has been Procced Successfully !";
                 return RedirectToAction(nameof(GetAllTask));
             }
@@ -470,12 +399,12 @@ namespace App.Web.Controllers
                 await _db.SaveChangesAsync();
 
                 //Sending Message To Telegram
-                string message = "### Task completed by <b>" + _userProvider.GetUsername() + "</b> ###";
-                await _telegramService.SendMessageAsync(message, null, workingTask.TelegramMessageId);
+                string message = "### ✅ Done :  <b>" + _userProvider.GetUsername() + "</b> ###";
+                await _telegramService.SendReplyMessageAsync(message, workingTask.TelegramMessageId);
 
                 scope.Complete();
                 TempData["success"] = "Task has been Completed Successfully !";
-                return RedirectToAction(nameof(GetAllTask));
+                return Redirect(_httpContext.Request.Path);
             }
             catch (Exception)
             {
@@ -563,7 +492,7 @@ namespace App.Web.Controllers
                 vm.IsInProgress = item.TSKStatus == CloudTaskStatus.InProgress;
                 vm.IsCompleted = item.TSKStatus == CloudTaskStatus.Completed;
                 vm.IsCanceled = item.TSKStatus == CloudTaskStatus.Canceled;
-                vm.IsShowDetailsPeekButton = true;
+                vm.IsShowPeekButton = true;
                 list.Add(vm);
             }
             return list;
@@ -573,6 +502,86 @@ namespace App.Web.Controllers
         {
             vm.taskTypes = _db.TaskTypes.ToList();
             vm.Users = _db.Users.Where(e => e.RecStatus == 'A').ToList();
+        }
+
+
+        //Private Method to send Newly created task in Telegram
+        private async Task SendNewTaskMessageToTelegram(CloudTask cloudTask, int TaskId)
+        {
+            var user = _userProvider.GetUsername();
+
+
+            string TaskCreatedBy = "";
+            if (user != null)
+                TaskCreatedBy = $"## Task Created by <b>{user}</b> ##";
+            else
+                TaskCreatedBy = "";
+
+
+
+            string pri = "";
+            if (cloudTask.Priority == 'Y')
+                pri = $"<b>Priority :</b> Urgent\r\n";
+            else
+                pri = "";
+
+            // Get the current HttpContext
+            var httpContext = HttpContext;
+            var scheme = httpContext.Request.Scheme;
+            var host = httpContext.Request.Host.Host;
+            var port = httpContext.Request.Host.Port;
+            var baseUrl = $"{scheme}://{host}:{port}/Task/TaskDetails?TaskID=" + TaskId;
+
+
+            string message = "";
+            if (cloudTask.TaskTypeId == 1)
+            {
+                message =
+                $"<b>Date:</b> {@Convert.ToDateTime(cloudTask.RecDate).ToNepaliDate()}\r\n" +
+                $"------------------------------------------------------\r\n" +
+                $"<b>To do :</b> {cloudTask.TaskName}\r\n" +
+                $"<b>Software Version :</b> <b>From</b> {cloudTask.SoftwareVersionFrom} <b>To</b> {cloudTask.SoftwareVersionTo}\r\n" +
+                pri +
+                $"<b>Update Time :</b> {cloudTask.TaskTime} \r\n" +
+                $"------------------------------------------------------\r\n" +
+                $"<b>Client :</b> {cloudTask.ClientName}\r\n" +
+                $"<b>Cloud URL :</b> {cloudTask.CloudUrl}\r\n" +
+                $"<b>Issue :</b> {cloudTask.IssueOnPreviousSoftware} \r\n\r\n\r\n" +
+                $"<b>Task Link</b> : <a href=\"{baseUrl}\">{baseUrl}</a> \r\n\r\n" +
+                TaskCreatedBy;
+            }
+            else if (cloudTask.TaskTypeId == 2)
+            {
+                message =
+                $"<b>Date:</b> {@Convert.ToDateTime(cloudTask.RecDate).ToNepaliDate()}\r\n" +
+                $"------------------------------------------------------\r\n" +
+                $"<b>To do :</b> {cloudTask.TaskName}\r\n" +
+                pri +
+                $"<b>Update Time :</b> {cloudTask.TaskTime} \r\n" +
+                $"------------------------------------------------------\r\n" +
+                $"<b>Client :</b> {cloudTask.ClientName}\r\n" +
+                $"<b>PAN No :</b> {cloudTask.PANNo}\r\n" +
+                $"<b>License Date :</b> {cloudTask.LicDate}\r\n\r\n" +
+                $"<b>Task Link</b> : <a href=\"{baseUrl}\">{baseUrl}</a> \r\n\r\n" +
+                TaskCreatedBy;
+            }
+            else if (cloudTask.TaskTypeId == 3)
+            {
+                message =
+                $"<b>Date:</b> {@Convert.ToDateTime(cloudTask.RecDate).ToNepaliDate()}\r\n" +
+                $"------------------------------------------------------\r\n" +
+                $"<b>To do :</b> {cloudTask.TaskName}\r\n" +
+                pri +
+                $"<b>Update Time :</b> {cloudTask.TaskTime} \r\n" +
+                $"------------------------------------------------------\r\n" +
+                $"<b>Client :</b> {cloudTask.ClientName}\r\n" +
+                $"<b>Cloud URL :</b> {cloudTask.CloudUrl}\r\n\r\n" +
+                $"<b>Task Link</b> : <a href='\"{baseUrl}\">{baseUrl}</a> \r\n\r\n" +
+                TaskCreatedBy;
+            }
+
+
+            await _telegramService.SendMessageAsync(message, TaskId);
         }
 
         #endregion private methods

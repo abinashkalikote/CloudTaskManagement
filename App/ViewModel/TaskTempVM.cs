@@ -60,7 +60,9 @@ namespace App.Web.ViewModel
         public bool IsCompleted { get; set; }
         public bool IsCanceled { get; set; }
 
-        public bool? IsShowDetailsPeekButton { get; set; } = true;
+        public bool? IsShowPeekButton { get; set; } = true;
+        public bool? IsShowDetailsButton { get; set; } = true;
+        public bool? IsShowActionButton { get; set; } = true;
 
 
 

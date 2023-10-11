@@ -83,7 +83,7 @@ namespace App.Web.Controllers
                 AuthenticationProperties properties = new()
                 {
                     AllowRefresh = true,
-                    IsPersistent = false
+                    IsPersistent = true
                 };
 
                 ClaimsIdentity identity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);

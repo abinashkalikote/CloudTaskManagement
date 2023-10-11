@@ -1,43 +1,50 @@
 ﻿@* @model App.Web.ViewModel.TaskTempV *@
 
 
-
-@if (Model.IsInPending)
+@if (Model.IsShowActionButton)
 {
-    <a asp-action="ProccedTask" asp-controller="Task" asp-route-TaskID="@Model?.Id" class="btn btn-danger btn-sm me-1 TaskBtn">
-        Process <i class="fa-solid fa-arrow-right"></i>
-    </a>
 
-    <a asp-action="EditTask" asp-controller="Task" asp-route-TaskID="@Model?.Id" class="btn btn-warning btn-sm me-1">
-        Edit <i class="fa-solid fa-pencil"></i>
-    </a>
+    @if (Model.IsInPending)
+    {
+        <a asp-action="ProccedTask" asp-controller="Task" asp-route-TaskID="@Model?.Id" class="btn btn-danger btn-sm me-1 TaskBtn">
+            Process <i class="fa-solid fa-arrow-right"></i>
+        </a>
 
+        <a asp-action="EditTask" asp-controller="Task" asp-route-TaskID="@Model?.Id" class="btn btn-warning btn-sm me-1">
+            Edit <i class="fa-solid fa-pencil"></i>
+        </a>
+
+    }
+    else if (Model.IsInProgress)
+    {
+        <a asp-action="CompletedTask" asp-controller="Task" asp-route-TaskID="@Model?.Id" class="btn btn-success btn-sm me-1 TaskBtn">
+            Complete <i class="fa-regular fa-circle-check"></i>
+        </a>
+    }
+    else if (Model.IsCompleted)
+    {
+        <i class="text-center">Completed </i> <b>✅</b>
+    }
+    else
+    {
+        <i class="text-center">Canceled <i class="fa fa-solid fa-times"></i></i>
+    }
 }
-else if (Model.IsInProgress)
-{
-    <a asp-action="CompletedTask" asp-controller="Task" asp-route-TaskID="@Model?.Id" class="btn btn-success btn-sm me-1 TaskBtn">
-        Complete <i class="fa-regular fa-circle-check"></i>
-    </a>
-}
-else if (Model.IsCompleted)
-{
-    <i class="text-center">Completed <i class="fa fa-solid fa-check"></i></i>
-}
-else
-{
-    <i class="text-center">Canceled <i class="fa fa-solid fa-times"></i></i>
-}
 
 
 
-@if (Model.IsShowDetailsPeekButton != null && Model.IsShowDetailsPeekButton == true)
+
+
+@if (Model.IsShowPeekButton != null && Model.IsShowPeekButton == true)
 {
     <button type="button" data-toggle="modal" data-target="#TaskModal-@Model?.Id" class="btn btn-sm btn-primary">
         Peek <i class="fa fa-eye"></i>
     </button>
 
+}
 
-
+@if (Model.IsShowDetailsButton != null && Model.IsShowDetailsButton == true)
+{
     <a asp-action="TaskDetails" asp-controller="Task" asp-route-TaskID="@Model?.Id" class="btn btn-secondary btn-sm me-1">
         Details <i class="fa fa-solid fa-circle-info"></i>
     </a>

@@ -354,7 +354,7 @@ namespace App.Web.Controllers
 
 
                 TempData["success"] = "Task has been Procced Successfully !";
-                return RedirectToAction(nameof(GetAllTask));
+                return RedirectToAction("TaskDetails", new { TaskID = TaskID });
             }
             catch (Exception)
             {
@@ -404,7 +404,7 @@ namespace App.Web.Controllers
 
                 scope.Complete();
                 TempData["success"] = "Task has been Completed Successfully !";
-                return Redirect(_httpContext.Request.Path);
+                return RedirectToAction("TaskDetails", new { TaskID = TaskID });
             }
             catch (Exception)
             {

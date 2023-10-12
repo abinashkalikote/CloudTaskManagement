@@ -29,6 +29,11 @@ for (let name of TaskBtn) {
 }
 
 
+//For Submit button disabled
+$("form").submit((e) => {
+    $('input[type=submit], button[type=submit]').prop('disabled', true);
+});
+
 
 
 //For Pagination

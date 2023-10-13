@@ -1,11 +1,4 @@
-﻿using App.Base.Constants;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace App.Model
 {
@@ -14,7 +7,7 @@ namespace App.Model
         [Key]
         public int Id { get; set; }
         public string TaskTypeName { get; set; }
-        public char? RecStatus { get; set; } = Status.Active;
+        public char? RecStatus { get; set; } = 'A';
         public DateTime RecDate { get; set; } = DateTime.Now;
 
         public virtual User RecBy { get; set; }

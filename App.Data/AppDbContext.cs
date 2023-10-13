@@ -1,12 +1,7 @@
 ﻿using App.Model;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CTM.Data
+namespace App.Data
 {
     public class AppDbContext : DbContext
     {
@@ -20,6 +15,7 @@ namespace CTM.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<CloudTask>()
                 .HasOne(e => e.RecBy)
                 .WithMany()

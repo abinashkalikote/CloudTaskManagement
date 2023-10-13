@@ -1,21 +1,15 @@
 ﻿using App.Model;
 using App.Base.Constants;
 using App.Web.ViewModel;
-using CTM.Data;
-using Humanizer;
+using App.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using System.Transactions;
 using App.Web.Providers.Interface;
-using App.Base.Extensions;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using System.Threading.Tasks;
 using App.Web.Services;
 using NepDate;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace App.Web.Controllers
 {

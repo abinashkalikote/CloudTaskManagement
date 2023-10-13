@@ -1,15 +1,4 @@
-﻿using App.Base.Constants;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace App.Model
+﻿namespace App.Model
 {
     public class CloudTask
     {
@@ -37,7 +26,7 @@ namespace App.Model
 
         public string RecAuditLog { get; set; } = "";
         public int RecVersion { get; set; } = 1;
-        public char? RecStatus { get; set; } = Status.Active;
+        public char? RecStatus { get; set; } = 'A';
         public DateTime RecDate { get; set; } = DateTime.Now;
         public string TSKStatus { get; set; }
         public DateTime? ProccedTime { get; set; }

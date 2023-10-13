@@ -1,5 +1,4 @@
-﻿using App.Base.Constants;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -17,7 +16,7 @@ namespace App.Model
         public string Password { get; set; }
         public char IsAdmin { get; set; } = 'N';
         public char IsNewPassword { get; set; } = 'N';
-        public char? RecStatus { get; set; } = Status.Active;
+        public char? RecStatus { get; set; } = 'A';
         public DateTime RecDate { get; set; } = DateTime.Now;
         public string RecBy { get; set; }
 

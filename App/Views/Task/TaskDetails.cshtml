@@ -7,10 +7,11 @@
     ViewData["Title"] = "Task Details";
 }
 
+<div class="alert alert-info text-center p-2 mb-1">
+    <h1 class="mb-0">@Model.TaskTypeName</h1>
+</div>
+
 <div class="card">
-    <div class="card-header">
-        <h2>Task Details</h2>
-    </div>
     <div class="card-body">
         @if (Model != null)
         {

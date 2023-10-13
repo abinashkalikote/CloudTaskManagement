@@ -130,6 +130,48 @@
     </div>
 </div>
 
+<div class="modal fade" id="TaskModal">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="taskTitle">${task.taskTitle}</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-muted">
+                <b>Client Name : </b> <span id="clientName">${task.clientName}</span>
+                <br>
+                <b>Cloud URL : </b> <a href="${task.cloudURL}" target="_blank" id="cloudURL">${task.cloudURL}</a>
+                <br>
+                <b>Software Version : </b> <span id="SoftwareVersionFrom"></span> <b>To</b> <span id="SoftwareVersionTo"></span>
+                <br>
+                <b>Issue On Previous Software : </b> <span id="issueOnPreviousSoftware">${task.issueOnPreviousSoftware}</span>
+                <br>
+                <b>Created Date : </b> <span id="createdDate">${task.createdDate}</span>
+                <br>
+                <b>Created By : </b> <span id="createdBy">${task.createdBy}</span>
+
+
+                <div class="card">
+                    <div class="card-body">
+                        <h2>Remarks: </h2>
+                        <div id="remarks">
+                            ${task.remarks}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer justify-content-end">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
 @section Scripts{
     <script>
         $(document).ready(() => {
@@ -141,51 +183,16 @@
                         .then(response => response.json())
                         .then(data => {
                             let task = data.data[0];
-                            let modal = `
-                                                <div class="modal fade" id="TaskModal">
-                                        <div class="modal-dialog modal-lg modal-dialog-centered">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h4 class="modal-title">${task.taskTitle}</h4>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body text-muted">
-                                                    <b>Client Name : </b> ${task.clientName}
-                                                    <br>
-                                                    <b>Cloud URL : </b> <a href="${task.cloudURL}">${task.cloudURL}</a>
-                                                    <br>
-                                                            <b>Software Version : </b> ${task.softwareVersionFrom} <b>To</b> ${task.softwareVersionTo}
-                                                    <br>
-                                                    <b>Issue On Previous Software : </b> ${task.issueOnPreviousSoftware}
-                                                    <br>
-                                                    <b>Created Date : </b> ${task.createdDate}
-                                                    <br>
-                                                    <b>Created By : </b> ${task.createdBy}
-
-
-                                                    <div class="card">
-                                                        <div class="card-body">
-                                                            <h2>Remarks: </h2>
-                                                            <div>
-                                                                ${task.remarks}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-                                                <div class="modal-footer justify-content-end">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                </div>
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-                                `;
-
-                            $("body").append(modal)
+                            $("#taskTitle").text(task.taskTitle);
+                            $("#clientName").text(task.clientName);
+                            $("#cloudURL").text(task.cloudURL);
+                            $("#cloudURL").attr("href", task.cloudURL);
+                            $("#SoftwareVersionFrom").text(task.softwareVersionFrom);
+                            $("#SoftwareVersionTo").text(task.softwareVersionTo);
+                            $("#issueOnPreviousSoftware").text(task.issueOnPreviousVersion);
+                            $("#createdDate").text(task.createdDate);
+                            $("#createdBy").text(task.createdBy);
+                            $("#remarks").text(task.remarks);
                         })
                 })
             })

@@ -1,21 +1,12 @@
 using App.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using App.Web.Providers.Interface;
 using App.Web.Providers;
-using System;
 using Pioneer.Pagination;
-using Humanizer;
-using System.Configuration;
 using App.Web.Services;
 using App.Web.Models;
-using Microsoft.Build.Execution;
+using App.Base;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +32,6 @@ builder.Services.AddSession(option => option.IdleTimeout = TimeSpan.FromMinutes(
 
 builder.Services.AddScoped<IUserProvider, UserProvider>();
 builder.Services.AddTransient<IPaginatedMetaService, PaginatedMetaService>();
-
 
 
 builder.Services.AddScoped<TelegramService>();

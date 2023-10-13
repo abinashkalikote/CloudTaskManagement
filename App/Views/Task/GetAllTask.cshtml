@@ -82,46 +82,46 @@
                         foreach (var item in Model.Tasks)
                         {
                             sn++;
-                            <tr>
-                                <td>@sn</td>
-                                 @*<td title="@item.TaskTitle" style="width: 20%; max-width: 30px; white-space: nowrap !important; overflow:hidden !important; text-overflow: ellipsis !important;">
-                                     @item.TaskTitle
-                                 </td>*@
+                                <tr>
+                                    <td>@sn</td>
+                                    @*<td title="@item.TaskTitle" style="width: 20%; max-width: 30px; white-space: nowrap !important; overflow:hidden !important; text-overflow: ellipsis !important;">
+                    @item.TaskTitle
+                    </td>*@
 
-                                <td style="width:20%">@item.ClientName</td>
-                                <td><a title="@item.CloudURL" href="@item.CloudURL" target="_blank">@item.CloudURL</a></td>
-                                <td>@item.TaskTypeName</td>
-                                <td>@Convert.ToDateTime(item.TimeSpan).Humanize()</td>
-                                <td>@item.RecDate</td>
-                                <td>
-                                
-                                    @if (item.IsInPending)
+                                    <td style="width:20%">@item.ClientName</td>
+                                    <td><a title="@item.CloudURL" href="@item.CloudURL" target="_blank">@item.CloudURL</a></td>
+                                    <td>@item.TaskTypeName</td>
+                                    <td>@Convert.ToDateTime(item.TimeSpan).Humanize()</td>
+                                    <td>@item.RecDate</td>
+                                    <td>
+
+                                        @if (item.IsInPending)
                                     {
-                                        <i title="@item.RecBy Created.">Pending</i>
+                                            <i title="@item.RecBy Created.">Pending</i>
                                     }
-                                    else if(item.IsInProgress)
+                                    else if (item.IsInProgress)
                                     {
-                                        <i title="@item.ProccedBy is working on it.">Working</i>
+                                            <i title="@item.ProccedBy is working on it.">Working</i>
                                     }
                                     else if (item.IsCompleted)
                                     {
-                                        <i title="@item.CompletedBy Completed.">Completed ✅</i>
+                                            <i title="@item.CompletedBy Completed.">Completed ✅</i>
                                     }
                                     else
                                     {
-                                        <i>Canceled</i>
+                                            <i>Canceled</i>
                                     }
 
-                                </td>
-                                <td>
-                                    @{
+                                    </td>
+                                    <td>
+                                        @{
                                         item.IsShowPeekButton = true;
                                         item.IsShowDetailsButton = true;
                                         item.IsShowActionButton = false;
-                                    }
-                                    <partial name="_TaskActionButtons" model="@item" />
-                                </td>
-                            </tr>
+                                        }
+                                        <partial name="_TaskActionButtons" model="@item" />
+                                    </td>
+                                </tr>
                         }
                     }
                 </tbody>
@@ -130,6 +130,65 @@
     </div>
 </div>
 
+@section Scripts{
+    <script>
+        $(document).ready(() => {
+            let PeekBtn = document.querySelectorAll(".peekBtn");
+            PeekBtn.forEach((btn) => {
+                $(btn).click((e) => {
+                    var TaskId = $(e.currentTarget).attr("data-TaskId");
+                    fetch(`/Task/GetTask/${TaskId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            let task = data.data[0];
+                            let modal = `
+                                                <div class="modal fade" id="TaskModal">
+                                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h4 class="modal-title">${task.taskTitle}</h4>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body text-muted">
+                                                    <b>Client Name : </b> ${task.clientName}
+                                                    <br>
+                                                    <b>Cloud URL : </b> <a href="${task.cloudURL}">${task.cloudURL}</a>
+                                                    <br>
+                                                            <b>Software Version : </b> ${task.softwareVersionFrom} <b>To</b> ${task.softwareVersionTo}
+                                                    <br>
+                                                    <b>Issue On Previous Software : </b> ${task.issueOnPreviousSoftware}
+                                                    <br>
+                                                    <b>Created Date : </b> ${task.createdDate}
+                                                    <br>
+                                                    <b>Created By : </b> ${task.createdBy}
 
 
-<Partial name="~/Views/Shared/TaskModal/_TaskModal.cshtml" />
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <h2>Remarks: </h2>
+                                                            <div>
+                                                                ${task.remarks}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="modal-footer justify-content-end">
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                `;
+
+                            $("body").append(modal)
+                        })
+                })
+            })
+        })
+    </script>
+}

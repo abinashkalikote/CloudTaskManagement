@@ -21,7 +21,7 @@ namespace App.Controllers
         public TelegramService _telegramService { get; }
 
         public HomeController(
-            ILogger<HomeController> logger, 
+            ILogger<HomeController> logger,
             AppDbContext db)
         {
             _db = db;
@@ -57,5 +57,29 @@ namespace App.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+
+        #region DashboardChartAPI
+        public IActionResult GetNoOfTask()
+        {
+            try
+            {
+                var pendingTask = _db.CloudTasks.Count(e => e.TSKStatus == CloudTaskStatus.Pending);
+                var workingTask = _db.CloudTasks.Count(e => e.TSKStatus == CloudTaskStatus.InProgress);
+                var completedTask = _db.CloudTasks.Count(e => e.TSKStatus == CloudTaskStatus.Completed);
+                var canceledTask = _db.CloudTasks.Count(e => e.TSKStatus == CloudTaskStatus.Canceled);
+
+                var data = new
+                {
+                    pendingTask, workingTask, completedTask, canceledTask
+                };
+                return Ok(new {data});
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
+        }
+        #endregion DashboardChartAPI
     }
 }

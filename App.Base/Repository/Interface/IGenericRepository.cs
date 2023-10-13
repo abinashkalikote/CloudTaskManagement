@@ -12,7 +12,6 @@ namespace App.Base.Repository.Interface
         Task<T> GetByIdAsync(int id);
         Task CreateAsync(T entity);
         Task UpdateAsync(int id, T entity);
-        Task DeleteAsync(int id);
         Task<IEnumerable<T>> ExecuteRawSqlAsync(string sql, params object[] parameters);
     }
 }

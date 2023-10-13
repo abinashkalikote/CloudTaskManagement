@@ -10,6 +10,8 @@ using System.Transactions;
 using App.Web.Providers.Interface;
 using App.Web.Services;
 using NepDate;
+using App.Base.Repository.Interface;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace App.Web.Controllers
 {
@@ -33,6 +35,7 @@ namespace App.Web.Controllers
             _telegramService = telegramService;
             _httpContext = httpContextAccessor.HttpContext;
         }
+
 
         public IActionResult Index()
         {
@@ -579,5 +582,41 @@ namespace App.Web.Controllers
         }
 
         #endregion private methods
+
+
+        #region TaskAPI
+        [HttpGet]
+        public IActionResult GetTask(int Id)
+        {
+            try
+            {
+                var data = _db.CloudTasks
+               .Include(e => e.RecBy)
+               .Include(t => t.ProccedBy)
+               .Include(f => f.CompletedBy)
+               .Where(e => e.RecStatus == Status.Active && e.Id == Id)
+               .Select(e => new
+               {
+                   ClientName = e.ClientName ?? "",
+                   TaskTitle = e.TaskName,
+                   CloudURL = e.CloudUrl,
+                   SoftwareVersionFrom = e.SoftwareVersionFrom ?? "",
+                   SoftwareVersionTo = e.SoftwareVersionTo ?? "",
+                   IssueOnPreviousVersion = e.IssueOnPreviousSoftware ?? "",
+                   CreatedDate = e.RecDate.Date,
+                   CreatedBy = e.RecBy.FullName,
+                   Remarks = e.Remarks
+               });
+                return Ok(new
+                {
+                    data
+                });
+            }
+            catch (Exception e)
+            {
+                return BadRequest();
+            }
+        }
+        #endregion TaskAPI
     }
 }

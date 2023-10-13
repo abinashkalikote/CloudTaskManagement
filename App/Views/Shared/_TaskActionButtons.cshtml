@@ -18,7 +18,7 @@
     else if (Model.IsInProgress)
     {
         <a asp-action="CompletedTask" asp-controller="Task" asp-route-TaskID="@Model?.Id" class="btn btn-success btn-sm me-1 TaskBtn">
-            Complete <i class="fa-regular fa-circle-check"></i>
+            Mark As Completed <i class="fa-regular fa-circle-check"></i>
         </a>
     }
     else if (Model.IsCompleted)
@@ -37,7 +37,7 @@
 
 @if (Model.IsShowPeekButton != null && Model.IsShowPeekButton == true)
 {
-    <button type="button" data-toggle="modal" data-target="#TaskModal-@Model?.Id" class="btn btn-sm btn-primary">
+    <button type="button" data-toggle="modal" data-target="#TaskModal" data-TaskId="@Model?.Id" class="btn btn-sm btn-primary peekBtn">
         Peek <i class="fa fa-eye"></i>
     </button>
 

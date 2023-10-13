@@ -20,29 +20,28 @@ namespace App.Base.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+
+        public async Task<IEnumerable<T>> ExecuteRawSqlAsync(string sql, params object[] parameters)
         {
-            
+            return await _context.Set<T>()
+                .FromSqlRaw(sql, parameters)
+                .ToListAsync();
         }
 
-        public Task<IEnumerable<T>> ExecuteRawSqlAsync(string sql, params object[] parameters)
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _dbSet.ToListAsync();
         }
 
-        public Task<IEnumerable<T>> GetAllAsync()
+        public async Task<T> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _dbSet.FindAsync(id);
         }
 
-        public Task<T> GetByIdAsync(int id)
+        public async Task UpdateAsync(int id, T entity)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task UpdateAsync(int id, T entity)
-        {
-            throw new NotImplementedException();
+            _context.Entry(entity).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
         }
     }
 }

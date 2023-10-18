@@ -9,11 +9,6 @@
         <a asp-action="ProccedTask" asp-controller="Task" asp-route-TaskID="@Model?.Id" class="btn btn-danger btn-sm me-1 TaskBtn">
             Process <i class="fa-solid fa-arrow-right"></i>
         </a>
-
-        <a asp-action="EditTask" asp-controller="Task" asp-route-TaskID="@Model?.Id" class="btn btn-warning btn-sm me-1">
-            Edit <i class="fa-solid fa-pencil"></i>
-        </a>
-
     }
     else if (Model.IsInProgress)
     {

@@ -8,7 +8,7 @@
 }
 
 <div class="alert alert-info text-center p-2 mb-1">
-    <h1 class="mb-0">@Model.TaskTypeName</h1>
+    <h1 class="mb-0 text-capitalize">@Model.TaskTypeName</h1>
 </div>
 
 <div class="card">
@@ -50,16 +50,30 @@
                 </div>
                 <div class="col-md-5 col-sm-12">
                     <partial name="~/Views/Shared/TaskModal/_TaskSummary.cshtml" />
-                    <div class="card">
-                        <div class="card-body p-2">
-                            @{
-                                Model.IsShowPeekButton = false;
-                                Model.IsShowActionButton = true;
-                                Model.IsShowDetailsButton = false;
-                            }
-                            <partial name="_TaskActionButtons" model="@Model" />
+                    @if (Model.IsInPending)
+                    {
+                        <a asp-action="ProccedTask" asp-controller="Task" asp-route-TaskID="@Model?.Id" class="btn btn-danger w-100 btn-sm me-1 TaskBtn">
+                            Process <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    }
+                    else if (Model.IsInProgress)
+                    {
+                        <a asp-action="CompletedTask" asp-controller="Task" asp-route-TaskID="@Model?.Id" class="btn btn-success w-100 btn-sm me-1 TaskBtn">
+                            Mark As Completed <i class="fa-regular fa-circle-check"></i>
+                        </a>
+                    }
+                    else if (Model.IsCompleted)
+                    {
+                        <div class="alert alert-success text-center h6">
+                            <i>Completed </i> <b>✔️✔️</b>
                         </div>
-                    </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-muted text-center">
+                            <i>Canceled <i class="fa fa-solid fa-times"></i></i>
+                        </div>
+                    }
                 </div>
             </div>
         }

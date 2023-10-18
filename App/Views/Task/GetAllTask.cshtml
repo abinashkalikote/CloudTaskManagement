@@ -97,15 +97,18 @@
 
                                         @if (item.IsInPending)
                                     {
-                                            <i title="@item.RecBy Created.">Pending</i>
+                                        <i title="@item.RecBy Created.">Pending </i>
+                                        <span style="font-size: 1.1rem"> ⏱️</span>
                                     }
                                     else if (item.IsInProgress)
                                     {
-                                            <i title="@item.ProccedBy is working on it.">Working</i>
+                                        <i title="@item.ProccedBy is working on it.">Working</i>
+                                        <span style="font-size: 1.1rem"> ⚒️</span>
                                     }
                                     else if (item.IsCompleted)
                                     {
-                                            <i title="@item.CompletedBy Completed.">Completed ✅</i>
+                                        <i title="@item.CompletedBy Completed.">Completed </i>
+                                        <span style="font-size: 1.1rem">✅</span>
                                     }
                                     else
                                     {
@@ -114,12 +117,14 @@
 
                                     </td>
                                     <td>
-                                        @{
-                                        item.IsShowPeekButton = true;
-                                        item.IsShowDetailsButton = true;
-                                        item.IsShowActionButton = false;
-                                        }
-                                        <partial name="_TaskActionButtons" model="@item" />
+                                    <button type="button" data-toggle="modal" data-target="#TaskModal" data-TaskId="@item?.Id" class="btn btn-sm btn-primary peekBtn">
+                                        Peek <i class="fa fa-eye"></i>
+                                    </button>
+
+                                    <a asp-action="TaskDetails" asp-controller="Task" asp-route-TaskID="@item?.Id" class="btn btn-secondary btn-sm me-1">
+                                        Details <i class="fa fa-solid fa-circle-info"></i>
+                                    </a>
+
                                     </td>
                                 </tr>
                         }

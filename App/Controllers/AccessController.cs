@@ -12,6 +12,7 @@ using System.Transactions;
 using System.Text.Json;
 using BC = BCrypt.Net.BCrypt;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Text;
 
 namespace App.Web.Controllers
 {
@@ -51,11 +52,18 @@ namespace App.Web.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _db.Users.FirstOrDefaultAsync(e =>
-                                e.Email == loginVM.Email && e.RecStatus == Status.Active);
+                                e.Email == loginVM.Email);
+
 
                 if (user == null)
                 {
                     TempData["error"] = "Credential Not Matched !";
+                    return View();
+                }
+
+                if(user.RecStatus != Status.Active)
+                {
+                    TempData["error"] = "Please contact to your Administrator";
                     return View();
                 }
 
@@ -90,7 +98,7 @@ namespace App.Web.Controllers
 
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), properties);
 
-                TempData["success"] = "User Successfully Logged In!";
+                TempData["success"] = "Welcome " + user.FullName;
 
                 var returnUrl = Request.Cookies["returnUrl"];
                 if (!string.IsNullOrEmpty(returnUrl))
@@ -104,7 +112,6 @@ namespace App.Web.Controllers
 
             return View();
         }
-
 
 
         [HttpGet]
@@ -121,6 +128,7 @@ namespace App.Web.Controllers
                 u.Email = user.Email;
                 u.IsAdmin = user.IsAdmin == 'Y' ? "Yes" : "No";
                 u.Status = user.RecStatus == 'A' ? "Active" : "InActive";
+                u.IsActive = user.RecStatus == 'A' ? true : false;
                 userVM.Add(u);
 
             }
@@ -192,6 +200,92 @@ namespace App.Web.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> ActiveInactiveUser(int Id)
+        {
+
+            if(Id == null) throw new Exception("id");
+
+            if (Id == _userProvider.GetUserId() || Id == 1)
+            {
+                TempData["error"] = "Currently logged in user cannot be inactive, please contact administrator";
+                return RedirectToAction("AllUsers");
+            }
+
+            if (!_userProvider.IsAdmin()) throw new Exception("Unauthorized Access !");
+
+            var user = await _db.Users.SingleOrDefaultAsync(x => x.Id == Id);
+            if (user == null) throw new Exception("User not Found !");
+
+            if(user.RecStatus == 'A')
+            {
+                user.RecStatus = 'D';
+            }
+            else
+            {
+                user.RecStatus = 'A';
+            }
+
+            _db.Users.Update(user);
+            _db.SaveChanges();
+            TempData["success"] = "User you have selected has Active/Inactive !";
+            return RedirectToAction(nameof(AllUsers));
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> PasswordReset(int UserId)
+        {
+            if (UserId == null) throw new Exception("User Id can't be a null !");
+            if (UserId == 1) throw new Exception("Password can't be changed of SuperAdmin !");
+
+            var user = _db.Users.Where(e => e.Id == UserId).FirstOrDefault();
+            if (user == null)
+            {
+                TempData["error"] = "User Not Found !";
+                return RedirectToAction(nameof(AllUsers));
+            }
+
+            var u = new PasswordResetVM()
+            {
+                UserId = user.Id,
+                FullName = user.FullName,
+                Password = ""
+            };
+
+            return View(u);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> PasswordReset(PasswordResetVM vM)
+        {
+            if (ModelState.IsValid)
+            {
+                using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+                try
+                {
+                    var user = await _db.Users.FirstOrDefaultAsync(e => e.Id == vM.UserId);
+                    user.Password = BC.EnhancedHashPassword(vM.Password);
+
+                    _db.Users.Update(user);
+                    await _db.SaveChangesAsync();
+
+                    scope.Complete();
+                    TempData["success"] = "Password Changed Successfully !";
+                    return RedirectToAction(nameof(AllUsers));
+                }
+                catch(Exception ex)
+                {
+                    scope.Dispose();
+                    TempData["error"] = "Something Went Wrong ! " + ex;
+                    return View(vM);
+                }
+            }
+            return View(vM);
+        }
+
 
         #region ChangePassword
 
@@ -248,7 +342,7 @@ namespace App.Web.Controllers
                 }
 
             }
-            return RedirectToAction(nameof(ChangePassword)); ;
+            return View(vm);
         }
 
         #endregion ChangePassword
@@ -289,6 +383,24 @@ namespace App.Web.Controllers
                 return false;
             }
         }
+
+        //private readonly Random _random = new Random();
+
+        //private string RandomPassword(int size, bool lowerCase = true)
+        //{
+        //    var builder = new StringBuilder(size);
+
+        //    char offset = lowerCase ? 'a' : 'A';
+        //    const int lettersOffset = 26;
+
+        //    for (int i = 0; i < size; i++)
+        //    {
+        //        var @char = (char)_random.Next(offset, offset + lettersOffset);
+        //        builder.Append(@char);
+        //    }
+
+        //    return lowerCase ? builder.ToString().ToLower() : builder.ToString();
+        //}
         #endregion PrivateMethods
     }
 }

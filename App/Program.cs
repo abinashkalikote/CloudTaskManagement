@@ -22,10 +22,11 @@ builder.Services.AddScoped<DbContext, AppDbContext>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
+    .AddCookie(option =>
     {
-        options.LoginPath = "/Access/Login";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+        option.LoginPath = "/Access/Login";
+        option.ExpireTimeSpan = TimeSpan.FromDays(1);
+        option.LogoutPath = "/Home/Logout";
     });
 
 builder.Services.AddSession(option => option.IdleTimeout = TimeSpan.FromMinutes(20));

@@ -20,6 +20,7 @@ let TaskBtn = $(".TaskBtn");
 for (let name of TaskBtn) {
     name.addEventListener('click', (e) => {
         e.preventDefault();
+
         if (confirm("Are you sure?")) {
             location.href = $(name).attr("href");
         } else {
@@ -33,6 +34,8 @@ for (let name of TaskBtn) {
 $("#confirmation").submit((e) => {
     if (confirm("Are you sure ?")) {
         $('input[type=submit], button[type=submit]').prop('disabled', true);
+
+
     } else {
         e.preventDefault();
     }

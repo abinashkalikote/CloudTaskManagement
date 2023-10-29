@@ -1,4 +1,6 @@
 ﻿@model IEnumerable<UserVM>
+@inject App.Web.Providers.Interface.IUserProvider _userProvider;
+
 @{
     ViewData["Title"] = "All Users";
 }
@@ -9,7 +11,7 @@
         <h1>All Users</h1>
     </div>
     <div class="card-body">
-        <table class="table table-bordered table-sm table-hover table-striped">
+        <table id="datatable" class="table table-hover table-striped table-sm w-100">
             <thead>
                 <tr>
                     <th>#</th>
@@ -32,7 +34,27 @@
                             <td>@item.Email</td>
                             <td>@item.IsAdmin</td>
                             <td>@item.Status</td>
-                            <td>Deactivate</td>
+                            <td>
+                                @if (_userProvider.IsAdmin())
+                                {
+                                    if (item?.IsActive == true)
+                                    {
+                                        <a asp-action="ActiveInactiveUser" asp-controller="Access" asp-route-Id="@item.Id" class="btn btn-warning btn-xs">
+                                            <i class="fa fa-ban"></i> 
+                                            Deactivate
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="ActiveInactiveUser" asp-controller="Access" asp-route-Id="@item.Id" class="btn btn-primary btn-xs">
+                                            <i class="fa fa-check-circle"></i> 
+                                            Activate
+                                        </a>
+                                    }
+
+                                    <a asp-action="PasswordReset" asp-controller="Access" asp-route-UserId="@item.Id" class="btn btn-danger btn-xs">Reset Password</a>
+                                }
+                            </td>
                         </tr>
                     }
                 }

@@ -27,5 +27,6 @@ namespace App.Web.ViewModel
         public string IsAdmin { get; set; }
 
         public string? Status { get; set; }
+        public bool? IsActive { get; set; }
     }
 }

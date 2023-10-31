@@ -30,7 +30,7 @@ namespace App.Web.Controllers
                 await _db.SaveChangesAsync();
             }
 
-            return RedirectToAction("Index", "Task");
+            return RedirectToAction("Index", "Home");
         }
 
 

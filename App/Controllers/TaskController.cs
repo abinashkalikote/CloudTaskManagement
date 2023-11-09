@@ -243,6 +243,7 @@ namespace App.Web.Controllers
             return View(vm);
         }
 
+        [HttpGet]
         public async Task<IActionResult> TaskDetails(int? TaskID)
         {
             if (TaskID == null)

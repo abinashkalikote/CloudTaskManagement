@@ -31,6 +31,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddSession(option => option.IdleTimeout = TimeSpan.FromMinutes(20));
 
+
+builder.Services.UseBase();
+
+
 builder.Services.AddScoped<IUserProvider, UserProvider>();
 builder.Services.AddTransient<IPaginatedMetaService, PaginatedMetaService>();
 

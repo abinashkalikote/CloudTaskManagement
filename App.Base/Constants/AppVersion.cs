@@ -8,6 +8,6 @@ namespace App.Base.Constants
 {
     public static class AppVersion
     {
-        public static string Version { get; set; } = "V1.0";
+        public static string Version { get; set; } = "V1.1";
     }
 }

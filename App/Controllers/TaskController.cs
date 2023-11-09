@@ -10,8 +10,6 @@ using System.Transactions;
 using App.Web.Providers.Interface;
 using App.Web.Services;
 using NepDate;
-using App.Base.Repository.Interface;
-using Microsoft.CodeAnalysis.CSharp;
 
 namespace App.Web.Controllers
 {

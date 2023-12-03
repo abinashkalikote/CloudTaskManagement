@@ -10,8 +10,6 @@ using System.Transactions;
 using App.Web.Providers.Interface;
 using App.Web.Services;
 using NepDate;
-using App.Base.Repository.Interface;
-using Microsoft.CodeAnalysis.CSharp;
 
 namespace App.Web.Controllers
 {
@@ -245,6 +243,7 @@ namespace App.Web.Controllers
             return View(vm);
         }
 
+        [HttpGet]
         public async Task<IActionResult> TaskDetails(int? TaskID)
         {
             if (TaskID == null)

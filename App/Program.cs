@@ -1,12 +1,17 @@
-using App.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using App.Web.Providers.Interface;
-using App.Web.Providers;
-using Pioneer.Pagination;
-using App.Web.Services;
-using App.Web.Models;
 using App.Base;
+using App.Data;
+using App.Web.Models;
+using App.Web.Providers;
+using App.Web.Providers.Interface;
+using App.Web.Repository;
+using App.Web.Repository.Interfaces;
+using App.Web.Services;
+using App.Web.Services.Interfaces;
+using App.Web.Validator;
+using App.Web.Validator.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
+using Pioneer.Pagination;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +21,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 builder.Services.AddScoped<DbContext, AppDbContext>();
-
 
 
 builder.Services.AddHttpContextAccessor();
@@ -38,12 +42,18 @@ builder.Services.UseBase();
 builder.Services.AddScoped<IUserProvider, UserProvider>();
 builder.Services.AddTransient<IPaginatedMetaService, PaginatedMetaService>();
 
+builder.Services.AddScoped<IAppClientRepo, AppClientRepo>()
+    .AddScoped<IAppClientValidator, AppClientValidator>()
+    .AddScoped<IAppClientService, AppClientService>();
+
 
 builder.Services.AddScoped<TelegramService>();
 builder.Services.AddHttpClient();
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 
+builder.Services.AddRazorPages()
+    .AddRazorRuntimeCompilation();
 
 builder.Services.AddControllersWithViews();
 

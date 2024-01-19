@@ -1,13 +1,7 @@
-﻿using App.Base.GenericRepository.Interface;
+﻿using System.Linq.Expressions;
+using App.Base.GenericRepository.Interface;
 using App.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace App.Base.GenericRepository
 {

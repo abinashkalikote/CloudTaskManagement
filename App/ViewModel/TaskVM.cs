@@ -75,7 +75,7 @@ namespace App.Web.ViewModel
 
         public SelectList TaskTimeList() => new SelectList(new List<TaskTimeVM>()
         {
-            new TaskTimeVM(){TaskTimeName="After a Hours"},
+            new TaskTimeVM(){TaskTimeName="After Office hours"},
             new TaskTimeVM(){TaskTimeName="Immediately"},
         }, nameof(TaskTimeVM.TaskTimeName), nameof(TaskTimeVM.TaskTimeName), TaskTime);
     }

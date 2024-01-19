@@ -1,17 +1,20 @@
 ﻿using App.Model;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Metadata;
 
 namespace App.Data
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options){}
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        {
+        }
+
         public DbSet<User> Users { get; set; }
         public DbSet<TaskType> TaskTypes { get; set; }
         public DbSet<CloudTask> CloudTasks { get; set; }
         public DbSet<AuditTask> AuditTasks { get; set; }
         public DbSet<CloudTaskLog> CloudTasksLog { get; set; }
+        public DbSet<AppClient> AppClients { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -59,8 +62,6 @@ namespace App.Data
                 .WithMany()
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
-
         }
-
     }
 }

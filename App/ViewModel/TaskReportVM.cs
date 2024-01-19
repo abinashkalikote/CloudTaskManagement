@@ -15,7 +15,7 @@ namespace App.Web.ViewModel
         public int? TaskTypeId { get; set; }
         public string? TaskTime { get; set; }
         public int? CreatedBy { get; set; }
-        public string? ClientName { get; set; }
+        public int? ClientName { get; set; }
         public string? TSKStatus { get; set; }
 
 

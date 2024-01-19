@@ -20,8 +20,34 @@
     <link rel="stylesheet" href="~/adminlte/dist/css/adminlte.min.css" asp-append-version="true">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/lib/chosen/chosen.min.css" asp-append-version="true" />
+    @* <link rel="stylesheet" href="~/lib/tom-select/css/tom-select.bootstrap5.min.css" asp-append-version="true"/> *@
     <partial name="_DataTableCSS" />
 </head>
+
+<style>
+    .chosen-single:hover{
+        color: initial !important;
+    }
+
+    .chosen-container, .chosen-drop {
+        background-color: #333 !important;
+        color: #fff !important;
+    }
+
+    .chosen-single{
+        background-color: darkgray !important;
+    }
+
+    .chosen-search-input{
+        color: #fff !important;
+    }
+
+    .chosen-results{
+        color: #fff !important;
+    }
+
+</style>
 
 <body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm" id="body">
     <div class="wrapper">
@@ -36,6 +62,20 @@
                     <a asp-controller="Home" asp-action="Index" class="nav-link">Home</a>
                 </li>
 
+                @* Client Dropdown *@
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Clients
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item nav-link" asp-action="Index" asp-controller="Client">Clients</a>
+                        <a class="dropdown-item nav-link" asp-action="Add" asp-controller="Client">Add Client</a>
+                    </div>
+                </li>
+
+
+                @* User Dropdown *@
 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -280,6 +320,8 @@
 
     <script src="~/adminlte/plugins/sweetalert2/sweetalert2.min.js" asp-append-version="true"></script>
     <script src="~/lib/Shortcut/Shortcut.js" asp-append-version="true"></script>
+    <script src="~/lib/chosen/chosen.jquery.min.js"></script>
+    @* <script src="~/lib/tom-select/js/tom-select.complete.min.js" asp-append-version="true"></script> *@
 
     @if (TempData["success"] != null)
     {
@@ -295,7 +337,7 @@
 
                 Toast.fire({
                     icon: 'success',
-                    title: '@TempData["success"]'
+                    title: '@Html.Raw(TempData["success"])'
                 })
 
             });
@@ -318,7 +360,7 @@
                 $(function () {
                     Toast.fire({
                         icon: 'error',
-                        title: '@TempData["error"]'
+                        title: '@Html.Raw(TempData["error"])'
                     })
                 });
             })

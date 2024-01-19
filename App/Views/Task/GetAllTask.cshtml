@@ -65,7 +65,6 @@
                 <thead>
                     <tr>
                         <th scope="col">#</th>
-                        @* <th scope="col">Task Name</th> *@
                         <th scope="col">Client Name</th>
                         <th scope="col">Cloud URL</th>
                         <th scope="col">Task Type</th>
@@ -84,10 +83,6 @@
                             sn++;
                                 <tr>
                                     <td>@sn</td>
-                                    @*<td title="@item.TaskTitle" style="width: 20%; max-width: 30px; white-space: nowrap !important; overflow:hidden !important; text-overflow: ellipsis !important;">
-                    @item.TaskTitle
-                    </td>*@
-
                                     <td style="width:20%">@item.ClientName</td>
                                     <td><a title="@item.CloudURL" href="@item.CloudURL" target="_blank">@item.CloudURL</a></td>
                                     <td>@item.TaskTypeName</td>

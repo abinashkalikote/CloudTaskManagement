@@ -7,7 +7,7 @@
         public virtual TaskType? TaskType { get; set; }
         public int TaskTypeId { get; set; }
 
-        public string ClientName { get; set; }
+        public int ClientName { get; set; }
         public char? Priority { get; set; } = 'Y';
         public string TaskTime { get; set; }
         public string? CloudUrl { get; set; }

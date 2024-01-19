@@ -21,7 +21,7 @@ namespace App.Web.ViewModel
 
         [Required]
         [DisplayName("Client Name")]
-        public string ClientName { get; set; }
+        public int ClientName { get; set; }
 
         [DisplayName("Cloud URL")]
         public string? CloudURL { get; set; }
@@ -71,6 +71,10 @@ namespace App.Web.ViewModel
         public List<TaskType>? taskTypes { get; set; }
         public SelectList TaskTypesList() => new SelectList(taskTypes, nameof(TaskType.Id), nameof(TaskType.TaskTypeName), TaskTypeId);
 
+
+
+        public List<Model.AppClient>? clients;
+        public SelectList GetClientList() => new SelectList(clients, nameof(Model.AppClient.Id), nameof(Model.AppClient.ClientName), ClientName);
 
 
         public SelectList TaskTimeList() => new SelectList(new List<TaskTimeVM>()

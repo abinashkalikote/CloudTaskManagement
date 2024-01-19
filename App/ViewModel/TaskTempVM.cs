@@ -20,7 +20,7 @@ namespace App.Web.ViewModel
 
         [Required]
         [DisplayName("Client Name")]
-        public string ClientName { get; set; }
+        public int ClientName { get; set; }
 
         [DisplayName("Cloud URL")]
         public string? CloudURL { get; set; }

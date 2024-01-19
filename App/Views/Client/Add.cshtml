@@ -1,0 +1,64 @@
+﻿@model AppClientVm
+@{
+    TempData["Title"] = "Add Client";
+}
+
+
+<form method="post" id="confirmation">
+    <div class="card">
+        <div class="card-header">
+            <h1>Add Client</h1>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 mb-2">
+                    <label asp-for="ClientName"></label>
+                    <input asp-for="ClientName" class="form-control form-control-border text-capitalize" placeholder="Client Name" autofocus required>
+                    <span class="text-danger" asp-validation-for="ClientName"></span>
+                </div>
+
+                <div class="col-12 mb-2">
+                    <label asp-for="Link"></label>
+                    <input asp-for="Link" class="form-control form-control-border text-lowercase" placeholder="https://example.finastraonline.com" required>
+                    <span class="text-danger" asp-validation-for="Link"></span>
+                </div>
+
+                
+
+                <div class="col-12 mb-2">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label asp-for="Location"></label>
+                            <input asp-for="Location" class="form-control form-control-border text-capitalize" placeholder="Address" required>
+                            <span class="text-danger" asp-validation-for="Location"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="CurrentVersion"></label>
+                            <input asp-for="CurrentVersion" class="form-control form-control-border text-uppercase" placeholder="Application Current Version" required>
+                            <span class="text-danger" asp-validation-for="CurrentVersion"></span>
+                        </div>
+
+                        <div class="col-md-1 d-flex">
+                            <div class="form-group">
+                                <label asp-for="IsMobileBankingClient"></label>
+                                <input type="checkbox" class="form-control form-control-border" asp-for="IsMobileBankingClient"/>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 d-flex align-items-end justify-content-center">
+                            <div class="form-group">
+                                <input type="submit" class="btn btn-primary btn-lg btn-block" value="Add" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -55,6 +55,9 @@ shortcut.add("alt+C", function () { window.location.href = "/Task/GetAllTask?TSK
 
 
 
+//For chosenjs
+
+$(".chosen-select").chosen();
 
 
 ////For Pagination

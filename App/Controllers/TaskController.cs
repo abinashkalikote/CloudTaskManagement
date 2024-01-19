@@ -10,6 +10,7 @@ using System.Transactions;
 using App.Web.Providers.Interface;
 using App.Web.Services;
 using NepDate;
+using App.Web.Repository.Interfaces;
 
 namespace App.Web.Controllers
 {
@@ -20,18 +21,22 @@ namespace App.Web.Controllers
         private readonly IUserProvider _userProvider;
         private readonly TelegramService _telegramService;
         private readonly HttpContext _httpContext;
+        public readonly IAppClientRepo _appClientRepo;
 
         public TaskController(
             AppDbContext db,
             IUserProvider userProvider,
             TelegramService telegramService,
-            IHttpContextAccessor httpContextAccessor
+            IHttpContextAccessor httpContextAccessor,
+            IAppClientRepo appClientRepo
             )
         {
             _db = db;
             _userProvider = userProvider;
             _telegramService = telegramService;
+            _appClientRepo = appClientRepo;
             _httpContext = httpContextAccessor.HttpContext;
+
         }
 
 
@@ -41,11 +46,12 @@ namespace App.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult CreateTask()
+        public async Task<IActionResult> CreateTask()
         {
             TaskVM vm = new()
             {
-                taskTypes = _db.TaskTypes.ToList()
+                taskTypes = _db.TaskTypes.ToList(),
+                clients = await _appClientRepo.GetAllAsync()
             };
             return View(vm);
         }
@@ -123,39 +129,47 @@ namespace App.Web.Controllers
         [HttpGet]
         public IActionResult EditTask(int? TaskID)
         {
-            if (TaskID == null)
-                throw new Exception($"TaskID {TaskID} can't found !");
-
-
-            var task = _db.CloudTasks.FirstOrDefault(e => e.Id == TaskID);
-
-            if (task == null)
-                throw new Exception($"Task not found !");
-
-            if (task.TSKStatus == CloudTaskStatus.InProgress ||
-                task.TSKStatus == CloudTaskStatus.Completed)
-                throw new Exception($"Task Is Alreday in Progress or Completed, You can't Edit this task !");
-
-
-            TaskVM vm = new()
+            try
             {
-                Id = task.Id,
-                TaskTitle = task.TaskName,
-                TaskTypeId = task.TaskTypeId,
-                ClientName = task.ClientName,
-                CloudURL = task.CloudUrl,
-                HighPriority = task.Priority == 'Y' ? "true" : "false",
-                TaskTime = task.TaskTime,
-                SoftwareVersionFrom = task.SoftwareVersionFrom,
-                SoftwareVersionTo = task.SoftwareVersionTo,
-                IssueOnPreviousSoftware = task.IssueOnPreviousSoftware,
-                Remarks = task.Remarks ?? "",
-                PANNo = task.PANNo ?? "",
-                ClientAddress = task.ClientAddress ?? "",
-                LicDate = task.LicDate ?? "",
-                taskTypes = _db.TaskTypes.ToList()
-            };
-            return View(vm);
+                if (TaskID == null)
+                    throw new Exception($"TaskID {TaskID} can't found !");
+
+
+                var task = _db.CloudTasks.FirstOrDefault(e => e.Id == TaskID);
+
+                if (task == null)
+                    throw new Exception($"Task not found !");
+
+                if (task.TSKStatus == CloudTaskStatus.InProgress ||
+                    task.TSKStatus == CloudTaskStatus.Completed)
+                    throw new Exception($"Task Is Alreday in Progress or Completed, You can't Edit this task !");
+
+
+                TaskVM vm = new()
+                {
+                    Id = task.Id,
+                    TaskTitle = task.TaskName,
+                    TaskTypeId = task.TaskTypeId,
+                    ClientName = task.ClientName,
+                    CloudURL = task.CloudUrl,
+                    HighPriority = task.Priority == 'Y' ? "true" : "false",
+                    TaskTime = task.TaskTime,
+                    SoftwareVersionFrom = task.SoftwareVersionFrom,
+                    SoftwareVersionTo = task.SoftwareVersionTo,
+                    IssueOnPreviousSoftware = task.IssueOnPreviousSoftware,
+                    Remarks = task.Remarks ?? "",
+                    PANNo = task.PANNo ?? "",
+                    ClientAddress = task.ClientAddress ?? "",
+                    LicDate = task.LicDate ?? "",
+                    taskTypes = _db.TaskTypes.ToList()
+                };
+                return View(vm);
+            }
+            catch (Exception ex)
+            {
+                TempData["error"] = ex.Message;
+                return RedirectToAction(nameof(GetAllTask));
+            }
         }
 
 
@@ -424,9 +438,9 @@ namespace App.Web.Controllers
 
 
             //Filter a data as per the passed data by form
-            if (!reportVM.ClientName.IsNullOrEmpty())
+            if (reportVM.ClientName != null)
             {
-                data = data.Where(e => e.ClientName.Contains(reportVM.ClientName));
+                data = data.Where(e => e.ClientName == reportVM.ClientName);
             }
 
             if (!reportVM.TaskTitle.IsNullOrEmpty())
@@ -596,7 +610,7 @@ namespace App.Web.Controllers
                .Where(e => e.RecStatus == Status.Active && e.Id == Id)
                .Select(e => new
                {
-                   ClientName = e.ClientName ?? "",
+                   e.ClientName,
                    TaskTitle = e.TaskName,
                    CloudURL = e.CloudUrl,
                    SoftwareVersionFrom = e.SoftwareVersionFrom ?? "",
@@ -604,7 +618,7 @@ namespace App.Web.Controllers
                    IssueOnPreviousVersion = e.IssueOnPreviousSoftware ?? "",
                    CreatedDate = e.RecDate.Date,
                    CreatedBy = e.RecBy.FullName,
-                   Remarks = e.Remarks
+                   e.Remarks
                });
                 return Ok(new
                 {

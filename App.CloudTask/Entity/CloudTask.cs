@@ -3,7 +3,7 @@ using App.Base.Entities;
 
 namespace App.CloudTask.Entity;
 
-[Table("CloudTask")]
+[Table("CloudTasks")]
 public class CloudTask
 {
     public long Id { get; set; }
@@ -11,7 +11,7 @@ public class CloudTask
     public virtual TaskType? TaskType { get; set; }
     public int TaskTypeId { get; set; }
 
-    public int ClientId { get; set; }
+    public long ClientId { get; set; }
     [ForeignKey("ClientId")]
     public virtual AppClient? Client { get; set; }
     public char? Priority { get; set; } = 'Y';

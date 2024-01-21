@@ -10,7 +10,8 @@ using App.Web.Validator;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Pioneer.Pagination;
-using App.Base;
+using App.Base.Configuration;
+using App.CloudTask.Configuration;
 using App.Web.Data;
 
 namespace App.Web
@@ -40,6 +41,7 @@ namespace App.Web
             builder.Services.AddSession(option => option.IdleTimeout = TimeSpan.FromMinutes(20));
 
             builder.Services.UseBase();
+            builder.Services.UseCloudTask();
 
 
             builder.Services.AddScoped<IUserProvider, UserProvider>();

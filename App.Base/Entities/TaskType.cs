@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace App.Base.Entities
 {
-    [Table("TaskType")]
+    [Table("TaskTypes")]
     public class TaskType
     {
         [Key]

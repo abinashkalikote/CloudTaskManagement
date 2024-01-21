@@ -9,6 +9,7 @@ using System.Transactions;
 using System.Text.Json;
 using BC = BCrypt.Net.BCrypt;
 using App.Base.Entities;
+using App.Base.Repository.Interfaces;
 using App.Web.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,14 +20,17 @@ namespace App.Web.Controllers
         private readonly AppDbContext _db;
 
         private readonly IUserProvider _userProvider;
+        private readonly IUserRepository _userRepository;
 
         public AccessController(
             AppDbContext db,
-            IUserProvider userProvider
-            )
+            IUserProvider userProvider,
+            IUserRepository userRepository
+        )
         {
             _db = db;
             _userProvider = userProvider;
+            _userRepository = userRepository;
         }
 
         [HttpGet]
@@ -41,74 +45,54 @@ namespace App.Web.Controllers
             {
                 Response.Cookies.Append("returnUrl", returnUrl);
             }
+
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginVM loginVM)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(loginVM);
+
+            var user = await _userRepository.GetFirstOrDefaultAsync(e => e.Email == loginVM.Email);
+
+
+            if (!ValidateUserCredential(this, loginVM, user))
             {
-                var user = await _db.Users.FirstOrDefaultAsync(e =>
-                                e.Email == loginVM.Email);
-
-
-                if (user == null)
-                {
-                    TempData["error"] = "Credential Not Matched !";
-                    return View();
-                }
-
-                if(user.RecStatus != Status.Active)
-                {
-                    TempData["error"] = "Please contact to your Administrator";
-                    return View();
-                }
-
-                if (!VerifyPassword(loginVM.Password, user.Password))
-                {
-                    TempData["error"] = "Password Not Matched !";
-                    return View();
-                }
-
-                SessionUserVM vm = new()
-                {
-                    Email = user.Email,
-                    IsAdmin = user.IsAdmin,
-                    UserId = user.Id,
-                    UserName = user.FullName
-                };
-
-                var data = JsonSerializer.Serialize(vm);
-                List<Claim> claims = new()
-                {
-                    new Claim("SessionUser", data),
-
-                };
-
-                AuthenticationProperties properties = new()
-                {
-                    AllowRefresh = true,
-                    IsPersistent = true
-                };
-
-                ClaimsIdentity identity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), properties);
-
-                TempData["success"] = "Welcome " + user.FullName;
-
-                var returnUrl = Request.Cookies["returnUrl"];
-                if (!string.IsNullOrEmpty(returnUrl))
-                {
-                    Response.Cookies.Delete("returnUrl");
-                    return Redirect(returnUrl);
-                }
-
-                return RedirectToAction("Index", "Home");
+                return View(loginVM);
             }
 
-            return View();
+            SessionUserVM vm = new()
+            {
+                Email = user.Email,
+                IsAdmin = user.IsAdmin,
+                UserId = user.Id,
+                UserName = user.FullName
+            };
+
+            var data = JsonSerializer.Serialize(vm);
+            List<Claim> claims = new()
+            {
+                new Claim("SessionUser", data),
+            };
+
+            AuthenticationProperties properties = new()
+            {
+                AllowRefresh = true,
+                IsPersistent = true
+            };
+
+            ClaimsIdentity identity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(identity), properties);
+
+            TempData["success"] = "Welcome " + user.FullName;
+
+            var returnUrl = Request.Cookies["returnUrl"];
+            if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index", "Home");
+            Response.Cookies.Delete("returnUrl");
+            return Redirect(returnUrl);
         }
 
 
@@ -128,81 +112,76 @@ namespace App.Web.Controllers
                 u.Status = user.RecStatus == 'A' ? "Active" : "InActive";
                 u.IsActive = user.RecStatus == 'A' ? true : false;
                 userVM.Add(u);
-
             }
+
             return View(userVM);
         }
-
 
 
         [HttpGet]
         public IActionResult AddUser()
         {
-            if (!_userProvider.IsAdmin())
-            {
-                TempData["error"] = "Permission Denied ! \\n You don't have permission to Access : " + Request.Path;
-                return RedirectToAction("Index", "Home");
-            }
-            return View();
+            if (_userProvider.IsAdmin()) return View();
+            TempData["error"] = "Permission Denied ! \\n You don't have permission to Access : " + Request.Path;
+            return RedirectToAction("Index", "Home");
+
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddUser(UserVM user)
+        public async Task<IActionResult> AddUser(UserVM vm)
         {
             if (!_userProvider.IsAdmin())
             {
                 TempData["error"] = "Permission Denied ! \\n You don't have permission to Access : " + Request.Path;
                 return RedirectToAction("Index", "Home");
             }
-            if (ModelState.IsValid)
+
+            if (!ModelState.IsValid) return View(vm);
+            
+            if (!await IsUniqueEmail(vm.Email))
             {
-
-                if (IsUniqueEmail(user))
-                {
-                    ModelState.AddModelError("Email", "Email is already Used !");
-                }
-
-                var admin = 'N';
-                if (user.IsAdmin == "true")
-                    admin = 'Y';
-
-
-                using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-
-                try
-                {
-                    var newUser = new User();
-                    newUser.FullName = user.FullName;
-                    newUser.Email = user.Email;
-                    newUser.Password = BC.EnhancedHashPassword(user.Password);
-                    newUser.IsNewPassword = 'Y';
-                    newUser.RecBy = _userProvider.GetUsername();
-                    newUser.IsAdmin = admin;
-
-                    await _db.Users.AddAsync(newUser);
-                    await _db.SaveChangesAsync();
-                    scope.Complete();
-
-                    TempData["success"] = "User Added Successfully !";
-                    return RedirectToAction(nameof(AddUser));
-                }
-                catch (Exception)
-                {
-                    scope.Dispose();
-                    throw new Exception("Something went wrong while User Add !");
-                }
-
+                ModelState.AddModelError("Email", "Email is already Used !");
+                return View(vm);
             }
 
-            return View(user);
+            var admin = 'N';
+            if (vm.IsAdmin == "true")
+                admin = 'Y';
+
+
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+            try
+            {
+                var newUser = new User();
+                newUser.FullName = vm.FullName;
+                newUser.Email = vm.Email;
+                newUser.Password = BC.EnhancedHashPassword(vm.Password);
+                newUser.IsNewPassword = 'Y';
+                newUser.RecBy = _userProvider.GetUsername();
+                newUser.IsAdmin = admin;
+
+                await _db.Users.AddAsync(newUser);
+                await _db.SaveChangesAsync();
+                scope.Complete();
+
+                TempData["success"] = "User Added Successfully !";
+                return RedirectToAction(nameof(AddUser));
+            }
+            catch (Exception)
+            {
+                scope.Dispose();
+                throw new Exception("Something went wrong while User Add !");
+            }
+
+            return View(vm);
         }
 
 
         [HttpGet]
         public async Task<IActionResult> ActiveInactiveUser(int Id)
         {
-
-            if(Id == null) throw new Exception("id");
+            if (Id == null) throw new Exception("id");
 
             if (Id == _userProvider.GetUserId() || Id == 1)
             {
@@ -215,7 +194,7 @@ namespace App.Web.Controllers
             var user = await _db.Users.SingleOrDefaultAsync(x => x.Id == Id);
             if (user == null) throw new Exception("User not Found !");
 
-            if(user.RecStatus == 'A')
+            if (user.RecStatus == 'A')
             {
                 user.RecStatus = 'D';
             }
@@ -229,7 +208,6 @@ namespace App.Web.Controllers
             TempData["success"] = "User you have selected has Active/Inactive !";
             return RedirectToAction(nameof(AllUsers));
         }
-
 
 
         [HttpGet]
@@ -274,13 +252,14 @@ namespace App.Web.Controllers
                     TempData["success"] = "Password Changed Successfully !";
                     return RedirectToAction(nameof(AllUsers));
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     scope.Dispose();
                     TempData["error"] = "Something Went Wrong ! " + ex;
                     return View(vM);
                 }
             }
+
             return View(vM);
         }
 
@@ -313,7 +292,6 @@ namespace App.Web.Controllers
 
                     if (user != null)
                     {
-
                         if (!VerifyPassword(vm.OldPassword, user.Password))
                         {
                             ModelState.AddModelError("OldPassword", "Recent Password not mached !");
@@ -329,17 +307,17 @@ namespace App.Web.Controllers
                         TempData["success"] = "Password Change Succssfully !";
                         return RedirectToAction("Logout", "Home");
                     }
+
                     scope.Dispose();
                     return RedirectToAction(nameof(ChangePassword));
-
                 }
                 catch (Exception ex)
                 {
                     scope.Dispose();
                     throw new Exception("Something Went Wrong !\n" + ex.Message);
                 }
-
             }
+
             return View(vm);
         }
 
@@ -347,58 +325,42 @@ namespace App.Web.Controllers
 
 
         #region PrivateMethods
-        private bool IsUniqueEmail(UserVM vm)
+
+        private async Task<bool> IsUniqueEmail(string email)
         {
-            var email = vm.Email;
-            var data = _db.Users.FirstOrDefault(e => e.Email == email);
-            if (data == null)
-            {
-                return true;
-            }
-            return false;
+            var data = await _userRepository.GetFirstOrDefaultAsync(e => e.Email == email);
+            return data == null;
         }
 
         private bool VerifyPassword(string Password, string HashPassword)
         {
-            if (BC.EnhancedVerify(Password, HashPassword))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return BC.EnhancedVerify(Password, HashPassword);
         }
 
         private bool NewAndConfirmPasswordSame(string NewPassword, string ConfirmPassword)
         {
-            if (NewPassword == ConfirmPassword)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return NewPassword == ConfirmPassword;
         }
 
-        //private readonly Random _random = new Random();
+        private bool ValidateUserCredential(Controller controller,LoginVM loginVM, User? user)
+        {
+            if (user == null)
+            {
+                controller.TempData["error"] = "Credential Not Matched !";
+                return false;
+            }
 
-        //private string RandomPassword(int size, bool lowerCase = true)
-        //{
-        //    var builder = new StringBuilder(size);
+            if (user.RecStatus != Status.Active)
+            {
+                controller.TempData["error"] = "Please contact to your Administrator";
+                return false;
+            }
 
-        //    char offset = lowerCase ? 'a' : 'A';
-        //    const int lettersOffset = 26;
+            if (!VerifyPassword(loginVM.Password, user.Password)) return false;
+            controller.TempData["error"] = "Password Not Matched !";
+            return true;
+        }
 
-        //    for (int i = 0; i < size; i++)
-        //    {
-        //        var @char = (char)_random.Next(offset, offset + lettersOffset);
-        //        builder.Append(@char);
-        //    }
-
-        //    return lowerCase ? builder.ToString().ToLower() : builder.ToString();
-        //}
         #endregion PrivateMethods
     }
 }

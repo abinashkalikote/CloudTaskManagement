@@ -21,7 +21,7 @@ namespace App.Web.ViewModel
 
         [Required]
         [DisplayName("Client Name")]
-        public int ClientId { get; set; }
+        public long ClientId { get; set; }
 
         [DisplayName("Cloud URL")]
         public string? CloudURL { get; set; }

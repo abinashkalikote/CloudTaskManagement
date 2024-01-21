@@ -3,7 +3,7 @@ using App.Base.Entities;
 
 namespace App.CloudTask.Entity
 {
-    [Table("CloudTaskLog")]
+    [Table("CloudTasksLog")]
     public class CloudTaskLog
     {
         public int Id { get; set; }

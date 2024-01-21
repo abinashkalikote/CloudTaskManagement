@@ -282,7 +282,7 @@ namespace App.Web.Controllers
 
             vm.Id = data.Id;
             vm.TaskTitle = data.TaskName;
-            vm.ClientName = data.ClientId;
+            vm.ClientId = data.ClientId;
             vm.CloudURL = data.CloudUrl;
             vm.TaskTypeId = data.TaskType.Id;
             vm.TaskTypeName = data.TaskType != null ? data.TaskType.TaskTypeName : "Not Declared";
@@ -487,7 +487,7 @@ namespace App.Web.Controllers
                 var vm = new TaskTempVM();
                 vm.Id = item.Id;
                 vm.TaskTitle = item.TaskName;
-                vm.ClientName = item.ClientId;
+                vm.ClientId = item.ClientId;
                 vm.CloudURL = item.CloudUrl;
                 vm.TaskTypeName = item.TaskType != null ? item.TaskType.TaskTypeName : "Not Declared";
                 vm.TaskTime = item.TaskTime;

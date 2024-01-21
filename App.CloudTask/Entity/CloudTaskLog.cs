@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using App.Base.Entities;
 
-namespace App.Model
+namespace App.CloudTask.Entity
 {
+    [Table("CloudTaskLog")]
     public class CloudTaskLog
     {
         public int Id { get; set; }
 
-        public CloudTask CloudTask { get; set; }
+        public App.CloudTask.Entity.CloudTask CloudTask { get; set; }
         public int CloudTaskId { get; set; }
 
         public virtual User? User { get; set; }

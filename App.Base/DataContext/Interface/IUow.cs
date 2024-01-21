@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace App.Base.DataContext.Interface
 {
@@ -10,7 +6,7 @@ namespace App.Base.DataContext.Interface
     {
         void Commit();
         Task CommitAsync();
-        Task CreateAsync<T>(T entity);
+        Task<T> CreateAsync<T>(T entity);
         Task CreateRangeAsync<T>(IEnumerable<T> list) where T : class;
         void Update<T>(T entity);
         void UpdateRange<T>(IEnumerable<T> list) where T : class;

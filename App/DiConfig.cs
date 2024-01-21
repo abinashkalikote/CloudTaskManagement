@@ -1,5 +1,4 @@
-﻿using App.Data;
-using App.Web.Models;
+﻿using App.Web.Models;
 using App.Web.Providers.Interface;
 using App.Web.Providers;
 using App.Web.Repository.Interfaces;
@@ -12,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Pioneer.Pagination;
 using App.Base;
+using App.Web.Data;
 
 namespace App.Web
 {

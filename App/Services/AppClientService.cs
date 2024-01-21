@@ -1,6 +1,6 @@
 ﻿using System.Transactions;
 using App.Base.DataContext.Interface;
-using App.Model;
+using App.Base.Entities;
 using App.Web.Dto;
 using App.Web.Services.Interfaces;
 using App.Web.Validator.Interfaces;

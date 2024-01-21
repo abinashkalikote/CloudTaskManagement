@@ -1,4 +1,4 @@
-﻿using App.Model;
+﻿using App.Base.Entities;
 
 namespace App.Web.Validator.Interfaces;
 

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 
 namespace App.Base.GenericRepository.Interface
 {
@@ -17,5 +12,7 @@ namespace App.Base.GenericRepository.Interface
         Task<bool> CheckIfExistAsync(Expression<Func<T, bool>> predicate);
         Task<T> FindOrThrowAsync(long id);
         IQueryable<T> GetQueryable();
+
+        Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> expression);
     }
 }

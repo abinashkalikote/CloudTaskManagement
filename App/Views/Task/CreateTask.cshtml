@@ -25,11 +25,11 @@
                     <span class="text-danger" asp-validation-for="TaskTypeId"></span>
                 </div>
                 <div class="col-12 mb-2">
-                    <label asp-for="ClientName"></label>
-                    <select asp-for="ClientName" asp-items="Model.GetClientList()" class="form-control chosen-dark chosen-select" autofocus required>
+                    <label asp-for="ClientId"></label>
+                    <select asp-for="ClientId" asp-items="Model.GetClientList()" class="form-control chosen-dark chosen-select" autofocus required>
                         <option value="">-- Select Client --</option>
                     </select>
-                    <span class="text-danger" asp-validation-for="ClientName"></span>
+                    <span class="text-danger" asp-validation-for="ClientId"></span>
                 </div>
 
 

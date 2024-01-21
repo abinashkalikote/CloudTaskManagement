@@ -1,10 +1,8 @@
 ﻿using App.Web.Providers.Interface;
 using App.Web.ViewModel;
-using App.Data;
 using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
-using App.Model;
 using System.Text.Json;
 
 namespace App.Web.Providers

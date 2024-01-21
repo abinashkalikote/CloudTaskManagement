@@ -1,4 +1,4 @@
-﻿using App.Model;
+﻿using App.Base.Entities;
 using App.Web.Dto;
 using App.Web.Repository.Interfaces;
 using App.Web.Services.Interfaces;

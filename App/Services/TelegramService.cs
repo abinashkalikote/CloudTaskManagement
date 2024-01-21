@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Telegram.Bot.Types.Enums;
-using App.Data;
-using System.Text.Json;
+﻿using System.Text.Json;
+using App.Base.DataContext.Interface;
+using App.CloudTask.Repository.Interfaces;
+using App.Web.Data;
 using App.Web.ViewModel;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,23 +9,26 @@ namespace App.Web.Services
 {
     public class TelegramService
     {
-        private readonly string _botToken;
-        private readonly string _chatId;
+        private readonly string? _botToken;
+        private readonly string? _chatId;
         private readonly HttpClient _httpClient;
-        private readonly AppDbContext _db;
+        private readonly ICloudTaskRepo _cloudTaskRepo;
+        private readonly IUow _uow;
 
         public TelegramService(
             IConfiguration configuration,
             HttpClient httpClient,
-            AppDbContext db)
+            ICloudTaskRepo cloudTaskRepo,
+            IUow uow)
         {
             _botToken = configuration["AppSettings:TelegramBotToken"];
             _chatId = configuration["AppSettings:ChatId"];
             _httpClient = httpClient;
-            _db = db;
+            _cloudTaskRepo = cloudTaskRepo;
+            _uow = uow;
         }
 
-        public async Task SendMessageAsync(string message, int? TaskId = null)
+        public async Task SendMessageAsync(string? message, long? TaskId = null)
         {
             try
             {
@@ -38,14 +37,13 @@ namespace App.Web.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var contents = response.Content.ReadAsStringAsync().Result;
-                    TelegramResponseVM data = JsonSerializer.Deserialize<TelegramResponseVM>(contents);
+                    var responseData = JsonSerializer.Deserialize<TelegramResponseVM>(contents);
                     if (TaskId != null)
                     {
-                        var task = await _db.CloudTasks.FirstOrDefaultAsync(e => e.Id == TaskId);
-                        task.TelegramMessageId = data.result.message_id;
-
-                        _db.CloudTasks.Update(task);
-                        await _db.SaveChangesAsync();
+                        var task = await _cloudTaskRepo.FindAsync(TaskId ?? 0);
+                        task.TelegramMessageId = responseData?.result.message_id;
+                        
+                        await _uow.CommitAsync();
                     }
                 }
 
@@ -63,7 +61,7 @@ namespace App.Web.Services
         }
 
 
-        public async Task SendReplyMessageAsync(string message, int? ReplyToMessageId = null)
+        public async Task SendReplyMessageAsync(string? message, int? ReplyToMessageId = null)
         {
             try
             {
@@ -86,13 +84,13 @@ namespace App.Web.Services
             }
         }
         
-        private async Task<HttpResponseMessage> SendToTelegram(string message, int? replyToId = null)
+        private async Task<HttpResponseMessage> SendToTelegram(string? message, int? replyToId = null)
         {
             var apiUrl = $"https://api.telegram.org/bot{_botToken}/sendMessage";
 
             // Data you want to send in the API request (in key-value pairs)
-            var requestData = new Dictionary<string, string>
-                {
+            var requestData = new Dictionary<string, string?>
+            {
                     { "chat_id", _chatId },
                     { "text", message },
                     {"parse_mode", "HTML" }

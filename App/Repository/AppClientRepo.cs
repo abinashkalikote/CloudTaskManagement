@@ -1,13 +1,13 @@
-﻿using App.Base.GenericRepository;
-using App.Data;
-using App.Model;
+﻿using App.Base.Entities;
+using App.Base.GenericRepository;
 using App.Web.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace App.Web.Repository;
 
 public class AppClientRepo : GenericRepository<AppClient>, IAppClientRepo
 {
-    public AppClientRepo(AppDbContext context) : base(context)
+    public AppClientRepo(DbContext context) : base(context)
     {
     }
 }

@@ -1,16 +1,15 @@
 ﻿using System.Linq.Expressions;
 using App.Base.GenericRepository.Interface;
-using App.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace App.Base.GenericRepository
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        private readonly AppDbContext _context;
+        private readonly DbContext _context;
         private readonly DbSet<T> _dbSet;
 
-        public GenericRepository(AppDbContext context)
+        public GenericRepository(DbContext context)
         {
             _context = context;
             _dbSet = _context.Set<T>();    
@@ -43,6 +42,11 @@ namespace App.Base.GenericRepository
         public IQueryable<T> GetQueryable()
         {
             return _dbSet.AsQueryable();
+        }
+
+        public async Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> expression)
+        {
+            return (await _dbSet.FirstOrDefaultAsync(expression))?? null;
         }
     }
 }

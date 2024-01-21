@@ -17,8 +17,4 @@
 		<PackageReference Include="Pioneer.Pagination" Version="3.0.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\App.Data\App.Data.csproj" />
-	</ItemGroup>
-
 </Project>

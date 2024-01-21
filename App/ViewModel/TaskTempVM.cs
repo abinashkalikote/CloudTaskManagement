@@ -1,12 +1,11 @@
-﻿using App.Model;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace App.Web.ViewModel
 {
     public class TaskTempVM
     {
-        public int? Id { get; set; }
+        public long? Id { get; set; }
 
         [Required]
         [MaxLength(100)]

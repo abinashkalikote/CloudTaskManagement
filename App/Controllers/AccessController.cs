@@ -1,18 +1,16 @@
 ﻿using App.Web.ViewModel;
-using App.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using App.Base.Constants;
-using App.Model;
 using App.Web.Providers.Interface;
 using System.Transactions;
 using System.Text.Json;
 using BC = BCrypt.Net.BCrypt;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Text;
+using App.Base.Entities;
+using App.Web.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace App.Web.Controllers
 {

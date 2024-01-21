@@ -1,6 +1,6 @@
 ﻿using App.Base.Constants;
+using App.Base.Entities;
 using App.Base.ValueObject;
-using App.Model;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace App.Web.ViewModel

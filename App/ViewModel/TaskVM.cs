@@ -1,13 +1,13 @@
-﻿using App.Model;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using App.Base.Entities;
 
 namespace App.Web.ViewModel
 {
     public class TaskVM
     {
-        public int? Id { get; set; }
+        public long? Id { get; set; }
 
         [Required]
         [MaxLength(100)]
@@ -21,7 +21,7 @@ namespace App.Web.ViewModel
 
         [Required]
         [DisplayName("Client Name")]
-        public int ClientName { get; set; }
+        public int ClientId { get; set; }
 
         [DisplayName("Cloud URL")]
         public string? CloudURL { get; set; }
@@ -73,8 +73,8 @@ namespace App.Web.ViewModel
 
 
 
-        public List<Model.AppClient>? clients;
-        public SelectList GetClientList() => new SelectList(clients, nameof(Model.AppClient.Id), nameof(Model.AppClient.ClientName), ClientName);
+        public List<Base.Entities.AppClient>? clients;
+        public SelectList GetClientList() => new SelectList(clients, nameof(Base.Entities.AppClient.Id), nameof(Base.Entities.AppClient.ClientName), ClientId);
 
 
         public SelectList TaskTimeList() => new SelectList(new List<TaskTimeVM>()

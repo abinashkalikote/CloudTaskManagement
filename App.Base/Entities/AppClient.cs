@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace App.Model;
+namespace App.Base.Entities;
 
 [Table("app_client")]
 public class AppClient

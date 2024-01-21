@@ -1,6 +1,4 @@
-﻿using App.Model;
-
-namespace App.Web.ViewModel
+﻿namespace App.Web.ViewModel
 {
     public class CloudTaskLogVM
     {

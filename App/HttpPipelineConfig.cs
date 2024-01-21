@@ -1,4 +1,4 @@
-﻿using App.Data;
+﻿using App.Web.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace App.Web

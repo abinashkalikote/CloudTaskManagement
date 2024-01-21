@@ -1,5 +1,5 @@
-﻿using App.Base.GenericRepository.Interface;
-using App.Model;
+﻿using App.Base.Entities;
+using App.Base.GenericRepository.Interface;
 
 namespace App.Web.Repository.Interfaces;
 

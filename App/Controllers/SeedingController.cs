@@ -1,5 +1,5 @@
-﻿using App.Model;
-using App.Data;
+﻿using App.Base.Entities;
+using App.Web.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BC = BCrypt.Net.BCrypt;

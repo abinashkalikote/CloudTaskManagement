@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace App.Model
+namespace App.Base.Entities
 {
+    [Table("TaskType")]
     public class TaskType
     {
         [Key]

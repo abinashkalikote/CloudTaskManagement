@@ -1,14 +1,14 @@
 ﻿using App.Base.DataContext.Interface;
-using App.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace App.Base.DataContext
 {
     public class Uow : IUow
     {
-        private readonly AppDbContext _context;
+        private readonly DbContext _context;
 
-        public Uow(AppDbContext context)
+        public Uow(DbContext context)
         {
             _context = context;
         }
@@ -17,7 +17,11 @@ namespace App.Base.DataContext
 
         public async Task CommitAsync() => await _context.SaveChangesAsync();
 
-        public async Task CreateAsync<T>(T entity) => await _context.AddAsync(entity);
+        public async Task<T> CreateAsync<T>(T entity)
+        {
+          await _context.AddAsync(entity);
+          return entity;
+        }
 
         public Task CreateRangeAsync<T>(IEnumerable<T> list) where T : class => _context.AddRangeAsync(list);
 

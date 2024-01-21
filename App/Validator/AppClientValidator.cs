@@ -1,4 +1,4 @@
-﻿using App.Model;
+﻿using App.Base.Entities;
 using App.Web.Exceptions.AppClientExceptions;
 using App.Web.Repository.Interfaces;
 using App.Web.Validator.Interfaces;

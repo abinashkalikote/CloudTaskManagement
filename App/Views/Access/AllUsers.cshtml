@@ -1,5 +1,5 @@
 ﻿@model IEnumerable<UserVM>
-@inject App.Web.Providers.Interface.IUserProvider _userProvider;
+@inject App.Base.Providers.Interfaces.ILoginUserProvider UserProvider;
 
 @{
     ViewData["Title"] = "All Users";
@@ -35,7 +35,7 @@
                             <td>@item.IsAdmin</td>
                             <td>@item.Status</td>
                             <td>
-                                @if (_userProvider.IsAdmin())
+                                @if (UserProvider.IsAdmin())
                                 {
                                     if (item?.IsActive == true)
                                     {

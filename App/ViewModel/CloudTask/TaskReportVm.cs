@@ -1,11 +1,10 @@
 ﻿using App.Base.Constants;
 using App.Base.Entities;
-using App.Base.ValueObject;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace App.Web.ViewModel
+namespace App.Web.ViewModel.CloudTask
 {
-    public class TaskReportVM
+    public class TaskReportVm
     {
 
         /// <summary>
@@ -23,7 +22,7 @@ namespace App.Web.ViewModel
 
 
         //List of Task Send to show in Table
-        public List<TaskTempVM>? Tasks { get; set; }
+        public List<TaskTempVm>? Tasks { get; set; }
 
 
 
@@ -37,14 +36,14 @@ namespace App.Web.ViewModel
         public SelectList TaskTypesList() => new SelectList(taskTypes, nameof(TaskType.Id), nameof(TaskType.TaskTypeName), TaskTypeId);
 
 
-        public SelectList TaskStatusList() => new SelectList(CloudTaskStatus.TaskStatusList, nameof(TStatus.TsStatus), nameof(TStatus.TsStatus), TSKStatus);
+        public SelectList TaskStatusList() => new SelectList(CloudTaskStatus.TaskStatusList, TSKStatus);
 
 
-        public SelectList TaskTimeList() => new SelectList(new List<TaskTimeVM>()
+        public SelectList TaskTimeList() => new SelectList(new List<TaskTimeVm>()
         {
-            new TaskTimeVM(){TaskTimeName="After a Hours"},
-            new TaskTimeVM(){TaskTimeName="Immediately"},
-        }, nameof(TaskTimeVM.TaskTimeName), nameof(TaskTimeVM.TaskTimeName), TaskTime);
+            new TaskTimeVm(){TaskTimeName="After Office Hour"},
+            new TaskTimeVm(){TaskTimeName="Immediately"},
+        }, nameof(TaskTimeVm.TaskTimeName), nameof(TaskTimeVm.TaskTimeName), TaskTime);
 
 
         public List<User>? Users { get; set; }

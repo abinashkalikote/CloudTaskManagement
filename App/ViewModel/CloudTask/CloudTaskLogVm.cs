@@ -1,6 +1,6 @@
-﻿namespace App.Web.ViewModel
+﻿namespace App.Web.ViewModel.CloudTask
 {
-    public class CloudTaskLogVM
+    public class CloudTaskLogVm
     {
         public int UserId { get; set; }
         public string UserName { get; set; }

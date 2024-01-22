@@ -9,22 +9,17 @@ namespace App.Base.Constants
     public static class CloudTaskStatus
     {
 
-        public static string Pending { get; set; } = "Pending";
-        public static string InProgress { get; set; } = "InProgress";
-        public static string Completed { get; set; } = "Completed";
-        public static string Canceled { get; set; } = "Canceled";
+        public const string Pending = "Pending";
+        public const string InProgress = "InProgress";
+        public const string Completed = "Completed";
+        public const string Canceled = "Canceled";
 
-        public static List<TStatus> TaskStatusList = new()
+        public static List<string> TaskStatusList = new()
         {
-            new TStatus { TsStatus = "Pending"},
-            new TStatus { TsStatus = "InProgress"},
-            new TStatus { TsStatus = "Completed"},
-            new TStatus { TsStatus = "Canceled"},
+            Pending,
+            InProgress,
+            Completed,
+            Canceled
         };
-    }
-
-    public class TStatus
-    {
-        public string TsStatus { get; set; }
     }
 }

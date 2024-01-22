@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using App.CloudTask.Repository.Interfaces;
+using App.CloudTask.Repositories.Interfaces;
 using App.Web.Data;
 
 namespace App.Controllers

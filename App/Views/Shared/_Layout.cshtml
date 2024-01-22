@@ -1,4 +1,4 @@
-﻿@inject App.Web.Providers.Interface.IUserProvider _userProvider
+﻿@inject App.Base.Providers.Interfaces.ILoginUserProvider UserProvider
 @using App.Base.Constants
 
 <!DOCTYPE html>
@@ -83,7 +83,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item nav-link" asp-action="AllUsers" asp-controller="Access">Users</a>
-                        @if (_userProvider.IsAdmin())
+                        @if (UserProvider.IsAdmin())
                         {
                             <a class="dropdown-item nav-link" asp-action="AddUser" asp-controller="Access">Add User</a>
                         }
@@ -140,7 +140,7 @@
                         <i class="far fa-user"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <span class="dropdown-item dropdown-header">@_userProvider.GetUsername()</span>
+                        <span class="dropdown-item dropdown-header">@UserProvider.GetUsername()</span>
                         <div class="dropdown-divider"></div>
                         <a asp-action="ChangePassword" asp-controller="Access" class="dropdown-item">
                             <i class="fas fa-key mr-2"></i> Change Passowrd
@@ -183,7 +183,7 @@
                         <img src="~/Images/avatar.png" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="#" class="d-block" id="FullName">@_userProvider.GetUsername()</a>
+                        <a href="#" class="d-block" id="FullName">@UserProvider.GetUsername()</a>
                     </div>
                 </div>
 

@@ -41,7 +41,7 @@ namespace App.Base.GenericRepository
 
         public IQueryable<T> GetQueryable()
         {
-            return _dbSet.AsQueryable();
+            return _dbSet;
         }
 
         public async Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> expression)

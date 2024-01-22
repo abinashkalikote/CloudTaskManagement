@@ -1,7 +1,9 @@
-﻿namespace App.CloudTask.Service.Interfaces;
+﻿using App.CloudTask.Dto;
+
+namespace App.CloudTask.Service.Interfaces;
 
 public interface ICloudTaskService
 {
-    Task<Entity.CloudTask> Create();
+    Task<Entity.CloudTask> Create(CloudTaskCreateDto dto);
     void Update();
 }

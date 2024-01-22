@@ -1,6 +1,6 @@
 ﻿using App.Base.GenericRepository.Interface;
 
-namespace App.CloudTask.Repository.Interfaces;
+namespace App.CloudTask.Repositories.Interfaces;
 
 public interface ICloudTaskRepo : IGenericRepository<Entity.CloudTask>
 {

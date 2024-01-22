@@ -22,32 +22,24 @@ namespace App.Web.Controllers
         {
             vm.SoftwareVersions = _clientRepo.GetQueryable().Select(e => e.CurrentVersion).Distinct().ToList();
 
-            if (vm.IsSearch)
+            if (!vm.IsSearch) return View(vm);
+            
+            var clients = _clientRepo.GetQueryable();
+            if (vm.CurrentVersion != null)
             {
-                var clients = _clientRepo.GetQueryable();
-                if (vm.CurrentVersion != null)
-                {
-                    clients = clients.Where(e => e.CurrentVersion.Equals(vm.CurrentVersion));
-                }
-
-                if (vm.IsMobileBankingClient != null)
-                {
-                    if(vm.IsMobileBankingClient.ToLower() == "yes")
-                    {
-                       clients = clients.Where(e => e.IsMobileBankingClient == true);
-                    }
-                    else
-                    {
-                       clients = clients.Where(e => e.IsMobileBankingClient == false);
-                    }
-                }
-
-                List<AppClientReport> clientList = MapAppClientToAppClientReport(clients.ToList());
-
-                vm.AppClientReport = clientList;
-
-                return View(vm);
+                clients = clients.Where(e => e.CurrentVersion != null && e.CurrentVersion.Equals(vm.CurrentVersion));
             }
+
+            if (vm.IsMobileBankingClient != null)
+            {
+                clients = string.Equals(vm.IsMobileBankingClient.ToLower(), "yes")
+                    ? clients.Where(e => e.IsMobileBankingClient == true)
+                    : clients.Where(e => e.IsMobileBankingClient == false);
+            }
+
+            List<AppClientReport> clientList = MapAppClientToAppClientReport(clients.ToList());
+
+            vm.AppClientReport = clientList;
 
             return View(vm);
         }
@@ -60,7 +52,7 @@ namespace App.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(AppClientVm vm)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View(vm);
             }
@@ -108,13 +100,12 @@ namespace App.Web.Controllers
                     Id = client.Id,
                     ClientName = client.ClientName,
                     CurrentVersion = client.CurrentVersion,
-                    IsMobileBankingClient= client.IsMobileBankingClient,
+                    IsMobileBankingClient = client.IsMobileBankingClient,
                     Link = client.Link,
                     Location = client.Location
                 };
 
                 return View(vm);
-
             }
             catch (Exception ex)
             {
@@ -168,6 +159,7 @@ namespace App.Web.Controllers
 
 
         #region PrivateMethods
+
         private static List<AppClientReport> MapAppClientToAppClientReport(List<AppClient> clients)
         {
             var clientList = new List<AppClientReport>();
@@ -187,6 +179,7 @@ namespace App.Web.Controllers
 
             return clientList;
         }
+
         #endregion
     }
 }

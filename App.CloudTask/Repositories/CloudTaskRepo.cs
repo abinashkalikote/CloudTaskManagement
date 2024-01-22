@@ -1,8 +1,8 @@
 ﻿using App.Base.GenericRepository;
-using App.CloudTask.Repository.Interfaces;
+using App.CloudTask.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace App.CloudTask.Repository;
+namespace App.CloudTask.Repositories;
 
 public class CloudTaskRepo : GenericRepository<Entity.CloudTask>, ICloudTaskRepo
 {

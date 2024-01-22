@@ -8,12 +8,14 @@ public class CloudTask
 {
     public long Id { get; set; }
     public string TaskName { get; set; }
+    
     public virtual TaskType? TaskType { get; set; }
     public int TaskTypeId { get; set; }
 
     public long ClientId { get; set; }
     [ForeignKey("ClientId")]
     public virtual AppClient? Client { get; set; }
+    
     public char? Priority { get; set; } = 'Y';
     public string TaskTime { get; set; }
     public string? CloudUrl { get; set; }

@@ -1,6 +1,4 @@
 ﻿using App.Web.Models;
-using App.Web.Providers.Interface;
-using App.Web.Providers;
 using App.Web.Repository.Interfaces;
 using App.Web.Repository;
 using App.Web.Services.Interfaces;
@@ -11,8 +9,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Pioneer.Pagination;
 using App.Base.Configuration;
+using App.Base.Providers.Interfaces;
+using App.Base.Services.Interfaces;
 using App.CloudTask.Configuration;
 using App.Web.Data;
+using App.Web.Providers.Implementation;
 
 namespace App.Web
 {
@@ -42,9 +43,10 @@ namespace App.Web
 
             builder.Services.UseBase();
             builder.Services.UseCloudTask();
-
-
-            builder.Services.AddScoped<IUserProvider, UserProvider>();
+            
+            
+            builder.Services.AddScoped<ILoginUserProvider, LoginUserProvider>()
+                .AddScoped<IHostProvider, HostProvider>();
             builder.Services.AddTransient<IPaginatedMetaService, PaginatedMetaService>();
 
             builder.Services.AddScoped<IAppClientRepo, AppClientRepo>()
@@ -52,7 +54,7 @@ namespace App.Web
                 .AddScoped<IAppClientService, AppClientService>();
 
 
-            builder.Services.AddScoped<TelegramService>();
+            builder.Services.AddScoped<ITelegramService, TelegramService>();
             builder.Services.AddHttpClient();
             builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 

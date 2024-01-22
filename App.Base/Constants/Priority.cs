@@ -9,5 +9,7 @@ namespace App.Web.Constants
     public static class Priority
     {
         public static int Urgent { get; set; } = 1;
+        public const char Low = 'N';
+        public const char High = 'Y';
     }
 }

@@ -6,13 +6,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Transactions;
 using App.Base.DataContext.Interface;
+using App.Base.Providers.Interfaces;
+using App.Base.Services.Interfaces;
+using App.CloudTask.Dto;
 using App.CloudTask.Entity;
-using App.CloudTask.Repository.Interfaces;
+using App.CloudTask.Managers.Interfaces;
+using App.CloudTask.Repositories.Interfaces;
+using App.Web.Constants;
 using App.Web.Data;
-using App.Web.Providers.Interface;
-using App.Web.Services;
 using NepDate;
 using App.Web.Repository.Interfaces;
+using App.Web.ViewModel.CloudTask;
 
 namespace App.Web.Controllers
 {
@@ -20,21 +24,23 @@ namespace App.Web.Controllers
     public class TaskController : Controller
     {
         private readonly AppDbContext _db;
-        private readonly IUserProvider _userProvider;
-        private readonly TelegramService _telegramService;
+        private readonly ILoginUserProvider _userProvider;
+        private readonly ITelegramService _telegramService;
         private readonly HttpContext _httpContext;
         public readonly IAppClientRepo _appClientRepo;
         private readonly IUow _uow;
         private readonly ICloudTaskRepo _cloudTaskRepo;
+        private readonly ICloudTaskManager _cloudTaskManager;
 
         public TaskController(
             AppDbContext db,
-            IUserProvider userProvider,
-            TelegramService telegramService,
+            ILoginUserProvider userProvider,
+            ITelegramService telegramService,
             IHttpContextAccessor httpContextAccessor,
             IAppClientRepo appClientRepo,
             IUow uow,
-            ICloudTaskRepo cloudTaskRepo
+            ICloudTaskRepo cloudTaskRepo,
+            ICloudTaskManager cloudTaskManager
         )
         {
             _db = db;
@@ -43,6 +49,7 @@ namespace App.Web.Controllers
             _appClientRepo = appClientRepo;
             _uow = uow;
             _cloudTaskRepo = cloudTaskRepo;
+            _cloudTaskManager = cloudTaskManager;
             _httpContext = httpContextAccessor.HttpContext;
         }
 
@@ -51,11 +58,11 @@ namespace App.Web.Controllers
         {
             return View();
         }
-
-        [HttpGet]
+        
+        
         public async Task<IActionResult> CreateTask()
         {
-            TaskVM vm = new()
+            CloudTaskVm vm = new()
             {
                 taskTypes = _db.TaskTypes.ToList(),
                 clients = await _appClientRepo.GetAllAsync()
@@ -65,70 +72,33 @@ namespace App.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateTask(TaskVM vm)
+        public async Task<IActionResult> CreateTask(CloudTaskVm vm)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-                try
-                {
-                    var pr = 'N';
-                    if (vm.HighPriority == "true")
-                        pr = 'Y';
-
-                    CloudTask.Entity.CloudTask cloudTask = new()
-                    {
-                        TaskName = vm.TaskTitle,
-                        TaskTypeId = vm.TaskTypeId,
-                        ClientId = vm.ClientId,
-                        CloudUrl = vm.CloudURL ?? "",
-                        Priority = pr,
-                        TaskTime = vm.TaskTime,
-                        SoftwareVersionFrom = vm.SoftwareVersionFrom ?? "Latest",
-                        SoftwareVersionTo = vm.SoftwareVersionTo ?? "Latest",
-                        IssueOnPreviousSoftware = vm.IssueOnPreviousSoftware ?? "",
-                        Remarks = vm.Remarks ?? "",
-                        LicDate = vm.LicDate ?? "",
-                        RecAuditLog = "Task Created by " + _userProvider.GetUsername(),
-                        RecById = Convert.ToInt32(_userProvider.GetUserId()),
-                        TSKStatus = CloudTaskStatus.Pending
-                    };
-
-                    //Cloud Task Log a Log
-                    CloudTaskLog cloudTaskLog = new()
-                    {
-                        Remarks = vm.Remarks ?? "",
-                        CloudTaskStatus = CloudTaskStatus.Pending,
-                        UserId = Convert.ToInt32(_userProvider.GetUserId())
-                    };
-
-                    cloudTask.CloudTaskLogs.Add(cloudTaskLog);
-
-                    var result = await _uow.CreateAsync(cloudTask);
-                    // var result = await _db.CloudTasks.AddAsync(cloudTask);
-                    await _db.SaveChangesAsync();
-
-
-                    //Sending a message to telegram
-                    await SendNewTaskMessageToTelegram(cloudTask, result.Id);
-
-                    scope.Complete();
-
-
-                    TempData["success"] = "Task Added Successfully !";
-                    return RedirectToAction("CreateTask", "Task");
-                }
-                catch (Exception ex)
-                {
-                    scope.Dispose();
-                    TempData["error"] = "Error occured while creating Task !" + ex.Message;
-                    return RedirectToAction("CreateTask", "Task");
-                }
+                vm.taskTypes = await _db.TaskTypes.ToListAsync();
+                return View(vm);
             }
 
-            vm.taskTypes = await _db.TaskTypes.ToListAsync();
-            return View(vm);
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            try
+            {
+                var dto = MapCloudTaskVmToCloudTaskCreateDto(vm);
+                await _cloudTaskManager.Create(dto);
+                scope.Complete();
+
+                TempData["success"] = "Task Added Successfully !";
+                return RedirectToAction("CreateTask", "Task");
+            }
+            catch (Exception ex)
+            {
+                scope.Dispose();
+                TempData["error"] = "Error occured while creating Task !" + ex.Message;
+                return RedirectToAction("CreateTask", "Task");
+            }
         }
+
+        
 
 
         [HttpGet]
@@ -150,14 +120,14 @@ namespace App.Web.Controllers
                     throw new Exception($"Task Is Already in Progress or Completed, You can't Edit this task !");
 
 
-                TaskVM vm = new()
+                CloudTaskVm vm = new()
                 {
                     Id = task.Id,
                     TaskTitle = task.TaskName,
                     TaskTypeId = task.TaskTypeId,
                     ClientId = task.ClientId,
                     CloudURL = task.CloudUrl,
-                    HighPriority = task.Priority == 'Y' ? "true" : "false",
+                    HighPriority = task.Priority == Priority.High,
                     TaskTime = task.TaskTime,
                     SoftwareVersionFrom = task.SoftwareVersionFrom,
                     SoftwareVersionTo = task.SoftwareVersionTo,
@@ -179,7 +149,7 @@ namespace App.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> AuditTask()
         {
-            var vm = new TaskReportVM();
+            var vm = new TaskReportVm();
             InitializeTaskVm(vm);
             var query = await GetTaskQueryable(vm)
                 .Where(e => e.TSKStatus == CloudTaskStatus.Pending)
@@ -190,7 +160,7 @@ namespace App.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AuditTask(TaskReportVM vm)
+        public async Task<IActionResult> AuditTask(TaskReportVm vm)
         {
             var data = await GetTaskQueryable(vm)
                 .Where(e => e.TSKStatus == CloudTaskStatus.Pending)
@@ -250,7 +220,7 @@ namespace App.Web.Controllers
         #region TaskReportMethod
 
         [HttpGet]
-        public async Task<IActionResult> GetAllTask(TaskReportVM vm)
+        public async Task<IActionResult> GetAllTask(TaskReportVm vm)
         {
             InitializeTaskVm(vm);
             var query = await GetTaskQueryable(vm)
@@ -278,7 +248,7 @@ namespace App.Web.Controllers
                 .Where(e => e.RecStatus == Status.Active && e.Id == TaskID)
                 .FirstOrDefaultAsync() ?? throw new Exception("Task Not Found !");
 
-            var vm = new TaskTempVM();
+            var vm = new TaskTempVm();
 
             vm.Id = data.Id;
             vm.TaskTitle = data.TaskName;
@@ -307,10 +277,10 @@ namespace App.Web.Controllers
             vm.IsCanceled = data.TSKStatus == CloudTaskStatus.Canceled;
 
             if (data.CloudTaskLogs.Count <= 0) return View(vm);
-            
+
             foreach (var log in data.CloudTaskLogs)
             {
-                CloudTaskLogVM cloudTaskLogVm = new()
+                CloudTaskLogVm cloudTaskLogVm = new()
                 {
                     UserId = log.UserId,
                     UserName = log.User.FullName,
@@ -346,6 +316,7 @@ namespace App.Web.Controllers
                 {
                     throw new Exception("Not a valid Task to Proceed !");
                 }
+
                 pendingTask.ProccedById = _userProvider.GetUserId();
                 pendingTask.ProccedTime = DateTime.Now;
                 pendingTask.TSKStatus = CloudTaskStatus.InProgress;
@@ -434,7 +405,7 @@ namespace App.Web.Controllers
 
         #region private methods
 
-        private IQueryable<CloudTask.Entity.CloudTask> GetTaskQueryable(TaskReportVM reportVM)
+        private IQueryable<CloudTask.Entity.CloudTask> GetTaskQueryable(TaskReportVm reportVM)
         {
             var data = _cloudTaskRepo.GetQueryable()
                 .Include(e => e.TaskType)
@@ -479,12 +450,12 @@ namespace App.Web.Controllers
             return data;
         }
 
-        private List<TaskTempVM> PrepareTaskVms(List<CloudTask.Entity.CloudTask> data)
+        private List<TaskTempVm> PrepareTaskVms(List<CloudTask.Entity.CloudTask> data)
         {
-            var list = new List<TaskTempVM>();
+            var list = new List<TaskTempVm>();
             foreach (var item in data)
             {
-                var vm = new TaskTempVM();
+                var vm = new TaskTempVm();
                 vm.Id = item.Id;
                 vm.TaskTitle = item.TaskName;
                 vm.ClientId = item.ClientId;
@@ -514,7 +485,7 @@ namespace App.Web.Controllers
             return list;
         }
 
-        private void InitializeTaskVm(TaskReportVM vm)
+        private void InitializeTaskVm(TaskReportVm vm)
         {
             vm.taskTypes = _db.TaskTypes.ToList();
             vm.Users = _db.Users.Where(e => e.RecStatus == 'A').ToList();
@@ -597,6 +568,32 @@ namespace App.Web.Controllers
 
 
             await _telegramService.SendMessageAsync(message, TaskId);
+        }
+        
+        private CloudTaskCreateDto MapCloudTaskVmToCloudTaskCreateDto(CloudTaskVm vm)
+        {
+            var priority = Priority.Low;
+            if (vm.HighPriority)
+                priority = Priority.High;
+
+            CloudTaskCreateDto dto = new()
+            {
+                TaskName = vm.TaskTitle,
+                TaskTypeId = vm.TaskTypeId,
+                ClientId = vm.ClientId,
+                CloudUrl = vm.CloudURL ?? "",
+                Priority = priority,
+                TaskTime = vm.TaskTime,
+                SoftwareVersionFrom = vm.SoftwareVersionFrom ?? "Latest",
+                SoftwareVersionTo = vm.SoftwareVersionTo ?? "Latest",
+                IssueOnPreviousSoftware = vm.IssueOnPreviousSoftware ?? "",
+                Remarks = vm.Remarks ?? "",
+                LicDate = vm.LicDate ?? "",
+                RecAuditLog = "Task Created by " + _userProvider.GetUsername(),
+                RecById = Convert.ToInt32(_userProvider.GetUserId()),
+                TSKStatus = CloudTaskStatus.Pending
+            };
+            return dto;
         }
 
         #endregion private methods

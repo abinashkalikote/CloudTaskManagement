@@ -4,12 +4,13 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using App.Base.Constants;
-using App.Web.Providers.Interface;
 using System.Transactions;
 using System.Text.Json;
 using BC = BCrypt.Net.BCrypt;
 using App.Base.Entities;
+using App.Base.Providers.Interfaces;
 using App.Base.Repository.Interfaces;
+using App.Base.ValueObject;
 using App.Web.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,12 +20,12 @@ namespace App.Web.Controllers
     {
         private readonly AppDbContext _db;
 
-        private readonly IUserProvider _userProvider;
+        private readonly ILoginUserProvider _userProvider;
         private readonly IUserRepository _userRepository;
 
         public AccessController(
             AppDbContext db,
-            IUserProvider userProvider,
+            ILoginUserProvider userProvider,
             IUserRepository userRepository
         )
         {
@@ -36,12 +37,12 @@ namespace App.Web.Controllers
         [HttpGet]
         public IActionResult Login(string? returnUrl)
         {
-            if (User.Identity.IsAuthenticated)
+            if (User.Identity is { IsAuthenticated: true })
             {
                 return RedirectToAction("Index", "Home");
             }
 
-            if (!String.IsNullOrEmpty(returnUrl))
+            if (!string.IsNullOrEmpty(returnUrl))
             {
                 Response.Cookies.Append("returnUrl", returnUrl);
             }
@@ -62,12 +63,12 @@ namespace App.Web.Controllers
                 return View(loginVM);
             }
 
-            SessionUserVM vm = new()
+            SessionUser vm = new()
             {
-                Email = user.Email,
-                IsAdmin = user.IsAdmin,
                 UserId = user.Id,
-                UserName = user.FullName
+                UserName = user.FullName,
+                Email = user?.Email,
+                IsAdmin = user.IsAdmin
             };
 
             var data = JsonSerializer.Serialize(vm);

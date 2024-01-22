@@ -5,9 +5,10 @@ namespace App.CloudTask.Dto;
 public class CloudTaskCreateDto
 {
     public int Id { get; set; }
+    public string TaskName { get; set; }
     public int TaskTypeId { get; set; }
 
-    public int ClientId { get; set; }
+    public long ClientId { get; set; }
     public char? Priority { get; set; } = 'Y';
     public string TaskTime { get; set; }
     public string? CloudUrl { get; set; }
@@ -33,6 +34,4 @@ public class CloudTaskCreateDto
     public int RecById { get; set; }
     public int? ProccedById { get; set; }
     public int? CompletedById { get; set; }
-
-    public int? TelegramMessageId { get; set; }
 }

@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using App.Base.Entities;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace App.Web.ViewModel
+namespace App.Web.ViewModel.CloudTask
 {
-    public class TaskVM
+    public class CloudTaskVm
     {
         public long? Id { get; set; }
 
@@ -27,7 +27,7 @@ namespace App.Web.ViewModel
         public string? CloudURL { get; set; }
 
         [DisplayName("High Priority ?")]
-        public string HighPriority { get; set; }
+        public bool HighPriority { get; set; }
 
         [DisplayName("Task Time")]
         public string TaskTime { get; set; }
@@ -77,10 +77,10 @@ namespace App.Web.ViewModel
         public SelectList GetClientList() => new SelectList(clients, nameof(Base.Entities.AppClient.Id), nameof(Base.Entities.AppClient.ClientName), ClientId);
 
 
-        public SelectList TaskTimeList() => new SelectList(new List<TaskTimeVM>()
+        public SelectList TaskTimeList() => new SelectList(new List<TaskTimeVm>()
         {
-            new TaskTimeVM(){TaskTimeName="After Office hours"},
-            new TaskTimeVM(){TaskTimeName="Immediately"},
-        }, nameof(TaskTimeVM.TaskTimeName), nameof(TaskTimeVM.TaskTimeName), TaskTime);
+            new(){TaskTimeName="After Office hours"},
+            new(){TaskTimeName="Immediately"},
+        }, nameof(TaskTimeVm.TaskTimeName), nameof(TaskTimeVm.TaskTimeName), TaskTime);
     }
 }

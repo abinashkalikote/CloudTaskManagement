@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace App.Web.ViewModel
+namespace App.Web.ViewModel.CloudTask
 {
-    public class TaskTempVM
+    public class TaskTempVm
     {
         public long? Id { get; set; }
 
@@ -75,6 +75,6 @@ namespace App.Web.ViewModel
         public string? CompletedBy { get; set; }
         public DateTime? TimeSpan { get; set; }
 
-        public List<CloudTaskLogVM>? cloudTaskLogs { get; set; } = new List<CloudTaskLogVM>();
+        public List<CloudTaskLogVm>? cloudTaskLogs { get; set; } = new List<CloudTaskLogVm>();
     }
 }

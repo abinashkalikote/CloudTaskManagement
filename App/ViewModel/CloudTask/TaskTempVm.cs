@@ -19,7 +19,7 @@ namespace App.Web.ViewModel.CloudTask
 
         [Required]
         [DisplayName("Client Name")]
-        public long ClientId { get; set; }
+        public string ClientName { get; set; }
 
         [DisplayName("Cloud URL")]
         public string? CloudURL { get; set; }

@@ -224,6 +224,7 @@ namespace App.Web.Controllers
         {
             InitializeTaskVm(vm);
             var query = await GetTaskQueryable(vm)
+                .Include(e => e.Client)
                 .OrderByDescending(e => e.RecDate)
                 .ThenBy(e => e.ProccedTime).ToListAsync();
 
@@ -238,21 +239,21 @@ namespace App.Web.Controllers
                 throw new Exception("Task Not Found !");
 
             var data = await _cloudTaskRepo.GetQueryable()
+                .Where(e => e.RecStatus == Status.Active && e.Id == TaskID)
                 .Include(e => e.TaskType)
-                .Include(e => e.ClientId)
+                .Include(e => e.Client)
                 .Include(e => e.RecBy)
                 .Include(e => e.ProccedBy)
                 .Include(e => e.CompletedBy)
                 .Include(e => e.CloudTaskLogs)
                 .ThenInclude(cl => cl.User)
-                .Where(e => e.RecStatus == Status.Active && e.Id == TaskID)
                 .FirstOrDefaultAsync() ?? throw new Exception("Task Not Found !");
 
             var vm = new TaskTempVm();
 
             vm.Id = data.Id;
             vm.TaskTitle = data.TaskName;
-            vm.ClientId = data.ClientId;
+            vm.ClientName = data.Client.ClientName;
             vm.CloudURL = data.CloudUrl;
             vm.TaskTypeId = data.TaskType.Id;
             vm.TaskTypeName = data.TaskType != null ? data.TaskType.TaskTypeName : "Not Declared";
@@ -458,7 +459,7 @@ namespace App.Web.Controllers
                 var vm = new TaskTempVm();
                 vm.Id = item.Id;
                 vm.TaskTitle = item.TaskName;
-                vm.ClientId = item.ClientId;
+                vm.ClientName = item.Client.ClientName;
                 vm.CloudURL = item.CloudUrl;
                 vm.TaskTypeName = item.TaskType != null ? item.TaskType.TaskTypeName : "Not Declared";
                 vm.TaskTime = item.TaskTime;

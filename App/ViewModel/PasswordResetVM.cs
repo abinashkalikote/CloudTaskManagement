@@ -6,7 +6,7 @@ namespace App.Web.ViewModel
     public class PasswordResetVM
     {
         [Required]
-        public int UserId { get; set; }
+        public long UserId { get; set; }
 
         [DisplayName("Full Name")]
         public string FullName { get; set; }

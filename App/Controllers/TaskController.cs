@@ -297,9 +297,9 @@ namespace App.Web.Controllers
         #endregion TaskReportMethod
 
 
-        public async Task<IActionResult> ProccedTask(long? TaskID)
+        public async Task<IActionResult> ProccedTask(long? taskId)
         {
-            if (TaskID == null)
+            if (taskId == null)
             {
                 TempData["error"] = "Something Went Wrong !";
                 return RedirectToAction(nameof(GetAllTask));
@@ -311,12 +311,7 @@ namespace App.Web.Controllers
             {
                 var pendingTask =
                     await _cloudTaskRepo.GetFirstOrDefaultAsync(e =>
-                        e.Id == TaskID && e.TSKStatus == CloudTaskStatus.Pending);
-
-                if (pendingTask == null)
-                {
-                    throw new Exception("Not a valid Task to Proceed !");
-                }
+                        e.Id == taskId && e.TSKStatus == CloudTaskStatus.Pending) ?? throw new Exception("Not a valid Task to Proceed !");
 
                 pendingTask.ProccedById = _userProvider.GetUserId();
                 pendingTask.ProccedTime = DateTime.Now;
@@ -328,13 +323,13 @@ namespace App.Web.Controllers
                 {
                     Remarks = "",
                     CloudTaskStatus = CloudTaskStatus.InProgress,
-                    UserId = Convert.ToInt32(_userProvider.GetUserId())
+                    UserId = _userProvider.GetUserId()
                 };
 
                 pendingTask.CloudTaskLogs.Add(cloudTaskLog);
 
                 _uow.Update(pendingTask);
-                await _db.SaveChangesAsync();
+                await _uow.CommitAsync();
 
                 //Sending Message To Telegram
                 string? message = "### Action on it : <b>" + _userProvider.GetUsername() + "</b>  . ###";
@@ -343,7 +338,7 @@ namespace App.Web.Controllers
 
 
                 TempData["success"] = "Task has been Procced Successfully !";
-                return RedirectToAction("TaskDetails", new { TaskID = TaskID });
+                return RedirectToAction("TaskDetails", new { TaskID = taskId });
             }
             catch (Exception e)
             {
@@ -385,7 +380,7 @@ namespace App.Web.Controllers
                 workingTask.CloudTaskLogs.Add(cloudTaskLog);
 
                 _uow.Update(workingTask);
-                await _db.SaveChangesAsync();
+                await _uow.CommitAsync();
 
                 //Sending Message To Telegram
                 string? message = "### ✅ Done :  <b>" + _userProvider.GetUsername() + "</b> ###";
@@ -603,11 +598,11 @@ namespace App.Web.Controllers
         #region TaskAPI
 
         [HttpGet]
-        public async Task<IActionResult> GetTask(int Id)
+        public async Task<IActionResult> GetTask(int id)
         {
             try
             {
-                var data = await _cloudTaskRepo.GetItemAsync(e => e.Id == Id && e.RecStatus == Status.Active);
+                var data = await _cloudTaskRepo.GetItemAsync(e => e.Id == id && e.RecStatus == Status.Active);
 
                 var finalData = new
                 {

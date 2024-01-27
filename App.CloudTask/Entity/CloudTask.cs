@@ -40,13 +40,13 @@ public class CloudTask
 
 
     public virtual User RecBy { get; set; }
-    public int RecById { get; set; }
+    public long RecById { get; set; }
 
     public virtual User? ProccedBy { get; set; }
-    public int? ProccedById { get; set; }
+    public long? ProccedById { get; set; }
 
     public virtual User? CompletedBy { get; set; }
-    public int? CompletedById { get; set; }
+    public long? CompletedById { get; set; }
 
     public int? TelegramMessageId { get; set; }
 

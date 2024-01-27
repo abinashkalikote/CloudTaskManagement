@@ -5,7 +5,7 @@ namespace App.Web.ViewModel
 {
     public class UserVM
     {
-        public int? Id { get; set; }
+        public long? Id { get; set; }
 
         [Required]
         [DisplayName("Full Name")]

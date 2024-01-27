@@ -1,4 +1,5 @@
 ﻿using App.Base.Entities;
+using App.Base.Extensions;
 using App.Web.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -49,7 +50,7 @@ namespace App.Web.Controllers
 
         public List<User> UsersData = new()
         {
-            new User { FullName="Office", Email="info@prathamit.com", IsNewPassword='N', Password=BC.EnhancedHashPassword("test"), IsAdmin='Y', RecBy="AutoAdmin" }
+            new User { FullName="Office", Email="info@prathamit.com", IsNewPassword='N', Password="test".Hash(), IsAdmin='Y', RecBy="AutoAdmin" }
         };
     }
 }

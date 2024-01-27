@@ -5,7 +5,7 @@ namespace App.Base.Providers.Interfaces;
 public interface ILoginUserProvider
 {
     public string? GetUsername();
-    public int? GetUserId();
+    public long GetUserId();
     public bool IsAdmin();
     public SessionUser? GetSessionUser();
 }

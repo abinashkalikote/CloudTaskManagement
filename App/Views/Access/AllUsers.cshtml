@@ -39,14 +39,14 @@
                                 {
                                     if (item?.IsActive == true)
                                     {
-                                        <a asp-action="ActiveInactiveUser" asp-controller="Access" asp-route-Id="@item.Id" class="btn btn-warning btn-xs">
+                                        <a asp-action="ActiveInactiveUser" asp-controller="Access" asp-route-id="@item.Id" class="btn btn-warning btn-xs">
                                             <i class="fa fa-ban"></i> 
                                             Deactivate
                                         </a>
                                     }
                                     else
                                     {
-                                        <a asp-action="ActiveInactiveUser" asp-controller="Access" asp-route-Id="@item.Id" class="btn btn-primary btn-xs">
+                                        <a asp-action="ActiveInactiveUser" asp-controller="Access" asp-route-id="@item.Id" class="btn btn-primary btn-xs">
                                             <i class="fa fa-check-circle"></i> 
                                             Activate
                                         </a>

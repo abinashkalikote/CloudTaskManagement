@@ -11,9 +11,9 @@
             <hr class="m-1" />
 
             @* <div><b>Task 1 :</b></div> *@
-            <div><b>To do :</b> @Model.TaskTypeName </div>
+            <div><b>To do :</b> @Model.TaskTypeName </div>
             <div>
-                <b>Software Version :</b>  <b>From</b> @Model.SoftwareVersionFrom <b>To </b>@Model.SoftwareVersionTo
+                <b>Software Version :</b>&nbsp; <b>From</b> @Model.SoftwareVersionFrom <b>To </b>@Model.SoftwareVersionTo
             </div>
             <div>
                 @if (string.IsNullOrEmpty(Model.HighPriority))
@@ -73,7 +73,7 @@
             </div>
             <div>
                 <b>
-                    PAN No :
+                    PAN No : @Model.PANNo
                 </b>
                 <button type="button" class="btn btn-primary btn-xs" style="font-size: 10px !important;" ctm-copy="copy" ctm-copy-for="copy-PANNo" title="Copy PAN No."><i class="fa-solid fa-copy"></i></button>
                 <span id="copy-PANNo">
@@ -83,7 +83,7 @@
             </div>
             <div>
                 <b>
-                    Licesnse Date :
+                    License Date :
                 </b>   @Model.LicDate
             </div>
         </div>

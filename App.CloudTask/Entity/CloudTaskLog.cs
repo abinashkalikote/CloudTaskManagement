@@ -9,10 +9,10 @@ namespace App.CloudTask.Entity
         public int Id { get; set; }
 
         public virtual CloudTaskLog? CloudTask { get; set; }
-        public int CloudTaskId { get; init; }
+        public long CloudTaskId { get; init; }
 
         public virtual User? User { get; set; }
-        public int UserId { get; set; }
+        public long UserId { get; set; }
 
         public string CloudTaskStatus { get; set; }
 

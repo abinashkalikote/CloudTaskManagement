@@ -13,6 +13,6 @@ namespace App.Base.Entities
         public DateTime RecDate { get; set; } = DateTime.Now;
 
         public virtual User RecBy { get; set; }
-        public int RecById { get; set; }
+        public long RecById { get; set; }
     }
 }

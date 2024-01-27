@@ -20,10 +20,10 @@ public class LoginUserProvider : ILoginUserProvider
     }
 
 
-    public int? GetUserId()
+    public long GetUserId()
     {
         var sessionUser = GetSessionUser();
-        return sessionUser?.UserId;
+        return sessionUser.UserId;
     }
 
     public bool IsAdmin()

@@ -7,11 +7,9 @@ namespace App.Web
     {
         public static void HttpPipelineConfiguration(this WebApplication app)
         {
-
-            app.Services.CreateScope().ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
-
             if (app.Environment.IsDevelopment())
             {
+                app.Services.CreateScope().ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
                 app.UseDeveloperExceptionPage();
             }
             else

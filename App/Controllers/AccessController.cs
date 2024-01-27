@@ -125,7 +125,6 @@ namespace App.Web.Controllers
             if (_userProvider.IsAdmin()) return View();
             TempData["error"] = "Permission Denied ! \\n You don't have permission to Access : " + Request.Path;
             return RedirectToAction("Index", "Home");
-
         }
 
         [HttpPost]
@@ -138,7 +137,7 @@ namespace App.Web.Controllers
             }
 
             if (!ModelState.IsValid) return View(vm);
-            
+
             if (!await IsUniqueEmail(vm.Email))
             {
                 ModelState.AddModelError("Email", "Email is already Used !");
@@ -277,49 +276,42 @@ namespace App.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ChangePassword(ChangePasswordVM vm)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                if (!NewAndConfirmPasswordSame(vm.NewPassword, vm.ConfirmPassword))
-                {
-                    ModelState.AddModelError("ConfirmPassword", "Password & Confirm Password not matched !");
-                    return View();
-                }
-
-
-                using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-                try
-                {
-                    var user = await _db.Users.FirstOrDefaultAsync(e => e.Id == _userProvider.GetUserId());
-
-                    if (user != null)
-                    {
-                        if (!VerifyPassword(vm.OldPassword, user.Password))
-                        {
-                            ModelState.AddModelError("OldPassword", "Recent Password not mached !");
-                            return View();
-                        }
-
-
-                        user.Password = BC.EnhancedHashPassword(vm.NewPassword);
-                        _db.Users.Update(user);
-                        await _db.SaveChangesAsync();
-                        scope.Complete();
-
-                        TempData["success"] = "Password Change Succssfully !";
-                        return RedirectToAction("Logout", "Home");
-                    }
-
-                    scope.Dispose();
-                    return RedirectToAction(nameof(ChangePassword));
-                }
-                catch (Exception ex)
-                {
-                    scope.Dispose();
-                    throw new Exception("Something Went Wrong !\n" + ex.Message);
-                }
+                return View(vm);
             }
 
-            return View(vm);
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            try
+            {
+                var user = await _db.Users.FirstOrDefaultAsync(e => e.Id == _userProvider.GetUserId());
+
+                if (user != null)
+                {
+                    if (!VerifyPassword(vm.OldPassword, user.Password))
+                    {
+                        ModelState.AddModelError("OldPassword", "Recent Password not mached !");
+                        return View();
+                    }
+
+
+                    user.Password = BC.EnhancedHashPassword(vm.NewPassword);
+                    _db.Users.Update(user);
+                    await _db.SaveChangesAsync();
+                    scope.Complete();
+
+                    TempData["success"] = "Password Change Succssfully !";
+                    return RedirectToAction("Logout", "Home");
+                }
+
+                scope.Dispose();
+                return RedirectToAction(nameof(ChangePassword));
+            }
+            catch (Exception ex)
+            {
+                scope.Dispose();
+                throw new Exception("Something Went Wrong !\n" + ex.Message);
+            }
         }
 
         #endregion ChangePassword
@@ -338,12 +330,7 @@ namespace App.Web.Controllers
             return BC.EnhancedVerify(Password, HashPassword);
         }
 
-        private bool NewAndConfirmPasswordSame(string NewPassword, string ConfirmPassword)
-        {
-            return NewPassword == ConfirmPassword;
-        }
-
-        private bool ValidateUserCredential(Controller controller,LoginVM loginVM, User? user)
+        private bool ValidateUserCredential(Controller controller, LoginVM loginVM, User? user)
         {
             if (user == null)
             {
@@ -357,8 +344,14 @@ namespace App.Web.Controllers
                 return false;
             }
 
-            if (!VerifyPassword(loginVM.Password, user.Password)) return false;
-            controller.TempData["error"] = "Password Not Matched !";
+            if (!VerifyPassword(loginVM.Password, user.Password))
+            {
+                controller.TempData["error"] = "Password Not Matched !";
+                return false;
+            }
+
+            ;
+
             return true;
         }
 

@@ -81,7 +81,7 @@
                                 <td>@Convert.ToDateTime(item.RecDate).Humanize()</td>
                                 <td>@item.RecDate</td>
                                 <td>
-                                    <a asp-action="DeleteTask" asp-controller="Task" asp-route-TaskID="@item.Id" class="btn btn-danger btn-sm me-1 TaskBtn">Revoke</a>
+                                    <a asp-action="DeleteTask" asp-controller="Task" asp-route-taskId="@item.Id" class="btn btn-danger btn-sm me-1 TaskBtn">Revoke</a>
 
                                     <button type="button" data-toggle="modal" data-target="#TaskModal" data-TaskId="@item?.Id" class="btn btn-sm btn-primary peekBtn">
                                         Peek <i class="fa fa-eye"></i>

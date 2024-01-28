@@ -152,6 +152,7 @@ namespace App.Web.Controllers
             var vm = new TaskReportVm();
             InitializeTaskVm(vm);
             var query = await GetTaskQueryable(vm)
+                .Include(e => e.Client)
                 .Where(e => e.TSKStatus == CloudTaskStatus.Pending)
                 .ToListAsync();
 
@@ -163,6 +164,7 @@ namespace App.Web.Controllers
         public async Task<IActionResult> AuditTask(TaskReportVm vm)
         {
             var data = await GetTaskQueryable(vm)
+                .Include(e => e.Client)
                 .Where(e => e.TSKStatus == CloudTaskStatus.Pending)
                 .ToListAsync();
             return RedirectToAction(nameof(AuditTask));
@@ -170,15 +172,15 @@ namespace App.Web.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> DeleteTask(long? TaskID)
+        public async Task<IActionResult> DeleteTask(long? taskId)
         {
-            if (TaskID == null)
+            if (taskId == null)
             {
                 return RedirectToAction(nameof(AuditTask));
             }
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-            var task = await _cloudTaskRepo.FindAsync(TaskID ?? 0);
+            var task = await _cloudTaskRepo.GetFirstOrDefaultAsync(e => e.Id == taskId);
             try
             {
                 if (task == null)
@@ -198,7 +200,7 @@ namespace App.Web.Controllers
                 task.CloudTaskLogs.Add(cloudTaskLog);
 
                 _uow.Update(task);
-                await _db.SaveChangesAsync();
+                await _uow.CommitAsync();
 
                 //Sending Message To Telegram
                 string? message = "### Deleted :  <b>" + CloudTaskStatus.Canceled + "</b> ###";

@@ -62,7 +62,7 @@ public class CloudTaskManager : ICloudTaskManager
                      $"<b>Software Version :</b> <b>From</b> {cloudTask.SoftwareVersionFrom} <b>To</b> {cloudTask.SoftwareVersionTo}\r\n" +
                      pri + $"<b>Update Time :</b> {cloudTask.TaskTime} \r\n" +
                      $"------------------------------------------------------\r\n" +
-                     $"<b>Client :</b> {cloudTask.ClientId}\r\n" + $"<b>Cloud URL :</b> {cloudTask.CloudUrl}\r\n" +
+                     $"<b>Client :</b> {cloudTask.ClientId}\r\n" + $"<b>Cloud URL :</b> {cloudTask.Client?.Link}\r\n" +
                      $"<b>Issue :</b> {cloudTask.IssueOnPreviousSoftware} \r\n\r\n\r\n" +
                      $"<b>Task Link</b> : <a href=\"{baseUrl}\">{baseUrl}</a> \r\n\r\n" + taskCreatedBy,
                 2 => $"<b>Date:</b> {@Convert.ToDateTime(cloudTask.RecDate).ToNepaliDate()}\r\n" +
@@ -78,7 +78,7 @@ public class CloudTaskManager : ICloudTaskManager
                      $"<b>To do :</b> {cloudTask.TaskName}\r\n" + pri +
                      $"<b>Update Time :</b> {cloudTask.TaskTime} \r\n" +
                      $"------------------------------------------------------\r\n" +
-                     $"<b>Client :</b> {cloudTask.ClientId}\r\n" + $"<b>Cloud URL :</b> {cloudTask.CloudUrl}\r\n\r\n" +
+                     $"<b>Client :</b> {cloudTask.ClientId}\r\n" + $"<b>Cloud URL :</b> {cloudTask.Client?.Link}\r\n\r\n" +
                      $"<b>Task Link</b> : <a href='\"{baseUrl}\">{baseUrl}</a> \r\n\r\n" + taskCreatedBy,
                 _ => ""
             };

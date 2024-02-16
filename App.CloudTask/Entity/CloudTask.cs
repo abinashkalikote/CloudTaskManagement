@@ -18,7 +18,6 @@ public class CloudTask
     
     public char? Priority { get; set; } = 'Y';
     public string TaskTime { get; set; }
-    public string? CloudUrl { get; set; }
     public string? IssueOnPreviousSoftware { get; set; }
     public string? SoftwareVersionFrom { get; set; }
     public string? SoftwareVersionTo { get; set; }

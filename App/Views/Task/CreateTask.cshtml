@@ -33,30 +33,30 @@
                 </div>
 
 
-                <div class="col-12 mb-2">
-                    <label asp-for="CloudURL"></label>
-                    <input asp-for="CloudURL" class="form-control form-control-border" placeholder="Cloud URL" required />
-                    <span class="text-danger" asp-validation-for="CloudURL"></span>
-                </div>
+                @* <div class="col-12 mb-2"> *@
+                @*     <label asp-for="CloudURL"></label> *@
+                @*     <input asp-for="CloudURL" class="form-control form-control-border" placeholder="Cloud URL" required /> *@
+                @*     <span class="text-danger" asp-validation-for="CloudURL"></span> *@
+                @* </div> *@
 
 
                 @* In case of New Client *@
                 
-                <div class="col-12 mb-2" style="display: none;">
-                    <label asp-for="PANNo"></label>
-                    <input asp-for="PANNo" class="form-control form-control-border" placeholder="PAN No." />
-                    <span class="text-danger" asp-validation-for="PANNo"></span>
-                </div>
+                @* <div class="col-12 mb-2" style="display: none;"> *@
+                @*     <label asp-for="PANNo"></label> *@
+                @*     <input asp-for="PANNo" class="form-control form-control-border" placeholder="PAN No." /> *@
+                @*     <span class="text-danger" asp-validation-for="PANNo"></span> *@
+                @* </div> *@
                 <div class="col-12 mb-2" style="display: none;">
                     <label asp-for="LicDate"></label>
                     <input asp-for="LicDate" class="form-control form-control-border" placeholder="License Date" />
                     <span class="text-danger" asp-validation-for="LicDate"></span>
                 </div>
-                <div class="col-12 mb-2" style="display: none;">
-                    <label asp-for="ClientAddress"></label>
-                    <input asp-for="ClientAddress" class="form-control form-control-border" placeholder="Address" />
-                    <span class="text-danger" asp-validation-for="ClientAddress"></span>
-                </div>
+                @* <div class="col-12 mb-2" style="display: none;"> *@
+                @*     <label asp-for="ClientAddress"></label> *@
+                @*     <input asp-for="ClientAddress" class="form-control form-control-border" placeholder="Address" /> *@
+                @*     <span class="text-danger" asp-validation-for="ClientAddress"></span> *@
+                @* </div> *@
 
                 @*  In case of New Client *@
 
@@ -123,5 +123,17 @@
 
 @section Scripts{
     <script src="~/js/createTask.js"></script>
-    <partial name="_ValidationScriptsPartial" />
+    <partial name="_ValidationScriptsPartial"/>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function (){
+            let elms = {
+                $TaskTypeId : $('#TaskTypeId'),
+                $ClientId : $('#ClientId'),
+                $CloudURL : $('#CloudURL'),
+                $PANNo : $('#PANNo'),
+                $ClientAddress : $('#ClientAddress'),
+            }
+        })
+    </script>
 }

@@ -51,7 +51,6 @@ public class CloudTaskService : ICloudTaskService
             ClientId = dto.ClientId,
             Priority = dto.Priority,
             TaskTime = dto.TaskTime,
-            CloudUrl = dto.CloudUrl,
             IssueOnPreviousSoftware = dto.IssueOnPreviousSoftware,
             SoftwareVersionFrom = dto.SoftwareVersionFrom,
             SoftwareVersionTo = dto.SoftwareVersionTo,

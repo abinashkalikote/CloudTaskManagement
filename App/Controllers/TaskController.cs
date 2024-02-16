@@ -31,6 +31,7 @@ namespace App.Web.Controllers
         private readonly IUow _uow;
         private readonly ICloudTaskRepo _cloudTaskRepo;
         private readonly ICloudTaskManager _cloudTaskManager;
+        private readonly ILogger<TaskController> _logger;
 
         public TaskController(
             AppDbContext db,
@@ -40,8 +41,8 @@ namespace App.Web.Controllers
             IAppClientRepo appClientRepo,
             IUow uow,
             ICloudTaskRepo cloudTaskRepo,
-            ICloudTaskManager cloudTaskManager
-        )
+            ICloudTaskManager cloudTaskManager,
+            ILogger<TaskController> logger)
         {
             _db = db;
             _userProvider = userProvider;
@@ -50,6 +51,7 @@ namespace App.Web.Controllers
             _uow = uow;
             _cloudTaskRepo = cloudTaskRepo;
             _cloudTaskManager = cloudTaskManager;
+            _logger = logger;
             _httpContext = httpContextAccessor.HttpContext;
         }
 
@@ -58,8 +60,8 @@ namespace App.Web.Controllers
         {
             return View();
         }
-        
-        
+
+
         public async Task<IActionResult> CreateTask()
         {
             CloudTaskVm vm = new()
@@ -98,8 +100,6 @@ namespace App.Web.Controllers
             }
         }
 
-        
-
 
         [HttpGet]
         public async Task<IActionResult> EditTask(long? TaskID)
@@ -126,7 +126,7 @@ namespace App.Web.Controllers
                     TaskTitle = task.TaskName,
                     TaskTypeId = task.TaskTypeId,
                     ClientId = task.ClientId,
-                    CloudURL = task.CloudUrl,
+                    CloudURL = task.Client?.Link,
                     HighPriority = task.Priority == Priority.High,
                     TaskTime = task.TaskTime,
                     SoftwareVersionFrom = task.SoftwareVersionFrom,
@@ -256,7 +256,7 @@ namespace App.Web.Controllers
             vm.Id = data.Id;
             vm.TaskTitle = data.TaskName;
             vm.ClientName = data.Client.ClientName;
-            vm.CloudURL = data.CloudUrl;
+            vm.CloudURL = data.Client.Link;
             vm.TaskTypeId = data.TaskType.Id;
             vm.TaskTypeName = data.TaskType != null ? data.TaskType.TaskTypeName : "Not Declared";
             vm.TaskTime = data.TaskTime;
@@ -313,7 +313,8 @@ namespace App.Web.Controllers
             {
                 var pendingTask =
                     await _cloudTaskRepo.GetFirstOrDefaultAsync(e =>
-                        e.Id == taskId && e.TSKStatus == CloudTaskStatus.Pending) ?? throw new Exception("Not a valid Task to Proceed !");
+                        e.Id == taskId && e.TSKStatus == CloudTaskStatus.Pending) ??
+                    throw new Exception("Not a valid Task to Proceed !");
 
                 pendingTask.ProccedById = _userProvider.GetUserId();
                 pendingTask.ProccedTime = DateTime.Now;
@@ -457,7 +458,7 @@ namespace App.Web.Controllers
                 vm.Id = item.Id;
                 vm.TaskTitle = item.TaskName;
                 vm.ClientName = item.Client.ClientName;
-                vm.CloudURL = item.CloudUrl;
+                vm.CloudURL = item.Client.Link;
                 vm.TaskTypeName = item.TaskType != null ? item.TaskType.TaskTypeName : "Not Declared";
                 vm.TaskTime = item.TaskTime;
                 vm.HighPriority = item.Priority == 'Y' ? "Yes" : "No";
@@ -529,7 +530,7 @@ namespace App.Web.Controllers
                     $"<b>Update Time :</b> {cloudTask.TaskTime} \r\n" +
                     $"------------------------------------------------------\r\n" +
                     $"<b>Client :</b> {cloudTask.ClientId}\r\n" +
-                    $"<b>Cloud URL :</b> {cloudTask.CloudUrl}\r\n" +
+                    $"<b>Cloud URL :</b> {cloudTask.Client.Link}\r\n" +
                     $"<b>Issue :</b> {cloudTask.IssueOnPreviousSoftware} \r\n\r\n\r\n" +
                     $"<b>Task Link</b> : <a href=\"{baseUrl}\">{baseUrl}</a> \r\n\r\n" +
                     TaskCreatedBy;
@@ -559,7 +560,7 @@ namespace App.Web.Controllers
                     $"<b>Update Time :</b> {cloudTask.TaskTime} \r\n" +
                     $"------------------------------------------------------\r\n" +
                     $"<b>Client :</b> {cloudTask.ClientId}\r\n" +
-                    $"<b>Cloud URL :</b> {cloudTask.CloudUrl}\r\n\r\n" +
+                    $"<b>Cloud URL :</b> {cloudTask.Client.Link}\r\n\r\n" +
                     $"<b>Task Link</b> : <a href='\"{baseUrl}\">{baseUrl}</a> \r\n\r\n" +
                     TaskCreatedBy;
             }
@@ -567,7 +568,7 @@ namespace App.Web.Controllers
 
             await _telegramService.SendMessageAsync(message, TaskId);
         }
-        
+
         private CloudTaskCreateDto MapCloudTaskVmToCloudTaskCreateDto(CloudTaskVm vm)
         {
             var priority = Priority.Low;
@@ -579,7 +580,6 @@ namespace App.Web.Controllers
                 TaskName = vm.TaskTitle,
                 TaskTypeId = vm.TaskTypeId,
                 ClientId = vm.ClientId,
-                CloudUrl = vm.CloudURL ?? "",
                 Priority = priority,
                 TaskTime = vm.TaskTime,
                 SoftwareVersionFrom = vm.SoftwareVersionFrom ?? "Latest",
@@ -600,34 +600,47 @@ namespace App.Web.Controllers
         #region TaskAPI
 
         [HttpGet]
-        public async Task<IActionResult> GetTask(int id)
+        public async Task<IActionResult> GetTaskAsync(int id)
         {
             try
             {
-                var data = await _cloudTaskRepo.GetItemAsync(e => e.Id == id && e.RecStatus == Status.Active);
+                // Retrieve task data by ID
+                var task = await _cloudTaskRepo.GetQueryable()
+                    .Include(e => e.Client)
+                    .FirstOrDefaultAsync(e => e.Id == id && e.RecStatus == Status.Active);
 
-                var finalData = new
+                if (task == null)
                 {
-                    ClientName = data.ClientId,
-                    TaskTitle = data.TaskName,
-                    CloudURL = data.CloudUrl,
-                    SoftwareVersionFrom = data.SoftwareVersionFrom ?? "",
-                    SoftwareVersionTo = data.SoftwareVersionTo ?? "",
-                    IssueOnPreviousVersion = data.IssueOnPreviousSoftware ?? "",
-                    CreatedDate = data.RecDate.Date,
-                    CreatedBy = data.RecBy.FullName,
-                    data.Remarks
+                    return NotFound(); // Return 404 Not Found if task with given ID is not found
+                }
+
+                // Prepare the response object
+                var taskDetails = new
+                {
+                    ClientName = task.Client?.ClientName,
+                    TaskTitle = task.TaskName,
+                    CloudURL = task.Client?.Link,
+                    SoftwareVersionFrom = task.SoftwareVersionFrom ?? "",
+                    SoftwareVersionTo = task.SoftwareVersionTo ?? "",
+                    IssueOnPreviousVersion = task.IssueOnPreviousSoftware ?? "",
+                    CreatedDate = task.RecDate.Date,
+                    CreatedBy = task.RecBy?.FullName,
+                    Remarks = task.Remarks
                 };
-                return Ok(new
-                {
-                    finalData
-                });
+
+                // Return successful response with task details
+                return Ok(taskDetails);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return BadRequest();
+                // Log the exception for debugging purposes
+                _logger.LogError(ex, "An error occurred while fetching task details.");
+
+                // Return a generic error response
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
             }
         }
+
 
         #endregion TaskAPI
     }

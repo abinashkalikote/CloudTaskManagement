@@ -182,7 +182,7 @@
                     fetch(`/Task/GetTask/${TaskId}`)
                         .then(response => response.json())
                         .then(data => {
-                            let task = data.data[0];
+                            let task = data;
                             $("#taskTitle").text(task.taskTitle);
                             $("#clientName").text(task.clientName);
                             $("#cloudURL").text(task.cloudURL);
